@@ -15,7 +15,7 @@ if !ghcmod#check_version(s:required_version)
 endif
 
 if !exists('g:ghcmod_type_highlight')
-  let g:ghcmod_type_highlight = 'PmenuSel'
+  let g:ghcmod_type_highlight = 'Search'
 endif
 
 command! -nargs=0 GhcModType echo ghcmod#type()[1]

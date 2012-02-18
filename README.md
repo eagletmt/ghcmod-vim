@@ -33,7 +33,7 @@ If you type `:GhcModType` multiple times, the sub-expression changes.
 
 Type `:GhcModTypeClear` to clear sub-expression's highlight.
 
-Sub-expressions are highlighted as `PmenuSel` by default.
+Sub-expressions are highlighted as `Search` by default.
 You can customize it by setting `g:ghcmod_type_highlight` .
 
 ~~~vim
