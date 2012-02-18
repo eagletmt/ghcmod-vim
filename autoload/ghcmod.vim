@@ -1,4 +1,7 @@
 function! ghcmod#type()
+  if &l:modified
+    call ghcmod#print_warning('ghcmod#type: the buffer has been modified but not written')
+  endif
   let l:line = line('.')
   let l:col = col('.')
   let l:file = expand('%:p')
@@ -67,6 +70,12 @@ endfunction
 
 function! ghcmod#print_error(msg)
   echohl ErrorMsg
+  echomsg a:msg
+  echohl None
+endfunction
+
+function! ghcmod#print_warning(msg)
+  echohl WarningMsg
   echomsg a:msg
   echohl None
 endfunction
