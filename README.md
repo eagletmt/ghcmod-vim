@@ -6,7 +6,7 @@ Happy Haskell programming on Vim, powered by [ghc-mod](https://github.com/kazu-y
 - Displaying the type of sub-expressions (`ghc-mod type`)
 - Displaying error/warning messages and their locations (compiler plugins for `ghc-mod check` and `ghc-mod lint`)
 
-Completions are support by another plugin.
+Completions are supported by another plugin.
 See [neco-ghc](https://github.com/ujihisa/neco-ghc) .
 
 ## Requirements
