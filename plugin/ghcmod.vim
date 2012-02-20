@@ -20,3 +20,16 @@ endif
 
 command! -nargs=0 GhcModType echo ghcmod#type()[1]
 command! -nargs=0 GhcModTypeClear call ghcmod#type_clear()
+command! -nargs=0 GhcModCheck call s:make('ghcmod_check')
+command! -nargs=0 GhcModLint call s:make('ghcmod_lint')
+
+function! s:make(compiler)
+  if exists('b:current_compiler')
+    let l:save_compiler = b:current_compiler
+  endif
+  execute 'compiler' a:compiler
+  make
+  if exists('l:save_compiler')
+    execute 'compiler' l:save_compiler
+  endif
+endfunction
