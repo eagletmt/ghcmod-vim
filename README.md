@@ -31,6 +31,11 @@ If you type `:GhcModType` multiple times, the sub-expression changes.
 4. ![type4](http://cache.gyazo.com/ece85e8a1250bebfd13208a63679a3db.png)
 5. ![type5](http://cache.gyazo.com/71e4c79f9b42faaaf81b4e3695fb4d7f.png)
 
+Since ghc-mod 1.10.8, not only sub-expressions but name bindings and sub-patterns are supported.
+
+- ![type-bind](http://cache.gyazo.com/cee203adbf715f00d2dbd82c5cff3eaa.png)
+- ![type-pat](http://cache.gyazo.com/7a22068b73442e8447a4081d5ddffd31.png)
+
 Type `:GhcModTypeClear` to clear sub-expression's highlight.
 
 Sub-expressions are highlighted as `Search` by default.
@@ -44,5 +49,6 @@ let g:ghcmod_type_highlight = 'ghcmodType'
 ### compiler plugins
 Type `:compiler ghcmod_check` to use `ghc-mod check` as a compiler.
 You can generate compiler errors/warnings by `:make` and they are available in quickfix window.
+For convenience, `:GhcModCheck` command is provided.
 
-Similarly, type `:compiler ghcmod_lint` to use `ghc-mod lint` as a compiler.
+Similarly, type `:compiler ghcmod_lint` to use `ghc-mod lint` as a compiler and `:GhcModLint` command is provided.
