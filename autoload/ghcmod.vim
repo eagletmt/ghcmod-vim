@@ -1,7 +1,6 @@
 let s:ghcmod_type = {
       \ 'ix': 0,
       \ 'types': [],
-      \ 'matchid': -1,
       \ }
 function! s:ghcmod_type.spans(line, col)
   if empty(self.types)
@@ -23,17 +22,33 @@ function! s:ghcmod_type.highlight(group)
   if empty(self.types)
     return
   endif
-  if self.matchid != -1
-    call self.clear_highlight()
-  endif
+  call ghcmod#clear_highlight()
   let [l:line1, l:col1, l:line2, l:col2] = self.types[self.ix][0]
-  let self.matchid = matchadd(a:group, '\%' . l:line1 . 'l\%' . l:col1 . 'c\_.*\%' . l:line2 . 'l\%' . l:col2 . 'c')
+  let w:ghcmod_type_matchid = matchadd(a:group, '\%' . l:line1 . 'l\%' . l:col1 . 'c\_.*\%' . l:line2 . 'l\%' . l:col2 . 'c')
+
+  augroup ghcmod-type-highlight
+    autocmd! * <buffer>
+    autocmd BufEnter <buffer> call s:on_enter()
+    autocmd WinEnter <buffer> call s:on_enter()
+    autocmd BufLeave <buffer> call s:on_leave()
+    autocmd WinLeave <buffer> call s:on_leave()
+  augroup END
 endfunction
 
-function! s:ghcmod_type.clear_highlight()
-  if self.matchid != -1
-    call matchdelete(self.matchid)
-    let self.matchid = -1
+function! s:on_enter()
+  if exists('b:ghcmod_type')
+    call b:ghcmod_type.highlight(g:ghcmod_type_highlight)
+  endif
+endfunction
+
+function! s:on_leave()
+  call ghcmod#clear_highlight()
+endfunction
+
+function! ghcmod#clear_highlight()
+  if exists('w:ghcmod_type_matchid')
+    call matchdelete(w:ghcmod_type_matchid)
+    unlet w:ghcmod_type_matchid
   endif
 endfunction
 
@@ -63,9 +78,7 @@ function! ghcmod#type()
     return
   endif
 
-  if exists('b:ghcmod_type')
-    call b:ghcmod_type.clear_highlight()
-  endif
+  call ghcmod#clear_highlight()
   let b:ghcmod_type = deepcopy(s:ghcmod_type)
 
   let b:ghcmod_type.types = l:types
@@ -77,7 +90,7 @@ endfunction
 
 function! ghcmod#type_clear()
   if exists('b:ghcmod_type')
-    call matchdelete(b:ghcmod_type.matchid)
+    call ghcmod#clear_highlight()
     unlet b:ghcmod_type
   endif
 endfunction
