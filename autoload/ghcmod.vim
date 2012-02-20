@@ -25,14 +25,6 @@ function! s:ghcmod_type.highlight(group)
   call ghcmod#clear_highlight()
   let [l:line1, l:col1, l:line2, l:col2] = self.types[self.ix][0]
   let w:ghcmod_type_matchid = matchadd(a:group, '\%' . l:line1 . 'l\%' . l:col1 . 'c\_.*\%' . l:line2 . 'l\%' . l:col2 . 'c')
-
-  augroup ghcmod-type-highlight
-    autocmd! * <buffer>
-    autocmd BufEnter <buffer> call s:on_enter()
-    autocmd WinEnter <buffer> call s:on_enter()
-    autocmd BufLeave <buffer> call s:on_leave()
-    autocmd WinLeave <buffer> call s:on_leave()
-  augroup END
 endfunction
 
 function! s:on_enter()
@@ -85,6 +77,15 @@ function! ghcmod#type()
   let l:ret = b:ghcmod_type.type()
   let [l:line1, l:col1, l:line2, l:col2] = l:ret[0]
   call b:ghcmod_type.highlight(g:ghcmod_type_highlight)
+
+  augroup ghcmod-type-highlight
+    autocmd! * <buffer>
+    autocmd BufEnter <buffer> call s:on_enter()
+    autocmd WinEnter <buffer> call s:on_enter()
+    autocmd BufLeave <buffer> call s:on_leave()
+    autocmd WinLeave <buffer> call s:on_leave()
+  augroup END
+
   return l:ret
 endfunction
 
