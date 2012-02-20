@@ -1,9 +1,54 @@
+let s:ghcmod_type = {
+      \ 'ix': 0,
+      \ 'types': [],
+      \ 'matchid': -1,
+      \ }
+function! s:ghcmod_type.spans(line, col)
+  if empty(self.types)
+    return 0
+  endif
+  let [l:line1, l:col1, l:line2, l:col2] = self.types[self.ix][0]
+  return l:line1 <= a:line && a:line <= l:line2 && l:col1 <= a:col && a:col <= l:col2
+endfunction
+
+function! s:ghcmod_type.type()
+  return self.types[self.ix]
+endfunction
+
+function! s:ghcmod_type.incr_ix()
+  let self.ix = (self.ix + 1) % len(self.types)
+endfunction
+
+function! s:ghcmod_type.highlight(group)
+  if empty(self.types)
+    return
+  endif
+  if self.matchid != -1
+    call self.clear_highlight()
+  endif
+  let [l:line1, l:col1, l:line2, l:col2] = self.types[self.ix][0]
+  let self.matchid = matchadd(a:group, '\%' . l:line1 . 'l\%' . l:col1 . 'c\_.*\%' . l:line2 . 'l\%' . l:col2 . 'c')
+endfunction
+
+function! s:ghcmod_type.clear_highlight()
+  if self.matchid != -1
+    call matchdelete(self.matchid)
+    let self.matchid = -1
+  endif
+endfunction
+
 function! ghcmod#type()
   if &l:modified
     call ghcmod#print_warning('ghcmod#type: the buffer has been modified but not written')
   endif
   let l:line = line('.')
   let l:col = col('.')
+  if exists('b:ghcmod_type') && b:ghcmod_type.spans(l:line, l:col)
+    call b:ghcmod_type.incr_ix()
+    call b:ghcmod_type.highlight(g:ghcmod_type_highlight)
+    return b:ghcmod_type.type()
+  endif
+
   let l:file = expand('%:p')
   let l:mod = ghcmod#detect_module()
   let l:output = vimproc#system(['ghc-mod', 'type', l:file, l:mod, l:line, l:col])
@@ -19,21 +64,14 @@ function! ghcmod#type()
   endif
 
   if exists('b:ghcmod_type')
-    if b:ghcmod_type.ix < l:len && b:ghcmod_type.span == l:types[b:ghcmod_type.ix][0]
-      let b:ghcmod_type.ix = (b:ghcmod_type.ix + 1) % l:len
-    else
-      let b:ghcmod_type.ix = 0
-    endif
-    call matchdelete(b:ghcmod_type.matchid)
-  else
-    let b:ghcmod_type = {}
-    let b:ghcmod_type.ix = 0
+    call b:ghcmod_type.clear_highlight()
   endif
+  let b:ghcmod_type = deepcopy(s:ghcmod_type)
 
-  let l:ret = l:types[b:ghcmod_type.ix]
-  let [b:ghcmod_type.span, l:type] = l:ret
-  let [l:line1, l:col1, l:line2, l:col2] = b:ghcmod_type.span
-  let b:ghcmod_type.matchid = matchadd(g:ghcmod_type_highlight, '\%' . l:line1 . 'l\%' . l:col1 . 'c\_.*\%' . l:line2 . 'l\%' . l:col2 . 'c')
+  let b:ghcmod_type.types = l:types
+  let l:ret = b:ghcmod_type.type()
+  let [l:line1, l:col1, l:line2, l:col2] = l:ret[0]
+  call b:ghcmod_type.highlight(g:ghcmod_type_highlight)
   return l:ret
 endfunction
 
