@@ -166,7 +166,6 @@ function! ghcmod#make(type)
         call add(l:qflist, {'text': l:text})
       endfor
     endfor
-    call setqflist(l:qflist)
   catch
     call ghcmod#print_error(printf('%s %s', v:throwpoint, v:exception))
   finally
