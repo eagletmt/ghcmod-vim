@@ -109,6 +109,72 @@ function! ghcmod#detect_module()
   return 'Main'
 endfunction
 
+call vimproc#version()  " make sure vimproc is loaded
+redir => s:output
+silent! scriptnames
+redir END
+for s:line in split(s:output, '\n')
+  if s:line =~# '/vimproc/autoload/vimproc\.vim$'
+    let s:F_libcall = function('<SNR>' . matchstr(s:line, '^\s*\zs\d\+') . '_libcall')
+    break
+  endif
+endfor
+unlet s:output
+unlet s:line
+
+function! ghcmod#make(type)
+  " `ghc-mod check` and `ghc-mod lint` produces <NUL> characters but Vim cannot
+  " treat them correctly.  Vim converts <NUL> characters to <NL> in readfile().
+  " See also :help readfile() and :help NL-used-for-Nul.
+  let l:tmpfile = tempname()
+  let l:qflist = []
+  try
+    let l:path = expand('%:p')
+    let l:args = ['ghc-mod', a:type, l:path]
+    let l:proc = vimproc#plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
+
+    " XXX
+    let [l:cond, l:status] = s:F_libcall('vp_waitpid', [l:proc.pid])
+    let l:tries = 1
+    while l:cond ==# 'run'
+      if l:tries >= 50
+        throw printf('ghcmod#make: `ghc-mod %s` takes too long time!', a:type)
+      endif
+      sleep 100m
+      let [l:cond, l:status] = s:F_libcall('vp_waitpid', [l:proc.pid])
+      let l:tries += 1
+    endwhile
+
+    for l:output in readfile(l:tmpfile)
+      let l:qf = {}
+      let l:m = matchlist(l:output, '^\(\f\+\):\(\d\+\):\(\d\+\):\s*\(.*\)$')
+      let [l:qf.filename, l:qf.lnum, l:qf.col, l:rest] = l:m[1 : 4]
+      if l:rest =~# '^Warning:'
+        let l:qf.type = 'W'
+        let l:rest = matchstr(l:rest, '^Warning:\s*\zs.*$')
+      elseif l:rest =~# '^Error:'
+        let l:qf.type = 'E'
+        let l:rest = matchstr(l:rest, '^Error:\s*\zs.*$')
+      else
+        let l:qf.type = 'E'
+      endif
+      let l:texts = split(l:rest, '\n')
+      let l:qf.text = l:texts[0]
+      call add(l:qflist, l:qf)
+
+      for l:text in l:texts[1 :]
+        call add(l:qflist, {'text': l:text})
+      endfor
+    endfor
+    call setqflist(l:qflist)
+  catch
+    call ghcmod#print_error(printf('%s %s', v:throwpoint, v:exception))
+  finally
+    call delete(l:tmpfile)
+  endtry
+  return l:qflist
+endfunction
+
 function! ghcmod#check_version(version)
   call vimproc#system('ghc-mod')
   let l:m = matchlist(vimproc#get_last_errmsg(), 'version \(\d\+\)\.\(\d\+\)\.\(\d\+\)')

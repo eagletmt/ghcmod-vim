@@ -4,7 +4,7 @@ Happy Haskell programming on Vim, powered by [ghc-mod](https://github.com/kazu-y
 ## Features
 
 - Displaying the type of sub-expressions (`ghc-mod type`)
-- Displaying error/warning messages and their locations (compiler plugins for `ghc-mod check` and `ghc-mod lint`)
+- Displaying error/warning messages and their locations (`ghc-mod check` and `ghc-mod lint`)
 
 Completions are supported by another plugin.
 See [neco-ghc](https://github.com/ujihisa/neco-ghc) .
@@ -46,9 +46,7 @@ hi ghcmodType ctermbg=yellow
 let g:ghcmod_type_highlight = 'ghcmodType'
 ~~~
 
-### compiler plugins
-Type `:compiler ghcmod_check` to use `ghc-mod check` as a compiler.
-You can generate compiler errors/warnings by `:make` and they are available in quickfix window.
-For convenience, `:GhcModCheck` command is provided.
+### error/warning messages
+You can get compiler errors/warnings by `:GhcModCheck` and they are available in quickfix window.
 
-Similarly, type `:compiler ghcmod_lint` to use `ghc-mod lint` as a compiler and `:GhcModLint` command is provided.
+Similarly, type `:GhcModLint` to get suggestions by `ghc-mod lint`.
