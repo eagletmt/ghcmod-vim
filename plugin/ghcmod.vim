@@ -20,5 +20,5 @@ endif
 
 command! -nargs=0 GhcModType echo ghcmod#type()[1]
 command! -nargs=0 GhcModTypeClear call ghcmod#type_clear()
-command! -nargs=0 GhcModCheck call setqflist(ghcmod#make('check'))
-command! -nargs=0 GhcModLint call setqflist(ghcmod#make('lint'))
+command! -nargs=0 GhcModCheck call ghcmod#make('check') | cwindow
+command! -nargs=0 GhcModLint call ghcmod#make('lint') | cwindow
