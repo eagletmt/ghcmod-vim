@@ -144,6 +144,8 @@ function! ghcmod#make(type)
     let l:tries = 1
     while l:cond ==# 'run'
       if l:tries >= 50
+        call l:proc.kill(15)  " SIGTERM
+        call l:proc.waitpid()
         throw printf('ghcmod#make: `ghc-mod %s` takes too long time!', a:type)
       endif
       sleep 100m
