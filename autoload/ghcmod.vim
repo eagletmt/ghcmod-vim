@@ -57,6 +57,10 @@ function! ghcmod#type()
   endif
 
   let l:file = expand('%:p')
+  if l:file ==# ''
+    call ghcmod#print_warning("current version of ghcmod.vim doesn't support running on an unnamed buffer.")
+    return ['', '']
+  endif
   let l:mod = ghcmod#detect_module()
   let l:output = vimproc#system(['ghc-mod', 'type', l:file, l:mod, l:line, l:col])
   let l:types = []
