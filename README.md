@@ -50,3 +50,8 @@ let g:ghcmod_type_highlight = 'ghcmodType'
 You can get compiler errors/warnings by `:GhcModCheck` and they are available in quickfix window.
 
 Similarly, type `:GhcModLint` to get suggestions by `ghc-mod lint`.
+
+## License
+[BSD3 License](http://www.opensource.org/licenses/BSD-3-Clause), the same license as ghc-mod.
+
+Copyright (c) 2012, eagletmt
