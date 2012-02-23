@@ -134,13 +134,20 @@ function! s:wait(proc)
 endfunction
 
 function! ghcmod#make(type)
+  if &l:modified
+    call ghcmod#print_warning('ghcmod#make: the buffer has been modified but not written')
+  endif
+  let l:path = expand('%:p')
+  if empty(l:path)
+    call ghcmod#print_warning("ghcmod#make doesn't support running on an unnamed buffer.")
+    return []
+  endif
   " `ghc-mod check` and `ghc-mod lint` produces <NUL> characters but Vim cannot
   " treat them correctly.  Vim converts <NUL> characters to <NL> in readfile().
   " See also :help readfile() and :help NL-used-for-Nul.
   let l:tmpfile = tempname()
   let l:qflist = []
   try
-    let l:path = expand('%:p')
     let l:args = ['ghc-mod', a:type, l:path]
     let l:proc = vimproc#plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
 
