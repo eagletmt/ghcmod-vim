@@ -197,7 +197,7 @@ function! ghcmod#check_version(version)
   call vimproc#system('ghc-mod')
   let l:m = matchlist(vimproc#get_last_errmsg(), 'version \(\d\+\)\.\(\d\+\)\.\(\d\+\)')
   for l:i in range(0, 2)
-    if a:version[l:i] > (l:m[l:i+1]+0)
+    if a:version[l:i] > str2nr(l:m[l:i+1])
       return 0
     endif
   endfor
