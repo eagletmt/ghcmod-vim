@@ -207,7 +207,8 @@ function! ghcmod#expand()
   for l:line in split(vimproc#system(['ghc-mod', 'expand', l:path]), '\n')
     let l:qf = {}
     " path:line:col1-col2: message
-    let l:m = matchlist(l:line, '^\(\f\+\):\(\d\+\):\(\d\+\)-\d\+:\s*\(.*\)$')
+    " or path:line:col: message
+    let l:m = matchlist(l:line, '^\(\f\+\):\(\d\+\):\(\d\+\)\%(-\d\+\)\?:\s*\(.*\)$')
     if !empty(l:m)
       let [l:qf.filename, l:qf.lnum, l:qf.col, l:qf.text] = l:m[1 : 4]
     else
