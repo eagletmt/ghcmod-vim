@@ -226,10 +226,15 @@ function! ghcmod#expand()
 endfunction
 
 function! ghcmod#check_version(version)
-  call vimproc#system('ghc-mod')
-  let l:m = matchlist(vimproc#get_last_errmsg(), 'version \(\d\+\)\.\(\d\+\)\.\(\d\+\)')
+  if !exists('s:ghc_mod_version')
+    call vimproc#system('ghc-mod')
+    let l:m = matchlist(vimproc#get_last_errmsg(), 'version \(\d\+\)\.\(\d\+\)\.\(\d\+\)')
+    let s:ghc_mod_version = l:m[1 : 3]
+    call map(s:ghc_mod_version, 'str2nr(v:val)')
+  endif
+
   for l:i in range(0, 2)
-    if a:version[l:i] > str2nr(l:m[l:i+1])
+    if a:version[l:i] > s:ghc_mod_version[l:i]
       return 0
     endif
   endfor
