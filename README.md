@@ -5,6 +5,7 @@ Happy Haskell programming on Vim, powered by [ghc-mod](https://github.com/kazu-y
 
 - Displaying the type of sub-expressions (`ghc-mod type`)
 - Displaying error/warning messages and their locations (`ghc-mod check` and `ghc-mod lint`)
+- Displaying the expansion of splices (`ghc-mod expand`)
 
 Completions are supported by another plugin.
 See [neco-ghc](https://github.com/ujihisa/neco-ghc) .
@@ -46,10 +47,21 @@ hi ghcmodType ctermbg=yellow
 let g:ghcmod_type_highlight = 'ghcmodType'
 ~~~
 
-### error/warning messages
+### :GhcModCheck, :GhcModLint
 You can get compiler errors/warnings by `:GhcModCheck` and they are available in quickfix window.
 
+![check](http://cache.gyazo.com/c09399b2fe370ce9d328b8ed12118de8.png)
+
 Similarly, type `:GhcModLint` to get suggestions by `ghc-mod lint`.
+
+![lint](http://cache.gyazo.com/3b64724ce2587e03761fe618457f1c2e.png)
+
+### :GhcModExpand
+You can see the expansion of splices by `:GhcModExpand` and they are available in quickfix window.
+
+![expand](http://cache.gyazo.com/bcbee2b84f956a87b636a67b5d5af488.png)
+
+This feature was introduced since ghc-mod 1.10.10.
 
 ## License
 [BSD3 License](http://www.opensource.org/licenses/BSD-3-Clause), the same license as ghc-mod.
