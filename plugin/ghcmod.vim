@@ -22,6 +22,9 @@ command! -nargs=0 GhcModType echo ghcmod#type()[1]
 command! -nargs=0 GhcModTypeClear call ghcmod#type_clear()
 command! -nargs=0 GhcModCheck call s:check()
 command! -nargs=0 GhcModLint call setqflist(ghcmod#make('lint')) | cwindow
+if ghcmod#check_version([1, 10, 10])
+  command! -nargs=0 GhcModExpand call setqflist(ghcmod#expand()) | cwindow
+endif
 
 function! s:check()
   let l:qflist = ghcmod#make('check')
