@@ -208,12 +208,12 @@ function! ghcmod#expand()
     let l:qf = {}
     " path:line:col1-col2: message
     " or path:line:col: message
-    let l:m = matchlist(l:line, '^\(\f\+\):\(\d\+\):\(\d\+\)\%(-\d\+\)\?:\s*\(.*\)$')
+    let l:m = matchlist(l:line, '^\s*\(\f\+\):\(\d\+\):\(\d\+\)\%(-\d\+\)\?\%(:\s*\(.*\)\)\?$')
     if !empty(l:m)
       let [l:qf.filename, l:qf.lnum, l:qf.col, l:qf.text] = l:m[1 : 4]
     else
       " path:(line1,col1):(line2,col2): message
-      let l:m = matchlist(l:line, '^\(\f\+\):(\(\d\+\),\(\d\+\))-(\d\+,\d\+):\s*\(.*\)$')
+      let l:m = matchlist(l:line, '^\s*\(\f\+\):(\(\d\+\),\(\d\+\))-(\d\+,\d\+)\%(:\s*\(.*\)\)\?$')
       if !empty(l:m)
         let [l:qf.filename, l:qf.lnum, l:qf.col, l:qf.text] = l:m[1 : 4]
       else
