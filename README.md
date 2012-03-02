@@ -68,6 +68,9 @@ You can see the expansion of splices by `:GhcModExpand` and they are available i
 
 This feature was introduced since ghc-mod 1.10.10.
 
+## Customize
+See wiki page [Customize](https://github.com/eagletmt/ghcmod-vim/wiki/Customize).
+
 ## License
 [BSD3 License](http://www.opensource.org/licenses/BSD-3-Clause), the same license as ghc-mod.
 
