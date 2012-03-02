@@ -189,12 +189,12 @@ function! ghcmod#make(type)
       let [l:cond, l:status] = s:wait(l:proc)
       let l:tries += 1
     endwhile
+    return ghcmod#parse_make(readfile(l:tmpfile))
   catch
     call ghcmod#print_error(printf('%s %s', v:throwpoint, v:exception))
   finally
     call delete(l:tmpfile)
   endtry
-  return ghcmod#parse_make(readfile(l:tmpfile))
 endfunction
 
 let s:sessions = {}
@@ -301,6 +301,7 @@ function! s:wait(proc)
     return s:libcall('vp_waitpid', [a:proc.pid])
   endif
 endfunction
+
 function! ghcmod#expand()
   if &l:modified
     call ghcmod#print_warning('ghcmod#expand: the buffer has been modified but not written')
