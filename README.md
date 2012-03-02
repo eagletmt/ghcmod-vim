@@ -61,6 +61,13 @@ Similarly, type `:GhcModLint` to get suggestions by `ghc-mod lint`.
 
 ![lint](http://cache.gyazo.com/3b64724ce2587e03761fe618457f1c2e.png)
 
+
+### :GhcModCheckAsnyc, :GhcModLintAsync, :GhcModCheckAndLintAsync
+You can run check and/or lint asynchronously.
+
+This would be useful when you'd like to run check and/or lint automatically (especially on `BufWritePost`).
+See Customize wiki page for more detail.
+
 ### :GhcModExpand
 You can see the expansion of splices by `:GhcModExpand` and they are available in quickfix window.
 
