@@ -21,6 +21,11 @@ cabal install ghc-mod
 ~~~
 
 ## Details
+If you'd like to give GHC options, set `g:ghcmod_ghc_options`.
+
+~~~vim
+let g:ghcmod_ghc_options = ['-idir1', '-idir2']
+~~~
 
 ### :GhcModType, :GhcModTypeClear
 Type `:GhcModType` on a expression, then the sub-expression is highlighted and its type is echoed.

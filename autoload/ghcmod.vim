@@ -62,7 +62,8 @@ function! ghcmod#type()
     return ['', '']
   endif
   let l:mod = ghcmod#detect_module()
-  let l:output = vimproc#system(['ghc-mod', 'type', l:file, l:mod, l:line, l:col])
+  let l:cmd = ghcmod#build_command(['type', l:file, l:mod, l:line, l:col])
+  let l:output = vimproc#system(l:cmd)
   let l:types = []
   for l:line in split(l:output, '\n')
     let l:m = matchlist(l:line, '\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\([^"]\+\)"')
@@ -148,7 +149,7 @@ function! ghcmod#make(type)
   let l:tmpfile = tempname()
   let l:qflist = []
   try
-    let l:args = ['ghc-mod', a:type, l:path]
+    let l:args = ghcmod#build_command([a:type, l:path])
     let l:proc = vimproc#plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
 
     let [l:cond, l:status] = s:wait(l:proc)
@@ -204,7 +205,8 @@ function! ghcmod#expand()
   endif
 
   let l:qflist = []
-  for l:line in split(vimproc#system(['ghc-mod', 'expand', l:path]), '\n')
+  let l:cmd = ghcmod#build_command(['expand', l:path])
+  for l:line in split(vimproc#system(l:cmd), '\n')
     let l:qf = {}
     " path:line:col1-col2: message
     " or path:line:col: message
@@ -240,6 +242,15 @@ function! ghcmod#check_version(version)
     endif
   endfor
   return 1
+endfunction
+
+function! ghcmod#build_command(args)
+  let l:cmd = ['ghc-mod']
+  for l:opt in get(g:, 'ghcmod_ghc_options', [])
+    call extend(l:cmd, ['-g', l:opt])
+  endfor
+  call extend(l:cmd, a:args)
+  return l:cmd
 endfunction
 
 function! ghcmod#print_error(msg)
