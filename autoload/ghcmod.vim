@@ -134,6 +134,35 @@ function! s:wait(proc)
   endif
 endfunction
 
+function! ghcmod#parse_make(lines)
+  " `ghc-mod check` and `ghc-mod lint` produces <NUL> characters but Vim cannot
+  " treat them correctly.  Vim converts <NUL> characters to <NL> in readfile().
+  " See also :help readfile() and :help NL-used-for-Nul.
+  let l:qflist = []
+  for l:output in a:lines
+    let l:qf = {}
+    let l:m = matchlist(l:output, '^\(\f\+\):\(\d\+\):\(\d\+\):\s*\(.*\)$')
+    let [l:qf.filename, l:qf.lnum, l:qf.col, l:rest] = l:m[1 : 4]
+    if l:rest =~# '^Warning:'
+      let l:qf.type = 'W'
+      let l:rest = matchstr(l:rest, '^Warning:\s*\zs.*$')
+    elseif l:rest =~# '^Error:'
+      let l:qf.type = 'E'
+      let l:rest = matchstr(l:rest, '^Error:\s*\zs.*$')
+    else
+      let l:qf.type = 'E'
+    endif
+    let l:texts = split(l:rest, '\n')
+    let l:qf.text = l:texts[0]
+    call add(l:qflist, l:qf)
+
+    for l:text in l:texts[1 :]
+      call add(l:qflist, {'text': l:text})
+    endfor
+  endfor
+  return l:qflist
+endfunction
+
 function! ghcmod#make(type)
   if &l:modified
     call ghcmod#print_warning('ghcmod#make: the buffer has been modified but not written')
@@ -143,15 +172,11 @@ function! ghcmod#make(type)
     call ghcmod#print_warning("ghcmod#make doesn't support running on an unnamed buffer.")
     return []
   endif
-  " `ghc-mod check` and `ghc-mod lint` produces <NUL> characters but Vim cannot
-  " treat them correctly.  Vim converts <NUL> characters to <NL> in readfile().
-  " See also :help readfile() and :help NL-used-for-Nul.
+
   let l:tmpfile = tempname()
-  let l:qflist = []
   try
     let l:args = ghcmod#build_command([a:type, l:path])
     let l:proc = vimproc#plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
-
     let [l:cond, l:status] = s:wait(l:proc)
     let l:tries = 1
     while l:cond ==# 'run'
@@ -164,36 +189,118 @@ function! ghcmod#make(type)
       let [l:cond, l:status] = s:wait(l:proc)
       let l:tries += 1
     endwhile
-
-    for l:output in readfile(l:tmpfile)
-      let l:qf = {}
-      let l:m = matchlist(l:output, '^\(\f\+\):\(\d\+\):\(\d\+\):\s*\(.*\)$')
-      let [l:qf.filename, l:qf.lnum, l:qf.col, l:rest] = l:m[1 : 4]
-      if l:rest =~# '^Warning:'
-        let l:qf.type = 'W'
-        let l:rest = matchstr(l:rest, '^Warning:\s*\zs.*$')
-      elseif l:rest =~# '^Error:'
-        let l:qf.type = 'E'
-        let l:rest = matchstr(l:rest, '^Error:\s*\zs.*$')
-      else
-        let l:qf.type = 'E'
-      endif
-      let l:texts = split(l:rest, '\n')
-      let l:qf.text = l:texts[0]
-      call add(l:qflist, l:qf)
-
-      for l:text in l:texts[1 :]
-        call add(l:qflist, {'text': l:text})
-      endfor
-    endfor
   catch
     call ghcmod#print_error(printf('%s %s', v:throwpoint, v:exception))
   finally
     call delete(l:tmpfile)
   endtry
-  return l:qflist
+  return ghcmod#parse_make(readfile(l:tmpfile))
 endfunction
 
+let s:sessions = {}
+
+function! ghcmod#exist_session()
+  return !empty(s:sessions)
+endfunction
+
+function! ghcmod#async_make(type, action)
+  if &l:modified
+    call ghcmod#print_warning('ghcmod#async_make: the buffer has been modified but not written')
+  endif
+  let l:path = expand('%:p')
+  if empty(l:path)
+    call ghcmod#print_warning("ghcmod#async_make doesn't support running on an unnamed buffer.")
+    return
+  endif
+  if exists('s:proc')
+    call ghcmod#print_error('ghcmod#async_make: already running!')
+    return
+  endif
+
+  let l:tmpfile = tempname()
+  try
+    let l:args = ghcmod#build_command([a:type, l:path])
+    let l:proc = vimproc#plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
+    let l:key = reltimestr(reltime()) " this value should be unique
+    if !exists('s:updatetime')
+      let s:updatetime = &updatetime
+    endif
+    let s:sessions[l:key] = {
+          \ 'proc': l:proc,
+          \ 'tmpfile': l:tmpfile,
+          \ 'action': a:action,
+          \ }
+    set updatetime=0
+    augroup ghcmod-async-make
+      execute 'autocmd CursorHold,CursorHoldI * call s:receive(' . string(l:key) . ')'
+    augroup END
+  catch
+    if exists('l:proc')
+      call l:proc.kill(15)
+      call l:proc.waitpid()
+    endif
+    if exists('l:key') && has_key(s:sessions, l:key)
+      call remove(s:sessions, l:key)
+      if empty(s:sessions)
+        augroup ghcmod-async-make
+          autocmd!
+        augroup END
+        let &updatetime = s:updatetime
+      endif
+    endif
+    call delete(l:tmpfile)
+    call ghcmod#print_error(printf('%s %s', v:throwpoint, v:exception))
+  endtry
+endfunction
+
+function! s:receive(key)
+  if !has_key(s:sessions, a:key)
+    return
+  endif
+  let l:session = s:sessions[a:key]
+  let [l:cond, l:status] = s:wait(l:session.proc)
+  if l:cond ==# 'run'
+    return
+  endif
+
+  call remove(s:sessions, a:key)
+  if empty(s:sessions)
+    augroup ghcmod-async-make
+      autocmd!
+    augroup END
+    let &updatetime = s:updatetime
+  endif
+
+  lcd `=expand('%:p:h')`
+  call setqflist(ghcmod#parse_make(readfile(l:session.tmpfile)), l:session.action)
+  lcd -
+  call delete(l:session.tmpfile)
+  cwindow
+  if &l:buftype ==# 'quickfix'
+    " go back to original window
+    wincmd p
+  endif
+endfunction
+
+function! s:wait(proc)
+  if has_key(a:proc, 'checkpid')
+    return a:proc.checkpid()
+  else
+    " old vimproc
+    if !exists('s:libcall')
+      redir => l:output
+      silent! scriptnames
+      redir END
+      for l:line in split(l:output, '\n')
+        if l:line =~# '/vimproc/autoload/vimproc\.vim$'
+          let s:libcall = function('<SNR>' . matchstr(l:line, '^\s*\zs\d\+') . '_libcall')
+          break
+        endif
+      endfor
+    endif
+    return s:libcall('vp_waitpid', [a:proc.pid])
+  endif
+endfunction
 function! ghcmod#expand()
   if &l:modified
     call ghcmod#print_warning('ghcmod#expand: the buffer has been modified but not written')
