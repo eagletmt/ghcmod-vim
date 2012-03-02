@@ -175,7 +175,13 @@ function! ghcmod#make(type)
 
   let l:tmpfile = tempname()
   try
-    let l:args = ghcmod#build_command([a:type, l:path])
+    let l:args = ghcmod#build_command([a:type])
+    if a:type ==# 'lint'
+      for l:hopt in get(g:, 'ghcmod_hlint_options', [])
+        call extend(l:args, ['-h', l:hopt])
+      endfor
+    endif
+    call add(l:args, l:path)
     let l:proc = vimproc#plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
     let [l:cond, l:status] = s:wait(l:proc)
     let l:tries = 1

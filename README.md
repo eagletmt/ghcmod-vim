@@ -59,6 +59,12 @@ You can get compiler errors/warnings by `:GhcModCheck` and they are available in
 
 Similarly, type `:GhcModLint` to get suggestions by `ghc-mod lint`.
 
+If you'd like to pass options to hlint, set `g:ghcmod_hlint_options`.
+
+~~~vim
+let g:ghcmod_hlint_options = ['--ignore=Redundant $']
+~~~
+
 ![lint](http://cache.gyazo.com/3b64724ce2587e03761fe618457f1c2e.png)
 
 
