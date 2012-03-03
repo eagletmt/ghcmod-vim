@@ -2,49 +2,49 @@ let s:ghcmod_type = {
       \ 'ix': 0,
       \ 'types': [],
       \ }
-function! s:ghcmod_type.spans(line, col)
+function! s:ghcmod_type.spans(line, col)"{{{
   if empty(self.types)
     return 0
   endif
   let [l:line1, l:col1, l:line2, l:col2] = self.types[self.ix][0]
   return l:line1 <= a:line && a:line <= l:line2 && l:col1 <= a:col && a:col <= l:col2
-endfunction
+endfunction"}}}
 
-function! s:ghcmod_type.type()
+function! s:ghcmod_type.type()"{{{
   return self.types[self.ix]
-endfunction
+endfunction"}}}
 
-function! s:ghcmod_type.incr_ix()
+function! s:ghcmod_type.incr_ix()"{{{
   let self.ix = (self.ix + 1) % len(self.types)
-endfunction
+endfunction"}}}
 
-function! s:ghcmod_type.highlight(group)
+function! s:ghcmod_type.highlight(group)"{{{
   if empty(self.types)
     return
   endif
   call ghcmod#clear_highlight()
   let [l:line1, l:col1, l:line2, l:col2] = self.types[self.ix][0]
   let w:ghcmod_type_matchid = matchadd(a:group, '\%' . l:line1 . 'l\%' . l:col1 . 'c\_.*\%' . l:line2 . 'l\%' . l:col2 . 'c')
-endfunction
+endfunction"}}}
 
-function! s:on_enter()
+function! s:on_enter()"{{{
   if exists('b:ghcmod_type')
     call b:ghcmod_type.highlight(g:ghcmod_type_highlight)
   endif
-endfunction
+endfunction"}}}
 
-function! s:on_leave()
+function! s:on_leave()"{{{
   call ghcmod#clear_highlight()
-endfunction
+endfunction"}}}
 
-function! ghcmod#clear_highlight()
+function! ghcmod#clear_highlight()"{{{
   if exists('w:ghcmod_type_matchid')
     call matchdelete(w:ghcmod_type_matchid)
     unlet w:ghcmod_type_matchid
   endif
-endfunction
+endfunction"}}}
 
-function! ghcmod#type()
+function! ghcmod#type()"{{{
   if &l:modified
     call ghcmod#print_warning('ghcmod#type: the buffer has been modified but not written')
   endif
@@ -92,16 +92,16 @@ function! ghcmod#type()
   augroup END
 
   return l:ret
-endfunction
+endfunction"}}}
 
-function! ghcmod#type_clear()
+function! ghcmod#type_clear()"{{{
   if exists('b:ghcmod_type')
     call ghcmod#clear_highlight()
     unlet b:ghcmod_type
   endif
-endfunction
+endfunction"}}}
 
-function! ghcmod#detect_module()
+function! ghcmod#detect_module()"{{{
   let l:max_lineno = min([line('$'), 11])
   for l:lineno in range(1, l:max_lineno)
     let l:line = getline(l:lineno)
@@ -112,9 +112,9 @@ function! ghcmod#detect_module()
     let l:lineno += 1
   endfor
   return 'Main'
-endfunction
+endfunction"}}}
 
-function! ghcmod#parse_make(lines)
+function! ghcmod#parse_make(lines)"{{{
   " `ghc-mod check` and `ghc-mod lint` produces <NUL> characters but Vim cannot
   " treat them correctly.  Vim converts <NUL> characters to <NL> in readfile().
   " See also :help readfile() and :help NL-used-for-Nul.
@@ -141,9 +141,9 @@ function! ghcmod#parse_make(lines)
     endfor
   endfor
   return l:qflist
-endfunction
+endfunction"}}}
 
-function! s:build_make_command(type, path)
+function! s:build_make_command(type, path)"{{{
   let l:cmd = ghcmod#build_command([a:type])
   if a:type ==# 'lint'
     for l:hopt in get(g:, 'ghcmod_hlint_options', [])
@@ -152,9 +152,9 @@ function! s:build_make_command(type, path)
   endif
   call add(l:cmd, a:path)
   return l:cmd
-endfunction
+endfunction"}}}
 
-function! ghcmod#make(type)
+function! ghcmod#make(type)"{{{
   if &l:modified
     call ghcmod#print_warning('ghcmod#make: the buffer has been modified but not written')
   endif
@@ -186,15 +186,15 @@ function! ghcmod#make(type)
   finally
     call delete(l:tmpfile)
   endtry
-endfunction
+endfunction"}}}
 
 let s:sessions = {}
 
-function! ghcmod#exist_session()
+function! ghcmod#exist_session()"{{{
   return !empty(s:sessions)
-endfunction
+endfunction"}}}
 
-function! ghcmod#async_make(type, action)
+function! ghcmod#async_make(type, action)"{{{
   if &l:modified
     call ghcmod#print_warning('ghcmod#async_make: the buffer has been modified but not written')
   endif
@@ -242,9 +242,9 @@ function! ghcmod#async_make(type, action)
     call delete(l:tmpfile)
     call ghcmod#print_error(printf('%s %s', v:throwpoint, v:exception))
   endtry
-endfunction
+endfunction"}}}
 
-function! s:receive(key)
+function! s:receive(key)"{{{
   if !has_key(s:sessions, a:key)
     return
   endif
@@ -271,9 +271,9 @@ function! s:receive(key)
     " go back to original window
     wincmd p
   endif
-endfunction
+endfunction"}}}
 
-function! s:wait(proc)
+function! s:wait(proc)"{{{
   if has_key(a:proc, 'checkpid')
     return a:proc.checkpid()
   else
@@ -291,9 +291,9 @@ function! s:wait(proc)
     endif
     return s:libcall('vp_waitpid', [a:proc.pid])
   endif
-endfunction
+endfunction"}}}
 
-function! ghcmod#expand()
+function! ghcmod#expand()"{{{
   if &l:modified
     call ghcmod#print_warning('ghcmod#expand: the buffer has been modified but not written')
   endif
@@ -325,9 +325,9 @@ function! ghcmod#expand()
     call add(l:qflist, l:qf)
   endfor
   return l:qflist
-endfunction
+endfunction"}}}
 
-function! ghcmod#check_version(version)
+function! ghcmod#check_version(version)"{{{
   if !exists('s:ghc_mod_version')
     call vimproc#system('ghc-mod')
     let l:m = matchlist(vimproc#get_last_errmsg(), 'version \(\d\+\)\.\(\d\+\)\.\(\d\+\)')
@@ -341,25 +341,27 @@ function! ghcmod#check_version(version)
     endif
   endfor
   return 1
-endfunction
+endfunction"}}}
 
-function! ghcmod#build_command(args)
+function! ghcmod#build_command(args)"{{{
   let l:cmd = ['ghc-mod']
   for l:opt in get(g:, 'ghcmod_ghc_options', [])
     call extend(l:cmd, ['-g', l:opt])
   endfor
   call extend(l:cmd, a:args)
   return l:cmd
-endfunction
+endfunction"}}}
 
-function! ghcmod#print_error(msg)
+function! ghcmod#print_error(msg)"{{{
   echohl ErrorMsg
   echomsg a:msg
   echohl None
-endfunction
+endfunction"}}}
 
-function! ghcmod#print_warning(msg)
+function! ghcmod#print_warning(msg)"{{{
   echohl WarningMsg
   echomsg a:msg
   echohl None
-endfunction
+endfunction"}}}
+
+" vim: set ts=2 sw=2 et fdm=marker:
