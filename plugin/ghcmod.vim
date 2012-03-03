@@ -38,7 +38,7 @@ function! s:check()
 endfunction
 
 function! s:check_and_lint_async()
-  if !ghcmod#exist_session()
+  if !ghcmod#async#exist_session()
     call setqflist([])
     call ghcmod#async_make('check', 'a')
     call ghcmod#async_make('lint', 'a')

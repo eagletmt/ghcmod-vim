@@ -168,7 +168,7 @@ function! ghcmod#make(type)"{{{
   try
     let l:args = s:build_make_command(a:type, l:path)
     let l:proc = vimproc#plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
-    let [l:cond, l:status] = s:wait(l:proc)
+    let [l:cond, l:status] = ghcmod#wait(l:proc)
     let l:tries = 1
     while l:cond ==# 'run'
       if l:tries >= 50
@@ -177,7 +177,7 @@ function! ghcmod#make(type)"{{{
         throw printf('ghcmod#make: `ghc-mod %s` takes too long time!', a:type)
       endif
       sleep 100m
-      let [l:cond, l:status] = s:wait(l:proc)
+      let [l:cond, l:status] = ghcmod#wait(l:proc)
       let l:tries += 1
     endwhile
     return ghcmod#parse_make(readfile(l:tmpfile))
@@ -188,10 +188,12 @@ function! ghcmod#make(type)"{{{
   endtry
 endfunction"}}}
 
-let s:sessions = {}
+function! s:SID_PREFIX()"{{{
+  return matchstr(expand('<sfile>'), '<SNR>\d\+_\zeSID_PREFIX$')
+endfunction"}}}
 
-function! ghcmod#exist_session()"{{{
-  return !empty(s:sessions)
+function! s:funcref(funcname)"{{{
+  return function(s:SID_PREFIX() . a:funcname)
 endfunction"}}}
 
 function! ghcmod#async_make(type, action)"{{{
@@ -209,63 +211,26 @@ function! ghcmod#async_make(type, action)"{{{
   endif
 
   let l:tmpfile = tempname()
-  try
-    let l:args = s:build_make_command(a:type, l:path)
-    let l:proc = vimproc#plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
-    let l:key = reltimestr(reltime()) " this value should be unique
-    if !exists('s:updatetime')
-      let s:updatetime = &updatetime
-    endif
-    let s:sessions[l:key] = {
-          \ 'proc': l:proc,
-          \ 'tmpfile': l:tmpfile,
-          \ 'action': a:action,
-          \ }
-    set updatetime=0
-    augroup ghcmod-async-make
-      execute 'autocmd CursorHold,CursorHoldI * call s:receive(' . string(l:key) . ')'
-    augroup END
-  catch
-    if exists('l:proc')
-      call l:proc.kill(15)
-      call l:proc.waitpid()
-    endif
-    if exists('l:key') && has_key(s:sessions, l:key)
-      call remove(s:sessions, l:key)
-      if empty(s:sessions)
-        augroup ghcmod-async-make
-          autocmd!
-        augroup END
-        let &updatetime = s:updatetime
-      endif
-    endif
+  let l:args = s:build_make_command(a:type, l:path)
+  let l:proc = vimproc#plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
+  let l:obj = {
+        \ 'proc': l:proc,
+        \ 'tmpfile': l:tmpfile,
+        \ 'action': a:action,
+        \ 'on_finish': s:funcref('on_finish'),
+        \ }
+  if !ghcmod#async#register(l:obj)
+    call l:proc.kill(15)
+    call l:proc.waitpid()
     call delete(l:tmpfile)
-    call ghcmod#print_error(printf('%s %s', v:throwpoint, v:exception))
-  endtry
+  endif
 endfunction"}}}
 
-function! s:receive(key)"{{{
-  if !has_key(s:sessions, a:key)
-    return
-  endif
-  let l:session = s:sessions[a:key]
-  let [l:cond, l:status] = s:wait(l:session.proc)
-  if l:cond ==# 'run'
-    return
-  endif
-
-  call remove(s:sessions, a:key)
-  if empty(s:sessions)
-    augroup ghcmod-async-make
-      autocmd!
-    augroup END
-    let &updatetime = s:updatetime
-  endif
-
+function! s:on_finish(cond, status) dict"{{{
   lcd `=expand('%:p:h')`
-  call setqflist(ghcmod#parse_make(readfile(l:session.tmpfile)), l:session.action)
+  call setqflist(ghcmod#parse_make(readfile(self.tmpfile)), self.action)
   lcd -
-  call delete(l:session.tmpfile)
+  call delete(self.tmpfile)
   cwindow
   if &l:buftype ==# 'quickfix'
     " go back to original window
@@ -273,7 +238,7 @@ function! s:receive(key)"{{{
   endif
 endfunction"}}}
 
-function! s:wait(proc)"{{{
+function! ghcmod#wait(proc)"{{{
   if has_key(a:proc, 'checkpid')
     return a:proc.checkpid()
   else
