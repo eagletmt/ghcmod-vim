@@ -205,10 +205,6 @@ function! ghcmod#async_make(type, action)"{{{
     call ghcmod#print_warning("ghcmod#async_make doesn't support running on an unnamed buffer.")
     return
   endif
-  if exists('s:proc')
-    call ghcmod#print_error('ghcmod#async_make: already running!')
-    return
-  endif
 
   let l:tmpfile = tempname()
   let l:args = s:build_make_command(a:type, l:path)
