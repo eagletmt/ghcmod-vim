@@ -213,6 +213,7 @@ function! ghcmod#async_make(type, action)"{{{
         \ 'proc': l:proc,
         \ 'tmpfile': l:tmpfile,
         \ 'action': a:action,
+        \ 'type': a:type,
         \ 'on_finish': s:funcref('on_finish'),
         \ }
   if !ghcmod#async#register(l:obj)
@@ -223,14 +224,18 @@ function! ghcmod#async_make(type, action)"{{{
 endfunction"}}}
 
 function! s:on_finish(cond, status) dict"{{{
+  let l:qflist = ghcmod#parse_make(readfile(self.tmpfile))
   lcd `=expand('%:p:h')`
-  call setqflist(ghcmod#parse_make(readfile(self.tmpfile)), self.action)
+  call setqflist(l:qflist, self.action)
   lcd -
   call delete(self.tmpfile)
   cwindow
   if &l:buftype ==# 'quickfix'
     " go back to original window
     wincmd p
+  endif
+  if empty(l:qflist)
+    echomsg printf('ghc-mod %s(async): No errors found', self.type)
   endif
 endfunction"}}}
 
