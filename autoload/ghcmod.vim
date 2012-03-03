@@ -163,6 +163,17 @@ function! ghcmod#parse_make(lines)
   return l:qflist
 endfunction
 
+function! s:build_make_command(type, path)
+  let l:cmd = ghcmod#build_command([a:type])
+  if a:type ==# 'lint'
+    for l:hopt in get(g:, 'ghcmod_hlint_options', [])
+      call extend(l:cmd, ['-h', l:hopt])
+    endfor
+  endif
+  call add(l:cmd, a:path)
+  return l:cmd
+endfunction
+
 function! ghcmod#make(type)
   if &l:modified
     call ghcmod#print_warning('ghcmod#make: the buffer has been modified but not written')
@@ -175,13 +186,7 @@ function! ghcmod#make(type)
 
   let l:tmpfile = tempname()
   try
-    let l:args = ghcmod#build_command([a:type])
-    if a:type ==# 'lint'
-      for l:hopt in get(g:, 'ghcmod_hlint_options', [])
-        call extend(l:args, ['-h', l:hopt])
-      endfor
-    endif
-    call add(l:args, l:path)
+    let l:args = s:build_make_command(a:type, l:path)
     let l:proc = vimproc#plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
     let [l:cond, l:status] = s:wait(l:proc)
     let l:tries = 1
@@ -225,7 +230,7 @@ function! ghcmod#async_make(type, action)
 
   let l:tmpfile = tempname()
   try
-    let l:args = ghcmod#build_command([a:type, l:path])
+    let l:args = s:build_make_command(a:type, l:path)
     let l:proc = vimproc#plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
     let l:key = reltimestr(reltime()) " this value should be unique
     if !exists('s:updatetime')
