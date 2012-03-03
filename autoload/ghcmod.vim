@@ -114,26 +114,6 @@ function! ghcmod#detect_module()
   return 'Main'
 endfunction
 
-function! s:wait(proc)
-  if has_key(a:proc, 'checkpid')
-    return a:proc.checkpid()
-  else
-    " old vimproc
-    if !exists('s:libcall')
-      redir => l:output
-      silent! scriptnames
-      redir END
-      for l:line in split(l:output, '\n')
-        if l:line =~# '/vimproc/autoload/vimproc\.vim$'
-          let s:libcall = function('<SNR>' . matchstr(l:line, '^\s*\zs\d\+') . '_libcall')
-          break
-        endif
-      endfor
-    endif
-    return s:libcall('vp_waitpid', [a:proc.pid])
-  endif
-endfunction
-
 function! ghcmod#parse_make(lines)
   " `ghc-mod check` and `ghc-mod lint` produces <NUL> characters but Vim cannot
   " treat them correctly.  Vim converts <NUL> characters to <NL> in readfile().
