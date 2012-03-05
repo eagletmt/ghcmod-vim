@@ -27,9 +27,13 @@ function! s:ghcmod_type.highlight(group)"{{{
   let w:ghcmod_type_matchid = matchadd(a:group, '\%' . l:line1 . 'l\%' . l:col1 . 'c\_.*\%' . l:line2 . 'l\%' . l:col2 . 'c')
 endfunction"}}}
 
+function! s:highlight_group()"{{{
+  return get(g:, 'ghcmod_type_highlight', 'Search')
+endfunction"}}}
+
 function! s:on_enter()"{{{
   if exists('b:ghcmod_type')
-    call b:ghcmod_type.highlight(g:ghcmod_type_highlight)
+    call b:ghcmod_type.highlight(s:highlight_group())
   endif
 endfunction"}}}
 
@@ -52,7 +56,7 @@ function! ghcmod#type()"{{{
   let l:col = col('.')
   if exists('b:ghcmod_type') && b:ghcmod_type.spans(l:line, l:col)
     call b:ghcmod_type.incr_ix()
-    call b:ghcmod_type.highlight(g:ghcmod_type_highlight)
+    call b:ghcmod_type.highlight(s:highlight_group())
     return b:ghcmod_type.type()
   endif
 
@@ -81,7 +85,7 @@ function! ghcmod#type()"{{{
   let b:ghcmod_type.types = l:types
   let l:ret = b:ghcmod_type.type()
   let [l:line1, l:col1, l:line2, l:col2] = l:ret[0]
-  call b:ghcmod_type.highlight(g:ghcmod_type_highlight)
+  call b:ghcmod_type.highlight(s:highlight_group())
 
   augroup ghcmod-type-highlight
     autocmd! * <buffer>

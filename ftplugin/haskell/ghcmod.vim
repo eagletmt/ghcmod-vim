@@ -24,10 +24,6 @@ if !s:has_ghc_mod
   finish
 endif
 
-if !exists('g:ghcmod_type_highlight')
-  let g:ghcmod_type_highlight = 'Search'
-endif
-
 if exists('b:undo_ftplugin')
   let b:undo_ftplugin .= ' | '
 else
