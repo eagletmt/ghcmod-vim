@@ -229,9 +229,7 @@ endfunction"}}}
 
 function! s:on_finish(cond, status) dict"{{{
   let l:qflist = ghcmod#parse_make(readfile(self.tmpfile))
-  lcd `=expand('%:p:h')`
   call setqflist(l:qflist, self.action)
-  lcd -
   call delete(self.tmpfile)
   cwindow
   if &l:buftype ==# 'quickfix'

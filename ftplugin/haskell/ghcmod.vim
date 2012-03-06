@@ -11,7 +11,7 @@ if !exists('s:has_ghc_mod')
     finish
   endif
 
-  let s:required_version = [1, 10, 6]
+  let s:required_version = [1, 10, 11]
   if !ghcmod#check_version(s:required_version)
     call ghcmod#print_error(printf('ghcmod: requires ghc-mod %s or higher', join(s:required_version, '.')))
     finish
@@ -37,6 +37,7 @@ command! -buffer -nargs=0 GhcModLint call s:make('lint')
 command! -buffer -nargs=0 GhcModCheckAsync call ghcmod#async_make('check', '')
 command! -buffer -nargs=0 GhcModLintAsync call ghcmod#async_make('lint', '')
 command! -buffer -nargs=0 GhcModCheckAndLintAsync call s:check_and_lint_async()
+command! -buffer -nargs=0 GhcModExpand call setqflist(ghcmod#expand()) | cwindow
 let b:undo_ftplugin .= join(map([
       \ 'GhcModType',
       \ 'GhcModTypeClear',
@@ -45,18 +46,12 @@ let b:undo_ftplugin .= join(map([
       \ 'GhcModCheckAsync',
       \ 'GhcModLintAsync',
       \ 'GhcModCheckAndLintAsync',
+      \ 'GhcModExpand'
       \ ], '"delcommand " . v:val'), ' | ')
-
-if ghcmod#check_version([1, 10, 10])
-  command! -buffer -nargs=0 GhcModExpand call setqflist(ghcmod#expand()) | cwindow
-  let b:undo_ftplugin .= '| delcommand GhcModExpand'
-endif
 
 function! s:make(type)
   let l:qflist = ghcmod#make(a:type)
-  lcd `=expand('%:p:h')`
   call setqflist(l:qflist)
-  lcd -
   cwindow
   if empty(l:qflist)
     echo printf('ghc-mod %s: No errors found', a:type)
