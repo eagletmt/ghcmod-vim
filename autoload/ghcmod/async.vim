@@ -11,7 +11,7 @@ function! ghcmod#async#register(obj)
       let s:updatetime = &updatetime
     endif
     let s:sessions[l:key] = a:obj
-    set updatetime=0
+    set updatetime=100
     augroup ghcmod-async
       execute 'autocmd CursorHold,CursorHoldI * call s:receive(' . string(l:key) . ')'
     augroup END
@@ -32,6 +32,7 @@ function! s:receive(key)
   let l:session = s:sessions[a:key]
   let [l:cond, l:status] = ghcmod#wait(l:session.proc)
   if l:cond ==# 'run'
+    call feedkeys(mode() ==# 'i' ? "\<C-g>\<Esc>" : "\<Esc>", 'n')
     return
   endif
 
