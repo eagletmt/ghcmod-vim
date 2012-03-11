@@ -67,7 +67,7 @@ function! ghcmod#type()"{{{
   endif
   let l:mod = ghcmod#detect_module()
   let l:cmd = ghcmod#build_command(['type', l:file, l:mod, l:line, l:col])
-  let l:output = vimproc#system(l:cmd)
+  let l:output = s:system(l:cmd)
   let l:types = []
   for l:line in split(l:output, '\n')
     let l:m = matchlist(l:line, '\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\([^"]\+\)"')
@@ -171,7 +171,7 @@ function! ghcmod#make(type)"{{{
   let l:tmpfile = tempname()
   try
     let l:args = s:build_make_command(a:type, l:path)
-    let l:proc = vimproc#plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
+    let l:proc = s:plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
     let [l:cond, l:status] = ghcmod#wait(l:proc)
     let l:tries = 1
     while l:cond ==# 'run'
@@ -212,7 +212,7 @@ function! ghcmod#async_make(type, action)"{{{
 
   let l:tmpfile = tempname()
   let l:args = s:build_make_command(a:type, l:path)
-  let l:proc = vimproc#plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
+  let l:proc = s:plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
   let l:obj = {
         \ 'proc': l:proc,
         \ 'tmpfile': l:tmpfile,
@@ -273,7 +273,7 @@ function! ghcmod#expand()"{{{
 
   let l:qflist = []
   let l:cmd = ghcmod#build_command(['expand', l:path])
-  for l:line in split(vimproc#system(l:cmd), '\n')
+  for l:line in split(s:system(l:cmd), '\n')
     let l:qf = {}
     " path:line:col1-col2: message
     " or path:line:col: message
@@ -297,7 +297,7 @@ endfunction"}}}
 
 function! ghcmod#check_version(version)"{{{
   if !exists('s:ghc_mod_version')
-    call vimproc#system('ghc-mod')
+    call s:system('ghc-mod')
     let l:m = matchlist(vimproc#get_last_errmsg(), 'version \(\d\+\)\.\(\d\+\)\.\(\d\+\)')
     let s:ghc_mod_version = l:m[1 : 3]
     call map(s:ghc_mod_version, 'str2nr(v:val)')
@@ -338,6 +338,20 @@ function! ghcmod#build_command(args)"{{{
   endfor
   call extend(l:cmd, a:args)
   return l:cmd
+endfunction"}}}
+
+function! s:system(...)"{{{
+  lcd `=expand('%:p:h')`
+  let l:ret = call('vimproc#system', a:000)
+  lcd -
+  return l:ret
+endfunction"}}}
+
+function! s:plineopen2(...)"{{{
+  lcd `=expand('%:p:h')`
+  let l:ret = call('vimproc#plineopen2', a:000)
+  lcd -
+  return l:ret
 endfunction"}}}
 
 function! ghcmod#print_error(msg)"{{{
