@@ -313,6 +313,26 @@ endfunction"}}}
 
 function! ghcmod#build_command(args)"{{{
   let l:cmd = ['ghc-mod']
+
+  " detect autogen files created by Cabal
+  if !exists('b:ghcmod_autogen_opts')
+    let b:ghcmod_autogen_opts = []
+    let l:dir = expand('%:p:h')
+    for _ in range(6)
+      let l:autogen_dir = l:dir . '/dist/build/autogen'
+      if isdirectory(l:autogen_dir)
+        let b:ghcmod_autogen_opts = ['-g', '-i' . l:autogen_dir, '-g', '-I' . l:autogen_dir]
+        let l:macros_path = l:autogen_dir . '/cabal_macros.h'
+        if filereadable(l:macros_path)
+          call extend(b:ghcmod_autogen_opts, ['-g', '-optP-include', '-g', '-optP' . l:macros_path])
+        endif
+        break
+      endif
+      let l:dir = fnamemodify(l:dir, ':h')
+    endfor
+  endif
+  call extend(l:cmd, b:ghcmod_autogen_opts)
+
   for l:opt in get(g:, 'ghcmod_ghc_options', [])
     call extend(l:cmd, ['-g', l:opt])
   endfor
