@@ -118,7 +118,7 @@ function! ghcmod#detect_module()"{{{
   return 'Main'
 endfunction"}}}
 
-function! ghcmod#parse_make(lines)"{{{
+function! ghcmod#parse_make(lines, basedir)"{{{
   " `ghc-mod check` and `ghc-mod lint` produces <NUL> characters but Vim cannot
   " treat them correctly.  Vim converts <NUL> characters to <NL> in readfile().
   " See also :help readfile() and :help NL-used-for-Nul.
@@ -127,6 +127,7 @@ function! ghcmod#parse_make(lines)"{{{
     let l:qf = {}
     let l:m = matchlist(l:output, '^\(\f\+\):\(\d\+\):\(\d\+\):\s*\(.*\)$')
     let [l:qf.filename, l:qf.lnum, l:qf.col, l:rest] = l:m[1 : 4]
+    let l:qf.filename = s:join_path(a:basedir, l:qf.filename)
     if l:rest =~# '^Warning:'
       let l:qf.type = 'W'
       let l:rest = matchstr(l:rest, '^Warning:\s*\zs.*$')
@@ -145,6 +146,14 @@ function! ghcmod#parse_make(lines)"{{{
     endfor
   endfor
   return l:qflist
+endfunction"}}}
+
+function! s:join_path(dir, path)"{{{
+  if a:path[0] == '/'
+    return a:path
+  else
+    return a:dir . '/' . a:path
+  endif
 endfunction"}}}
 
 function! s:build_make_command(type, path)"{{{
@@ -167,6 +176,7 @@ function! ghcmod#make(type)"{{{
     call ghcmod#print_warning("ghcmod#make doesn't support running on an unnamed buffer.")
     return []
   endif
+  let l:dir = fnamemodify(l:path, ':h')
 
   let l:tmpfile = tempname()
   try
@@ -184,7 +194,7 @@ function! ghcmod#make(type)"{{{
       let [l:cond, l:status] = ghcmod#wait(l:proc)
       let l:tries += 1
     endwhile
-    return ghcmod#parse_make(readfile(l:tmpfile))
+    return ghcmod#parse_make(readfile(l:tmpfile), l:dir)
   catch
     call ghcmod#print_error(printf('%s %s', v:throwpoint, v:exception))
   finally
@@ -218,6 +228,7 @@ function! ghcmod#async_make(type, action)"{{{
         \ 'tmpfile': l:tmpfile,
         \ 'action': a:action,
         \ 'type': a:type,
+        \ 'basedir': fnamemodify(l:path, ':h'),
         \ 'on_finish': s:funcref('on_finish'),
         \ }
   if !ghcmod#async#register(l:obj)
@@ -228,7 +239,7 @@ function! ghcmod#async_make(type, action)"{{{
 endfunction"}}}
 
 function! s:on_finish(cond, status) dict"{{{
-  let l:qflist = ghcmod#parse_make(readfile(self.tmpfile))
+  let l:qflist = ghcmod#parse_make(readfile(self.tmpfile), self.basedir)
   call setqflist(l:qflist, self.action)
   call delete(self.tmpfile)
   cwindow
@@ -270,6 +281,7 @@ function! ghcmod#expand()"{{{
     call ghcmod#print_warning("ghcmod#expand doesn't support running on an unnamed buffer.")
     return []
   endif
+  let l:dir = fnamemodify(l:path, ':h')
 
   let l:qflist = []
   let l:cmd = ghcmod#build_command(['expand', l:path])
@@ -289,6 +301,9 @@ function! ghcmod#expand()"{{{
         " message
         let l:qf.text = substitute(l:line, '^\s\{2\}', '', '')
       endif
+    endif
+    if has_key(l:qf, 'filename')
+      let l:qf.filename = s:join_path(l:dir, l:qf.filename)
     endif
     call add(l:qflist, l:qf)
   endfor
