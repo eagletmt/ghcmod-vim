@@ -194,7 +194,7 @@ function! ghcmod#make(type)"{{{
       let [l:cond, l:status] = ghcmod#wait(l:proc)
       let l:tries += 1
     endwhile
-    return ghcmod#parse_make(readfile(l:tmpfile), l:dir)
+    return ghcmod#parse_make(readfile(l:tmpfile), b:ghcmod_basedir)
   catch
     call ghcmod#print_error(printf('%s %s', v:throwpoint, v:exception))
   finally
@@ -228,7 +228,7 @@ function! ghcmod#async_make(type, action)"{{{
         \ 'tmpfile': l:tmpfile,
         \ 'action': a:action,
         \ 'type': a:type,
-        \ 'basedir': fnamemodify(l:path, ':h'),
+        \ 'basedir': b:ghcmod_basedir,
         \ 'on_finish': s:funcref('on_finish'),
         \ }
   if !ghcmod#async#register(l:obj)
@@ -329,17 +329,21 @@ endfunction"}}}
 function! ghcmod#build_command(args)"{{{
   let l:cmd = ['ghc-mod']
 
-  " detect autogen files created by Cabal
-  if !exists('b:ghcmod_autogen_opts')
+  " search Cabal file
+  if !exists('b:ghcmod_basedir')
+    let b:ghcmod_basedir = expand('%:p:h')
     let b:ghcmod_autogen_opts = []
-    let l:dir = expand('%:p:h')
+    let l:dir = b:ghcmod_basedir
     for _ in range(6)
-      let l:autogen_dir = l:dir . '/dist/build/autogen'
-      if isdirectory(l:autogen_dir)
-        let b:ghcmod_autogen_opts = ['-g', '-i' . l:autogen_dir, '-g', '-I' . l:autogen_dir]
-        let l:macros_path = l:autogen_dir . '/cabal_macros.h'
-        if filereadable(l:macros_path)
-          call extend(b:ghcmod_autogen_opts, ['-g', '-optP-include', '-g', '-optP' . l:macros_path])
+      if !empty(glob(l:dir . '/*.cabal', 1))
+        let b:ghcmod_basedir = l:dir
+        let l:autogen_dir = l:dir . '/dist/build/autogen'
+        if isdirectory(l:autogen_dir)
+          let b:ghcmod_autogen_opts = ['-g', '-i' . l:autogen_dir, '-g', '-I' . l:autogen_dir]
+          let l:macros_path = l:autogen_dir . '/cabal_macros.h'
+          if filereadable(l:macros_path)
+            call extend(b:ghcmod_autogen_opts, ['-g', '-optP-include', '-g', '-optP' . l:macros_path])
+          endif
         endif
         break
       endif
