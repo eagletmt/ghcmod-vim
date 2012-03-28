@@ -349,10 +349,16 @@ function! ghcmod#build_command(args)"{{{
           endif
         endif
 
-        " detect *-tmp directory
-        for l:tmp in glob(l:build_dir . '/*/*-tmp', 0, 1)
-          call extend(b:ghcmod_autogen_opts, ['-g', '-i' . l:tmp, '-g', '-I' . l:tmp])
-        endfor
+        let l:tmps = glob(l:build_dir . '/*/*-tmp', 0, 1)
+        if !empty(l:tmps)
+          " add *-tmp directory to include path for executable project
+          for l:tmp in l:tmps
+            call extend(b:ghcmod_autogen_opts, ['-g', '-i' . l:tmp, '-g', '-I' . l:tmp])
+          endfor
+        else
+          " add build directory to include path for library project
+          call extend(b:ghcmod_autogen_opts, ['-g', '-i' . l:build_dir, '-g', '-I' . l:build_dir])
+        endif
         break
       endif
       let l:dir = fnamemodify(l:dir, ':h')
