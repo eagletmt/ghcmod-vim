@@ -326,6 +326,16 @@ function! ghcmod#check_version(version)"{{{
   return 1
 endfunction"}}}
 
+if v:version > 703 || (v:version == 703 && has('patch465'))"{{{
+  function! s:globlist(pat)
+    return glob(a:pat, 0, 1)
+  endfunction
+else
+  function! s:globlist(pat)
+    return split(glob(a:pat, 0), '\n')
+  endfunction
+endif"}}}
+
 function! ghcmod#build_command(args)"{{{
   let l:cmd = ['ghc-mod']
 
@@ -349,7 +359,7 @@ function! ghcmod#build_command(args)"{{{
           endif
         endif
 
-        let l:tmps = glob(l:build_dir . '/*/*-tmp', 0, 1)
+        let l:tmps = s:globlist(l:build_dir . '/*/*-tmp')
         if !empty(l:tmps)
           " add *-tmp directory to include path for executable project
           for l:tmp in l:tmps
