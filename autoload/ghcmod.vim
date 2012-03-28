@@ -335,16 +335,24 @@ function! ghcmod#build_command(args)"{{{
     let b:ghcmod_autogen_opts = []
     let l:dir = b:ghcmod_basedir
     for _ in range(6)
-      if !empty(glob(l:dir . '/*.cabal', 1))
+      if !empty(glob(l:dir . '/*.cabal', 0))
         let b:ghcmod_basedir = l:dir
-        let l:autogen_dir = l:dir . '/dist/build/autogen'
+        let l:build_dir = l:dir . '/dist/build'
+
+        " detect autogen directory
+        let l:autogen_dir = l:build_dir . '/autogen'
         if isdirectory(l:autogen_dir)
-          let b:ghcmod_autogen_opts = ['-g', '-i' . l:autogen_dir, '-g', '-I' . l:autogen_dir]
+          call extend(b:ghcmod_autogen_opts, ['-g', '-i' . l:autogen_dir, '-g', '-I' . l:autogen_dir])
           let l:macros_path = l:autogen_dir . '/cabal_macros.h'
           if filereadable(l:macros_path)
             call extend(b:ghcmod_autogen_opts, ['-g', '-optP-include', '-g', '-optP' . l:macros_path])
           endif
         endif
+
+        " detect *-tmp directory
+        for l:tmp in glob(l:build_dir . '/*/*-tmp', 0, 1)
+          call extend(b:ghcmod_autogen_opts, ['-g', '-i' . l:tmp, '-g', '-I' . l:tmp])
+        endfor
         break
       endif
       let l:dir = fnamemodify(l:dir, ':h')
