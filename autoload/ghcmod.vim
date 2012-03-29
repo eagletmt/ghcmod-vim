@@ -342,39 +342,39 @@ function! ghcmod#build_command(args)"{{{
   " search Cabal file
   if !exists('b:ghcmod_basedir')
     let b:ghcmod_basedir = expand('%:p:h')
-    let b:ghcmod_autogen_opts = []
     let l:dir = b:ghcmod_basedir
     for _ in range(6)
       if !empty(glob(l:dir . '/*.cabal', 0))
         let b:ghcmod_basedir = l:dir
-        let l:build_dir = l:dir . '/dist/build'
-
-        " detect autogen directory
-        let l:autogen_dir = l:build_dir . '/autogen'
-        if isdirectory(l:autogen_dir)
-          call extend(b:ghcmod_autogen_opts, ['-g', '-i' . l:autogen_dir, '-g', '-I' . l:autogen_dir])
-          let l:macros_path = l:autogen_dir . '/cabal_macros.h'
-          if filereadable(l:macros_path)
-            call extend(b:ghcmod_autogen_opts, ['-g', '-optP-include', '-g', '-optP' . l:macros_path])
-          endif
-        endif
-
-        let l:tmps = s:globlist(l:build_dir . '/*/*-tmp')
-        if !empty(l:tmps)
-          " add *-tmp directory to include path for executable project
-          for l:tmp in l:tmps
-            call extend(b:ghcmod_autogen_opts, ['-g', '-i' . l:tmp, '-g', '-I' . l:tmp])
-          endfor
-        else
-          " add build directory to include path for library project
-          call extend(b:ghcmod_autogen_opts, ['-g', '-i' . l:build_dir, '-g', '-I' . l:build_dir])
-        endif
         break
       endif
       let l:dir = fnamemodify(l:dir, ':h')
     endfor
   endif
-  call extend(l:cmd, b:ghcmod_autogen_opts)
+
+  let l:build_dir = b:ghcmod_basedir . '/dist/build'
+  if isdirectory(l:build_dir)
+    " detect autogen directory
+    let l:autogen_dir = l:build_dir . '/autogen'
+    if isdirectory(l:autogen_dir)
+      call extend(l:cmd, ['-g', '-i' . l:autogen_dir, '-g', '-I' . l:autogen_dir])
+      let l:macros_path = l:autogen_dir . '/cabal_macros.h'
+      if filereadable(l:macros_path)
+        call extend(l:cmd, ['-g', '-optP-include', '-g', '-optP' . l:macros_path])
+      endif
+    endif
+
+    let l:tmps = s:globlist(l:build_dir . '/*/*-tmp')
+    if !empty(l:tmps)
+      " add *-tmp directory to include path for executable project
+      for l:tmp in l:tmps
+        call extend(l:cmd, ['-g', '-i' . l:tmp, '-g', '-I' . l:tmp])
+      endfor
+    else
+      " add build directory to include path for library project
+      call extend(l:cmd, ['-g', '-i' . l:build_dir, '-g', '-I' . l:build_dir])
+    endif
+  endif
 
   for l:opt in get(g:, 'ghcmod_ghc_options', [])
     call extend(l:cmd, ['-g', l:opt])
