@@ -1,0 +1,116 @@
+*ghcmod.txt* Happy Haskell programming on Vim, powered by ghc-mod
+
+Author: eagletmt <eagletmt@gmail.com>
+Repository: https://github.com/eagletmt/ghcmod-vim
+
+CONTENTS                                                     *ghcmod-contents*
+
+Features		|ghcmod-features|
+Requirements		|ghcmod-requirements|
+Details			|ghcmod-details|
+Global variables	|ghcmod-global-variables|
+Customize		|ghcmod-customize|
+License			|ghcmod-license|
+
+==============================================================================
+FEATURES                                                    *ghcmod-features*
+
+- Displaying the type of sub-expressions (ghc-mod type)
+- Displaying error/warning messages and their locations (ghc-mod check and
+  ghc-mod lint)
+- Displaying the expansion of splices (ghc-mod expand)
+
+Completions are supported by another plugin. See neco-ghc
+<https://github.com/ujihisa/neco-ghc>.
+
+==============================================================================
+REQUIREMENTS                                             *ghcmod-requirements*
+
+- vimproc <https://github.com/Shougo/vimproc>
+- ghc-mod <https://github.com/kazu-yamamoto/ghc-mod>
+
+You can install ghc-mod via cabal-install.
+>
+	cabal install ghc-mod
+<
+
+==============================================================================
+DETAILS                                                       *ghcmod-details*
+
+If you'd like to give GHC options, set |g:ghcmod_ghc_options|.
+
+:GhcModType                                                      *:GhcModType*
+	The sub-expression under the cursor is highlighted and its type is
+	echoed. If you type |:GhcModType| multiple times, the sub-expression
+	changes.
+
+	Sub-expressions are highlighted as |hl-Search| by default. You can
+	customize it by setting |g:ghcmod_type_highlight|.
+
+:GhcModTypeClear                                            *:GhcModTypeClear*
+	Clear the highlight created by |:GhcModType|.
+
+:GhcModCheck                                                    *:GhcModCheck*
+	Display compiler errors/warnings in |quickfix|.
+
+:GhcModLint                                                      *:GhcModLint*
+	Display hlint suggestions in |quickfix|. If you'd like to pass options
+	to hlint, set |g:ghcmod_hlint_options|.
+
+:GhcModCheckAsync                                          *:GhcModCheckAsync*
+	Asynchronous variant of |:GhcModCheck|. This would be useful when
+	you'd like to run check and/or lint automatically (especially on
+	|BufWritePost|).  See |ghcmod-customize| wiki page for more detail.
+
+:GhcModLintAsync                                            *:GhcModLintAsync*
+	Asynchronous variant of |:GhcModLint|.
+
+:GhcModCheckAndLintAsync                            *:GhcModCheckAndLintAsync*
+	Perform |:GhcModCheck| and |:GhcModLint| asynchronously.
+
+:GhcModExpand                                                  *:GhcModExpand*
+	Display the expansion of splices in |quickfix|.
+
+==============================================================================
+GLOBAL VARIABLES                                     *ghcmod-global-variables*
+
+g:ghcmod_ghc_options                                    *g:ghcmod_ghc_options*
+	Pass these options to GHC. By default, ghcmod doesn't pass any GHC
+	options. When ghcmod finds a Cabal directory structure, ghcmod
+	automatically append suitable options for it.
+
+	Example: passing -idir1 and -idir2 to GHC
+>
+	let g:ghcmod_ghc_options = ['-idir1', '-idir2']
+<
+
+g:ghcmod_hlint_options                                *g:ghcmod_hlint_options*
+	Pass these options to hlint. By default, ghcmod doesn't pass any GHC
+	options.
+
+	Example: passing --ignore=Redundant $ to hlint
+>
+	let g:ghcmod_hlint_options = ['--ignore=Redundant $']
+<
+
+g:ghcmod_type_highlight                              *g:ghcmod_type_highlight*
+	The highlight group used in |:GhcModType|. By default, Search group is
+	used. See |:highlight| for details on highlighting.
+
+	Example: highlighting sub-expressions with yellow background
+>
+	let ghcmodType ctermbg=yellow
+	let g:ghcmod_type_highlight = 'ghcmodType'
+<
+
+==============================================================================
+CUSTOMIZE                                                   *ghcmod-customize*
+
+See wiki page <https://github.com/eagletmt/ghcmod-vim/wiki/Customize>.
+
+==============================================================================
+LICENSE                                                       *ghcmod-license*
+
+BSD3 License, the same license as ghc-mod.
+
+vim:tw=78:ts=8:noet:ft=help:norl:
