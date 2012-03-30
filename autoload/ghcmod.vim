@@ -106,7 +106,7 @@ function! ghcmod#type()"{{{
   let l:len = len(l:types)
   if l:len == 0
     call ghcmod#print_error('ghcmod#type: Cannot guess type')
-    return
+    return ['', '']
   endif
 
   call ghcmod#clear_highlight()
@@ -458,5 +458,46 @@ endfunction"}}}
 function! ghcmod#version()"{{{
   return [0, 2, 0]
 endfunction"}}}
+
+function! ghcmod#type_insert() "{{{
+  let fexp = ghcmod#getHaskellIdentifier()
+  if !exists('fexp') || fexp  == ''
+    call ghcmod#print_error('Failed to determine identifier under cursor.')
+    return 0
+  endif
+  let [locsym, type] = ghcmod#type()
+  if type == ''
+    return 0
+  endif
+  let [_, offset, _, _] = locsym
+  call append(line(".")-1, repeat(' ', offset-1) . fexp . " :: " . type)
+endfunction "}}}
+
+function! ghcmod#preview(str, size) "{{{
+  silent! wincmd P
+  if !(&previewwindow && expand("%:t") == "GHC-mod")
+      pclose
+      pedit GHC-mod
+      silent! wincmd P
+  endif
+  setlocal modifiable
+  setlocal buftype=nofile
+  " make sure buffer is deleted when view is closed
+  setlocal bufhidden=wipe
+  setlocal noswapfile
+  setlocal nobuflisted
+  setlocal nonumber
+  setlocal statusline=%F
+  setlocal nofoldenable
+  setlocal filetype=haskell
+  setlocal nolist
+  let l:str = escape(a:str, '"|')
+  silent 0put =l:str
+  setlocal nomodifiable
+  exec 'resize ' . min([line('$')+1, a:size])
+  normal gg
+  wincmd p
+  return
+endfunction "}}}
 
 " vim: set ts=2 sw=2 et fdm=marker:

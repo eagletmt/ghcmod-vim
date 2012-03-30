@@ -54,6 +54,16 @@ If you'd like to give GHC options, set |g:ghcmod_ghc_options|.
 :GhcModInfo {identifier}
 	Information about {identifier} is echoed.
 
+:GhcModInfoPreview                                        *:GhcModInfoPreview*
+	Information about the identifier under the cursor is displayed in
+	the preview window. Info accumulates until the preview window is
+	closed or renamed, for example by a different command.
+
+:GhcModInfoPreview {identifier}
+	Information about {identifier} is displayed in the preview window.
+	Info accumulates until the preview window is closed or renamed,
+	for example by a different command.
+
 :GhcModTypeClear                                            *:GhcModTypeClear*
 	Clear the highlight created by |:GhcModType|.
 
@@ -120,6 +130,13 @@ g:ghcmod_use_basedir                                    *g:ghcmod_use_basedir*
 	If you do not set it, ghcmod will be executed from the folder the file
 	current Haskell file is contained in.
 
+g:ghcmod_max_preview_size                          *g:ghcmod_max_preview_size*
+	The maximum size in lines of that the preview window will grow to
+	while under the control of ghcmod. Useful for preventing huge lists
+	from taking up the screen, for example with
+>
+	:GhcModInfoPreview Eq
+<
 ==============================================================================
 CUSTOMIZE                                                   *ghcmod-customize*
 

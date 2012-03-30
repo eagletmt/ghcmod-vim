@@ -30,9 +30,15 @@ else
   let b:undo_ftplugin = ''
 endif
 
+if !exists('g:ghcmod_max_preview_size')
+  let g:ghcmod_max_preview_size = 10
+endif
+
 command! -buffer -nargs=0 GhcModType echo ghcmod#type()[1]
-command! -buffer -nargs=? GhcModInfo call s:info(<q-args>)
+command! -buffer -nargs=0 GhcModTypeInsert call ghcmod#type_insert()
+command! -buffer -nargs=? GhcModInfo echo s:info(<q-args>)
 command! -buffer -nargs=0 GhcModTypeClear call ghcmod#type_clear()
+command! -buffer -nargs=? GhcModInfoPreview call ghcmod#preview(s:info(<q-args>), g:ghcmod_max_preview_size)
 command! -buffer -nargs=0 GhcModCheck call s:make('check')
 command! -buffer -nargs=0 GhcModLint call s:make('lint')
 command! -buffer -nargs=0 GhcModCheckAsync call ghcmod#async_make('check', '')
@@ -41,7 +47,9 @@ command! -buffer -nargs=0 GhcModCheckAndLintAsync call s:check_and_lint_async()
 command! -buffer -nargs=0 GhcModExpand call setqflist(ghcmod#expand()) | cwindow
 let b:undo_ftplugin .= join(map([
       \ 'GhcModType',
+      \ 'GhcModTypeInsert',
       \ 'GhcModInfo',
+      \ 'GhcModInfoPreview',
       \ 'GhcModTypeClear',
       \ 'GhcModCheck',
       \ 'GhcModLint',
@@ -74,5 +82,5 @@ function! s:info(fexp)
   if empty(l:fexp)
     let l:fexp = ghcmod#getHaskellIdentifier()
   end
-  echo ghcmod#info(l:fexp)
+  return ghcmod#info(l:fexp)
 endfunction
