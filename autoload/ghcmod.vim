@@ -409,4 +409,8 @@ function! ghcmod#print_warning(msg)"{{{
   echohl None
 endfunction"}}}
 
+function! ghcmod#version()"{{{
+  return [0, 1, 0]
+endfunction"}}}
+
 " vim: set ts=2 sw=2 et fdm=marker:
