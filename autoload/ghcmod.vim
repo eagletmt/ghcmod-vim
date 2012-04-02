@@ -262,7 +262,7 @@ function! ghcmod#wait(proc)"{{{
       silent! scriptnames
       redir END
       for l:line in split(l:output, '\n')
-        if l:line =~# '/vimproc/autoload/vimproc\.vim$'
+        if l:line =~# 'autoload/vimproc\.vim$'
           let s:libcall = function('<SNR>' . matchstr(l:line, '^\s*\zs\d\+') . '_libcall')
           break
         endif
