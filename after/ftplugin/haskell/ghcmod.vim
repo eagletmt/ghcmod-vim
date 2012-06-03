@@ -48,6 +48,7 @@ let b:undo_ftplugin .= join(map([
       \ 'GhcModCheckAndLintAsync',
       \ 'GhcModExpand'
       \ ], '"delcommand " . v:val'), ' | ')
+let b:undo_ftplugin .= ' | unlet b:did_ftplugin_ghcmod'
 
 function! s:make(type)
   let l:qflist = ghcmod#make(a:type)
