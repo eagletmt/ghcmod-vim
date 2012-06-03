@@ -148,8 +148,18 @@ function! ghcmod#parse_make(lines, basedir)"{{{
   return l:qflist
 endfunction"}}}
 
+if vimproc#util#is_windows()" s:is_abspath {{{
+  function! s:is_abspath(path)
+    return a:path =~? '^[a-z]:[\/]'
+  endfunction
+else
+  function! s:is_abspath(path)
+    return a:path[0] ==# '/'
+  endfunction
+endif"}}}
+
 function! s:join_path(dir, path)"{{{
-  if a:path[0] == '/'
+  if s:is_abspath(a:path)
     return a:path
   else
     return a:dir . '/' . a:path
