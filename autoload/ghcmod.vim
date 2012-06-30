@@ -331,6 +331,8 @@ function! ghcmod#check_version(version)"{{{
   for l:i in range(0, 2)
     if a:version[l:i] > s:ghc_mod_version[l:i]
       return 0
+    elseif a:version[l:i] < s:ghc_mod_version[l:i]
+      return 1
     endif
   endfor
   return 1
