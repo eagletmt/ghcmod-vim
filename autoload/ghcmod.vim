@@ -403,7 +403,11 @@ function! s:system(...)"{{{
 endfunction"}}}
 
 function! s:plineopen2(...)"{{{
-  lcd `=expand('%:p:h')`
+  if empty(g:ghcmod_use_basedir)
+    lcd `=expand('%:p:h')`
+  else
+    lcd `=g:ghcmod_use_basedir`
+  endif
   let l:ret = call('vimproc#plineopen2', a:000)
   lcd -
   return l:ret
