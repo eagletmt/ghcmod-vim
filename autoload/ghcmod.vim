@@ -403,7 +403,7 @@ function! s:system(...)"{{{
 endfunction"}}}
 
 function! s:plineopen2(...)"{{{
-  if empty(g:ghcmod_use_basedir)
+  if empty(get(g:, 'ghcmod_use_basedir', ''))
     lcd `=expand('%:p:h')`
   else
     lcd `=g:ghcmod_use_basedir`
