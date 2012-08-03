@@ -71,7 +71,9 @@ function! ghcmod#type()"{{{
   let l:types = []
   for l:line in split(l:output, '\n')
     let l:m = matchlist(l:line, '\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\([^"]\+\)"')
-    call add(l:types, [l:m[1 : 4], l:m[5]])
+    if !empty(l:m)
+      call add(l:types, [l:m[1 : 4], l:m[5]])
+    endif
   endfor
   let l:len = len(l:types)
   if l:len == 0
