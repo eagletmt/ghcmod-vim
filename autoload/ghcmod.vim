@@ -111,6 +111,7 @@ function! ghcmod#type()"{{{
 
   call ghcmod#clear_highlight()
   let b:ghcmod_type = deepcopy(s:ghcmod_type)
+  let g:ghcmod_type_highlighted = 1
 
   let b:ghcmod_type.types = l:types
   let l:ret = b:ghcmod_type.type()
@@ -132,6 +133,7 @@ function! ghcmod#type_clear()"{{{
   if exists('b:ghcmod_type')
     call ghcmod#clear_highlight()
     unlet b:ghcmod_type
+    unlet g:ghcmod_type_highlighted
   endif
 endfunction"}}}
 
