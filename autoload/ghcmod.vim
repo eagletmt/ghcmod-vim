@@ -48,6 +48,35 @@ function! ghcmod#clear_highlight()"{{{
   endif
 endfunction"}}}
 
+" Return the current haskell identifier
+function! ghcmod#getHaskellIdentifier()"{{{
+  let c = col ('.')-1
+  let l = line('.')
+  let ll = getline(l)
+  let ll1 = strpart(ll,0,c)
+  let ll1 = matchstr(ll1,"[a-zA-Z0-9_'.]*$")
+  let ll2 = strpart(ll,c,strlen(ll)-c+1)
+  let ll2 = matchstr(ll2,"^[a-zA-Z0-9_'.]*")
+  return ll1.ll2
+endfunction"}}}
+
+function! ghcmod#info()"{{{
+  if &l:modified
+    call ghcmod#print_warning('ghcmod#info: the buffer has been modified but not written')
+  endif
+  let l:fexp  = ghcmod#getHaskellIdentifier()
+  let l:file = expand('%:p')
+  if l:file ==# ''
+    call ghcmod#print_warning("current version of ghcmod.vim doesn't support running on an unnamed buffer.")
+    return ''
+  endif
+  let l:mod = ghcmod#detect_module()
+  let l:cmd = ghcmod#build_command(['info', l:file, l:mod, l:fexp])
+  let l:output = s:system(l:cmd)
+
+  return l:output
+endfunction"}}}
+
 function! ghcmod#type()"{{{
   if &l:modified
     call ghcmod#print_warning('ghcmod#type: the buffer has been modified but not written')

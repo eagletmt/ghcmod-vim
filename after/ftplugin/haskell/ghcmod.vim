@@ -31,6 +31,7 @@ else
 endif
 
 command! -buffer -nargs=0 GhcModType echo ghcmod#type()[1]
+command! -buffer -nargs=0 GhcModInfo echo ghcmod#info()
 command! -buffer -nargs=0 GhcModTypeClear call ghcmod#type_clear()
 command! -buffer -nargs=0 GhcModCheck call s:make('check')
 command! -buffer -nargs=0 GhcModLint call s:make('lint')
@@ -40,6 +41,7 @@ command! -buffer -nargs=0 GhcModCheckAndLintAsync call s:check_and_lint_async()
 command! -buffer -nargs=0 GhcModExpand call setqflist(ghcmod#expand()) | cwindow
 let b:undo_ftplugin .= join(map([
       \ 'GhcModType',
+      \ 'GhcModInfo',
       \ 'GhcModTypeClear',
       \ 'GhcModCheck',
       \ 'GhcModLint',
