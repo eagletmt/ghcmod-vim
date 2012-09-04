@@ -16,6 +16,7 @@ License			|ghcmod-license|
 FEATURES                                                    *ghcmod-features*
 
 - Displaying the type of sub-expressions (ghc-mod type)
+- Displaying the info for identifiers (ghc-mod info)
 - Displaying error/warning messages and their locations (ghc-mod check and
   ghc-mod lint)
 - Displaying the expansion of splices (ghc-mod expand)
@@ -46,6 +47,9 @@ If you'd like to give GHC options, set |g:ghcmod_ghc_options|.
 
 	Sub-expressions are highlighted as |hl-Search| by default. You can
 	customize it by setting |g:ghcmod_type_highlight|.
+
+:GhcModInfo                                                      *:GhcModInfo*
+	Information about the identifier under the cursor is echoed.
 
 :GhcModTypeClear                                            *:GhcModTypeClear*
 	Clear the highlight created by |:GhcModType|.
