@@ -31,7 +31,7 @@ else
 endif
 
 command! -buffer -nargs=0 GhcModType echo ghcmod#type()[1]
-command! -buffer -nargs=0 GhcModInfo echo ghcmod#info()
+command! -buffer -nargs=? GhcModInfo call s:info(<q-args>)
 command! -buffer -nargs=0 GhcModTypeClear call ghcmod#type_clear()
 command! -buffer -nargs=0 GhcModCheck call s:make('check')
 command! -buffer -nargs=0 GhcModLint call s:make('lint')
@@ -67,4 +67,12 @@ function! s:check_and_lint_async()
     call ghcmod#async_make('check', 'a')
     call ghcmod#async_make('lint', 'a')
   endif
+endfunction
+
+function! s:info(fexp)
+  let l:fexp = a:fexp
+  if empty(l:fexp)
+    let l:fexp = ghcmod#getHaskellIdentifier()
+  end
+  echo ghcmod#info(l:fexp)
 endfunction

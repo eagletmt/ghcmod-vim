@@ -60,18 +60,17 @@ function! ghcmod#getHaskellIdentifier()"{{{
   return ll1.ll2
 endfunction"}}}
 
-function! ghcmod#info()"{{{
+function! ghcmod#info(fexp)"{{{
   if &l:modified
     call ghcmod#print_warning('ghcmod#info: the buffer has been modified but not written')
   endif
-  let l:fexp  = ghcmod#getHaskellIdentifier()
   let l:file = expand('%:p')
   if l:file ==# ''
     call ghcmod#print_warning("current version of ghcmod.vim doesn't support running on an unnamed buffer.")
     return ''
   endif
   let l:mod = ghcmod#detect_module()
-  let l:cmd = ghcmod#build_command(['info', l:file, l:mod, l:fexp])
+  let l:cmd = ghcmod#build_command(['info', l:file, l:mod, a:fexp])
   let l:output = s:system(l:cmd)
 
   return l:output

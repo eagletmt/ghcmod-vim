@@ -51,6 +51,9 @@ If you'd like to give GHC options, set |g:ghcmod_ghc_options|.
 :GhcModInfo                                                      *:GhcModInfo*
 	Information about the identifier under the cursor is echoed.
 
+:GhcModInfo {identifier}
+	Information about {identifier} is echoed.
+
 :GhcModTypeClear                                            *:GhcModTypeClear*
 	Clear the highlight created by |:GhcModType|.
 
