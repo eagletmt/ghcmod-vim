@@ -456,7 +456,7 @@ function! ghcmod#print_warning(msg)"{{{
 endfunction"}}}
 
 function! ghcmod#version()"{{{
-  return [0, 1, 2]
+  return [0, 2, 0]
 endfunction"}}}
 
 " vim: set ts=2 sw=2 et fdm=marker:
