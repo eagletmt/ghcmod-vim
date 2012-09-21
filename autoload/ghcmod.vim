@@ -111,6 +111,9 @@ function! ghcmod#type()"{{{
 
   call ghcmod#clear_highlight()
   let b:ghcmod_type = deepcopy(s:ghcmod_type)
+
+  " This flag tells us whether or not ghcmod's highlights are still active
+  " in case we want to do something with them.
   let g:ghcmod_type_highlighted = 1
 
   let b:ghcmod_type.types = l:types
