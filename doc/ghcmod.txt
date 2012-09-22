@@ -82,13 +82,20 @@ If you'd like to give GHC options, set |g:ghcmod_ghc_options|.
 GLOBAL VARIABLES                                     *ghcmod-global-variables*
 
 g:ghcmod_ghc_options                                    *g:ghcmod_ghc_options*
-	Pass these options to GHC. By default, ghcmod doesn't pass any GHC
-	options. When ghcmod finds a Cabal directory structure, ghcmod
-	automatically append suitable options for it.
+	Pass these options to GHC. By default, ghcmod only passes the
+	"-fno-code" option for performance reasons. Defining this variable
+	will prevent this, so if you want that option you should include
+	it manually. When ghcmod finds a Cabal directory structure,
+	ghcmod automatically appends suitable options for it.
 
-	Example: passing -idir1 and -idir2 to GHC
+	Example: passing ONLY -idir1 and -idir2 to GHC.
 >
 	let g:ghcmod_ghc_options = ['-idir1', '-idir2']
+<
+	Example: excluding the implicit "-fno-code". This was the default in
+	previous version of ghcmod.
+>
+	let g:ghcmod_ghc_options = []
 <
 
 g:ghcmod_hlint_options                                *g:ghcmod_hlint_options*
