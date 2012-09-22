@@ -120,6 +120,22 @@ g:ghcmod_use_basedir                                    *g:ghcmod_use_basedir*
 	If you do not set it, ghcmod will be executed from the folder the file
 	current Haskell file is contained in.
 
+g:ghcmod_type_highlighted                          *g:ghcmod_type_highlighted*
+	A flag which is True when ghcmod's highlighting is still present in
+	the text buffer. This allows for finer grained control over
+	highlights. Consider the following motivating example,
+>
+	" Either clear ghcmod or toggle normal search highlighting
+	function ClearAllHighlight()
+	  if exists('g:ghcmod_type_highlighted')
+	    GhcModTypeClear
+	  else
+	    set invhlsearch
+	  endif
+	endfun
+<
+
+
 ==============================================================================
 CUSTOMIZE                                                   *ghcmod-customize*
 
