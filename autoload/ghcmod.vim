@@ -418,7 +418,9 @@ function! ghcmod#build_command(args)"{{{
     endif
   endif
 
-  for l:opt in get(g:, 'ghcmod_ghc_options', [])
+  " Taking the -fno-code flag here results in a *massive* speed increase.
+  " Overrideable by the user setting g:ghcmod_ghc_options themselves.
+  for l:opt in get(g:, 'ghcmod_ghc_options', ["-fno-code"])
     call extend(l:cmd, ['-g', l:opt])
   endfor
   call extend(l:cmd, a:args)
