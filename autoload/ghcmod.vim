@@ -468,6 +468,7 @@ function! ghcmod#type_insert() "{{{
     return 0
   endif
   let [locsym, type] = ghcmod#type()
+  call ghcmod#clear_highlight()
   if type == ''
     return 0
   endif
