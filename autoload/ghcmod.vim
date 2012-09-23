@@ -467,13 +467,14 @@ function! ghcmod#type_insert() "{{{
     call ghcmod#print_error('Failed to determine identifier under cursor.')
     return 0
   endif
-  let [locsym, type] = ghcmod#type()
-  call ghcmod#clear_highlight()
+  let info = ghcmod#info(fexp)
+  let type = substitute(info, '\n\|\t.*', "", "g") " Remove extra lines
+  let type = substitute(type, '\s\+', " ", "g") " Compress whitespace
+  let type = substitute(type, '\s\+$', "", "g") " Remove trailing whitespace
   if type == ''
     return 0
   endif
-  let [_, offset, _, _] = locsym
-  call append(line(".")-1, repeat(' ', offset-1) . fexp . " :: " . type)
+  call append(line(".")-1, type)
 endfunction "}}}
 
 function! ghcmod#preview(str, size) "{{{
