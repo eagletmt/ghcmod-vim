@@ -420,7 +420,15 @@ function! ghcmod#build_command(args)"{{{
 
   " Taking the -fno-code flag here results in a *massive* speed increase.
   " Overrideable by the user setting g:ghcmod_ghc_options themselves.
-  for l:opt in get(g:, 'ghcmod_ghc_options', ["-fno-code"])
+  " We can't use it with TemplateHaskell however :(
+  let l:save_cursor = getpos(".")
+  if search("TemplateHaskell","n")
+    let l:defaults = []
+  else
+    let defaults = ["-fno-code"]
+  endif
+  call setpos('.', l:save_cursor)
+  for l:opt in get(g:, 'ghcmod_ghc_options', l:defaults)
     call extend(l:cmd, ['-g', l:opt])
   endfor
   call extend(l:cmd, a:args)
