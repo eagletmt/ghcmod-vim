@@ -156,6 +156,13 @@ function! ghcmod#parse_make(lines, basedir)"{{{
   for l:output in a:lines
     let l:qf = {}
     let l:m = matchlist(l:output, '^\(\f\+\):\(\d\+\):\(\d\+\):\s*\(.*\)$')
+    if len(l:m) < 4
+      let l:qf.bufnr = 0
+      let l:qf.type = 'E'
+      let l:qf.text = 'parse error in ghcmod! Could not parse the following ghc-mod output:' .  l:output
+      call add(l:qflist, l:qf)
+      break
+    end
     let [l:qf.filename, l:qf.lnum, l:qf.col, l:rest] = l:m[1 : 4]
     let l:qf.filename = s:join_path(a:basedir, l:qf.filename)
     if l:rest =~# '^Warning:'
@@ -168,12 +175,24 @@ function! ghcmod#parse_make(lines, basedir)"{{{
       let l:qf.type = 'E'
     endif
     let l:texts = split(l:rest, '\n')
-    let l:qf.text = l:texts[0]
-    call add(l:qflist, l:qf)
-
-    for l:text in l:texts[1 :]
-      call add(l:qflist, {'text': l:text})
-    endfor
+    if len(l:texts) > 0
+      let l:qf.text = l:texts[0]
+      call add(l:qflist, l:qf)
+      for l:text in l:texts[1 :]
+        call add(l:qflist, {'text': l:text})
+      endfor
+    else
+      let l:qf.filename = ''
+      let l:errortext = join(a:lines, "\n")
+      let l:qf.bufnr = 0
+      let l:qf.type = 'E'
+      let l:qf.text = 'parse error in ghcmod! Could not parse the following ghc-mod output:'
+      call add(l:qflist, l:qf)
+      for l:text in a:lines
+        call add(l:qflist, {'text': l:text})
+      endfor
+      break
+    endif
   endfor
   return l:qflist
 endfunction"}}}
