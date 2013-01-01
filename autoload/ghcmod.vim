@@ -437,9 +437,14 @@ function! ghcmod#build_command(args)"{{{
     endif
   endif
 
-  " Taking the -fno-code flag here results in a *massive* speed increase.
-  " Overrideable by the user setting g:ghcmod_ghc_options themselves.
-  for l:opt in get(g:, 'ghcmod_ghc_options', ["-fno-code"])
+  if exists('b:ghcmod_ghc_options')
+    let l:opts = b:ghcmod_ghc_options
+  else
+    " Taking the -fno-code flag here results in a *massive* speed increase.
+    " Overrideable by the user setting g:ghcmod_ghc_options themselves.
+    let l:opts = get(g:, 'ghcmod_ghc_options', ["-fno-code"])
+  endif
+  for l:opt in l:opts
     call extend(l:cmd, ['-g', l:opt])
   endfor
   call extend(l:cmd, a:args)

@@ -108,6 +108,23 @@ g:ghcmod_ghc_options                                    *g:ghcmod_ghc_options*
 	let g:ghcmod_ghc_options = []
 <
 
+b:ghcmod_ghc_options                                    *b:ghcmod_ghc_options*
+	Buffer-local version of |g:ghcmod_ghc_options|. When both
+	|b:ghcmod_ghc_options| and |g:ghcmod_ghc_options| are defined,
+	|b:ghcmod_ghc_options| is given preference and |g:ghcmod_ghc_options|
+	is ignored.
+
+	Example: adding ~/.xmonad/lib when editing XMonad configs.
+>
+	autocmd BufRead,BufNewFile ~/.xmonad/* call s:add_xmonad_path()
+	function! s:add_xmonad_path()
+	  if !exists('b:ghcmod_ghc_options')
+	    let b:ghcmod_ghc_options = []
+	  endif
+	  call add(b:ghcmod_ghc_options, '-i' . expand('~/.xmonad/lib'))
+	endfunction
+<
+
 g:ghcmod_hlint_options                                *g:ghcmod_hlint_options*
 	Pass these options to hlint. By default, ghcmod doesn't pass any GHC
 	options.

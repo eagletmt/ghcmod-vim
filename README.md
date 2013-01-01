@@ -27,6 +27,18 @@ If you'd like to give GHC options, set `g:ghcmod_ghc_options`.
 let g:ghcmod_ghc_options = ['-idir1', '-idir2']
 ~~~
 
+Also, there's buffer-local version `b:ghcmod_ghc_options`.
+
+~~~vim
+autocmd BufRead,BufNewFile ~/.xmonad/* call s:add_xmonad_path()
+function! s:add_xmonad_path()
+  if !exists('b:ghcmod_ghc_options')
+    let b:ghcmod_ghc_options = []
+  endif
+  call add(b:ghcmod_ghc_options, '-i' . expand('~/.xmonad/lib'))
+endfunction
+~~~
+
 ### :GhcModType, :GhcModTypeClear
 Type `:GhcModType` on a expression, then the sub-expression is highlighted and its type is echoed.
 If you type `:GhcModType` multiple times, the sub-expression changes.
