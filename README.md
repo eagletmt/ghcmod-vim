@@ -12,6 +12,14 @@ See [neco-ghc](https://github.com/ujihisa/neco-ghc) .
 
 ## Requirements
 
+### Vim
+ghcmod.vim contains ftplugin.
+Please make sure that filetype plugin is enabled.
+To check it, type `:filetype` and you would see something like this: `filetype detection:ON  plugin:ON  indent:ON`.
+You can enable it by `:filetype plugin on`.
+I highly recommend adding `filetype plugin indent on` to your vimrc.
+See `:help :filetype-overview` for more details.
+
 ### vimproc
 https://github.com/Shougo/vimproc
 
