@@ -137,13 +137,11 @@ g:ghcmod_type_highlight                              *g:ghcmod_type_highlight*
 	let g:ghcmod_type_highlight = 'ghcmodType'
 <
 g:ghcmod_use_basedir                                    *g:ghcmod_use_basedir*
-	The directory to execute ghc-mod from. This can have an effect
-	particularly on template Haskell splices that expect to find certain
-	files in certain places. A good practice in these cases is to make
-	them work from the projects base directory, and open Vim from there.
->
-	let g:ghcmod_use_basedir = getcwd()
-<
+	When value is 'yes' ghc-mod is executed from project base directory,
+	e.g. from directory where cabal file is placed. This can have an
+	effect particularly on template Haskell splices that expect to find
+	certain files in certain places.
+
 	If you do not set it, ghcmod will be executed from the folder the file
 	current Haskell file is contained in.
 
