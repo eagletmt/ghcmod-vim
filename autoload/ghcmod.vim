@@ -480,7 +480,7 @@ function! ghcmod#print_warning(msg)"{{{
 endfunction"}}}
 
 function! ghcmod#version()"{{{
-  return [0, 2, 0]
+  return [0, 3, 0]
 endfunction"}}}
 
 function! ghcmod#type_insert() "{{{
