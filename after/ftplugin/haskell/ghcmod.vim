@@ -34,9 +34,9 @@ if !exists('g:ghcmod_max_preview_size')
   let g:ghcmod_max_preview_size = 10
 endif
 
-command! -buffer -nargs=0 GhcModType echo ghcmod#type()[1]
+command! -buffer -nargs=0 GhcModType call s:echo(ghcmod#type()[1])
 command! -buffer -nargs=0 GhcModTypeInsert call ghcmod#type_insert()
-command! -buffer -nargs=? GhcModInfo echo s:info(<q-args>)
+command! -buffer -nargs=? GhcModInfo call s:echo(s:info(<q-args>))
 command! -buffer -nargs=0 GhcModTypeClear call ghcmod#type_clear()
 command! -buffer -nargs=? GhcModInfoPreview call ghcmod#preview(s:info(<q-args>), g:ghcmod_max_preview_size)
 command! -buffer -nargs=0 GhcModCheck call s:make('check')
@@ -59,6 +59,12 @@ let b:undo_ftplugin .= join(map([
       \ 'GhcModExpand'
       \ ], '"delcommand " . v:val'), ' | ')
 let b:undo_ftplugin .= ' | unlet b:did_ftplugin_ghcmod'
+
+function! s:echo(msg)
+  if !empty(a:msg)
+    echo a:msg
+  endif
+endfunction
 
 function! s:make(type)
   let l:qflist = ghcmod#make(a:type)
