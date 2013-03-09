@@ -72,6 +72,8 @@ function! ghcmod#info(fexp)"{{{
   let l:mod = ghcmod#detect_module()
   let l:cmd = ghcmod#build_command(['info', l:file, l:mod, a:fexp])
   let l:output = s:system(l:cmd)
+  " Remove trailing newlines to prevent empty lines from being echoed
+  let l:output = substitute(l:output, '\n*$', '', '')
 
   return l:output
 endfunction"}}}
