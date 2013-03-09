@@ -136,8 +136,7 @@ function! ghcmod#type_clear()"{{{
 endfunction"}}}
 
 function! ghcmod#detect_module()"{{{
-  let l:max_lineno = min([line('$'), 11])
-  for l:lineno in range(1, l:max_lineno)
+  for l:lineno in range(1, line('$'))
     let l:line = getline(l:lineno)
     let l:mod = matchstr(l:line, 'module \zs[A-Za-z0-9.]\+')
     if !empty(l:mod)
