@@ -136,7 +136,7 @@ function! ghcmod#type_clear()"{{{
 endfunction"}}}
 
 function! ghcmod#detect_module()"{{{
-  let l:regex = '^\s*module\s\+\zs[A-Za-z0-9.]\+'
+  let l:regex = '^\C\s*module\s\+\zs[A-Za-z0-9.]\+'
   for l:lineno in range(1, line('$'))
     let l:line = getline(l:lineno)
     let l:pos = match(l:line, l:regex)
