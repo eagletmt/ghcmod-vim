@@ -405,20 +405,7 @@ endif"}}}
 function! ghcmod#build_command(args)"{{{
   let l:cmd = ['ghc-mod']
 
-  " search Cabal file
-  if !exists('b:ghcmod_basedir')
-    let b:ghcmod_basedir = expand('%:p:h')
-    let l:dir = b:ghcmod_basedir
-    for _ in range(6)
-      if !empty(glob(l:dir . '/*.cabal', 0))
-        let b:ghcmod_basedir = l:dir
-        break
-      endif
-      let l:dir = fnamemodify(l:dir, ':h')
-    endfor
-  endif
-
-  let l:build_dir = b:ghcmod_basedir . '/dist/build'
+  let l:build_dir = s:find_basedir() . '/dist/build'
   if isdirectory(l:build_dir)
     " detect autogen directory
     let l:autogen_dir = l:build_dir . '/autogen'
@@ -455,21 +442,43 @@ function! ghcmod#build_command(args)"{{{
 endfunction"}}}
 
 function! s:system(...)"{{{
-  lcd `=expand('%:p:h')`
+  lcd `=ghcmod#basedir()`
   let l:ret = call('vimproc#system', a:000)
   lcd -
   return l:ret
 endfunction"}}}
 
 function! s:plineopen2(...)"{{{
-  if empty(get(g:, 'ghcmod_use_basedir', ''))
-    lcd `=expand('%:p:h')`
-  else
-    lcd `=g:ghcmod_use_basedir`
-  endif
+  lcd `=ghcmod#basedir()`
   let l:ret = call('vimproc#plineopen2', a:000)
   lcd -
   return l:ret
+endfunction"}}}
+
+function! ghcmod#basedir()"{{{
+  let l:use_basedir = get(g:, 'ghcmod_use_basedir', '')
+  if !empty(l:use_basedir) && l:use_basedir ==? 'yes'
+    return s:find_basedir()
+  else
+    return expand('%:p:h')
+  endif
+endfunction"}}}
+
+function! s:find_basedir()"{{{
+  " search Cabal file
+  if !exists('b:ghcmod_basedir')
+    let l:ghcmod_basedir = expand('%:p:h')
+    let l:dir = l:ghcmod_basedir
+    for _ in range(6)
+      if !empty(glob(l:dir . '/*.cabal', 0))
+        let l:ghcmod_basedir = l:dir
+        break
+      endif
+      let l:dir = fnamemodify(l:dir, ':h')
+    endfor
+    let b:ghcmod_basedir = l:ghcmod_basedir
+  endif
+  return b:ghcmod_basedir
 endfunction"}}}
 
 function! ghcmod#print_error(msg)"{{{
