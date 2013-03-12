@@ -60,6 +60,9 @@ let b:undo_ftplugin .= join(map([
       \ ], '"delcommand " . v:val'), ' | ')
 let b:undo_ftplugin .= ' | unlet b:did_ftplugin_ghcmod'
 
+" Ensure syntax highlighting for ghcmod#detect_module()
+syntax sync fromstart
+
 function! s:echo(msg)
   if !empty(a:msg)
     echo a:msg

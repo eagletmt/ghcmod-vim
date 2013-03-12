@@ -138,12 +138,15 @@ function! ghcmod#type_clear()"{{{
 endfunction"}}}
 
 function! ghcmod#detect_module()"{{{
-  let l:max_lineno = min([line('$'), 11])
-  for l:lineno in range(1, l:max_lineno)
+  let l:regex = '^\C\s*module\s\+\zs[A-Za-z0-9.]\+'
+  for l:lineno in range(1, line('$'))
     let l:line = getline(l:lineno)
-    let l:mod = matchstr(l:line, 'module \zs[A-Za-z0-9.]\+')
-    if !empty(l:mod)
-      return l:mod
+    let l:pos = match(l:line, l:regex)
+    if l:pos != -1
+      let l:synname = synIDattr(synID(l:lineno, l:pos+1, 0), 'name')
+      if l:synname !~# 'Comment'
+        return matchstr(l:line, l:regex)
+      endif
     endif
     let l:lineno += 1
   endfor
