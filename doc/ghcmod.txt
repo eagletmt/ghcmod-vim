@@ -137,13 +137,12 @@ g:ghcmod_type_highlight                              *g:ghcmod_type_highlight*
 	let g:ghcmod_type_highlight = 'ghcmodType'
 <
 g:ghcmod_use_basedir                                    *g:ghcmod_use_basedir*
-	When value is 'yes' ghc-mod is executed from project base directory,
+	The directory to execute ghc-mod from.
+
+	If you do not set it, ghc-mod is executed from project base directory,
 	e.g. from directory where cabal file is placed. This can have an
 	effect particularly on template Haskell splices that expect to find
 	certain files in certain places.
-
-	If you do not set it, ghcmod will be executed from the folder the file
-	current Haskell file is contained in.
 
 g:ghcmod_max_preview_size                          *g:ghcmod_max_preview_size*
 	The maximum size in lines of that the preview window will grow to

@@ -457,10 +457,10 @@ endfunction"}}}
 
 function! ghcmod#basedir()"{{{
   let l:use_basedir = get(g:, 'ghcmod_use_basedir', '')
-  if !empty(l:use_basedir) && l:use_basedir ==? 'yes'
+  if empty(l:use_basedir)
     return s:find_basedir()
   else
-    return expand('%:p:h')
+    return l:use_basedir
   endif
 endfunction"}}}
 
