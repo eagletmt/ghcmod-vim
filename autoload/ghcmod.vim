@@ -153,6 +153,16 @@ function! ghcmod#detect_module()"{{{
   return 'Main'
 endfunction"}}}
 
+function! s:fix_qf_lnum_col(qf)"{{{
+  " ghc-mod reports dummy error message with lnum=0 and col=0.
+  " This is not suitable for Vim, so tweak them.
+  for l:key in ['lnum', 'col']
+    if get(a:qf, l:key, -1) == 0
+      let a:qf[l:key] = 1
+    endif
+  endfor
+endfunction"}}}
+
 function! ghcmod#parse_make(lines, basedir)"{{{
   " `ghc-mod check` and `ghc-mod lint` produces <NUL> characters but Vim cannot
   " treat them correctly.  Vim converts <NUL> characters to <NL> in readfile().
@@ -187,10 +197,8 @@ function! ghcmod#parse_make(lines, basedir)"{{{
         call add(l:qflist, {'text': l:text})
       endfor
     else
-      let l:qf.filename = ''
-      let l:errortext = join(a:lines, "\n")
-      let l:qf.bufnr = 0
       let l:qf.type = 'E'
+      call s:fix_qf_lnum_col(l:qf)
       let l:qf.text = 'parse error in ghcmod! Could not parse the following ghc-mod output:'
       call add(l:qflist, l:qf)
       for l:text in a:lines
@@ -369,6 +377,7 @@ function! ghcmod#expand()"{{{
     if has_key(l:qf, 'filename')
       let l:qf.filename = s:join_path(l:dir, l:qf.filename)
     endif
+    call s:fix_qf_lnum_col(l:qf)
     call add(l:qflist, l:qf)
   endfor
   return l:qflist
