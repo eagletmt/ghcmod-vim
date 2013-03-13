@@ -7,13 +7,13 @@ if !exists('s:has_ghc_mod')
   let s:has_ghc_mod = 0
 
   if !executable('ghc-mod')
-    call ghcmod#print_error('ghcmod: ghc-mod is not executable!')
+    call ghcmod#util#print_error('ghcmod: ghc-mod is not executable!')
     finish
   endif
 
   let s:required_version = [1, 10, 11]
-  if !ghcmod#check_version(s:required_version)
-    call ghcmod#print_error(printf('ghcmod: requires ghc-mod %s or higher', join(s:required_version, '.')))
+  if !ghcmod#util#check_version(s:required_version)
+    call ghcmod#util#print_error(printf('ghcmod: requires ghc-mod %s or higher', join(s:required_version, '.')))
     finish
   endif
 
@@ -62,12 +62,6 @@ let b:undo_ftplugin .= ' | unlet b:did_ftplugin_ghcmod'
 
 " Ensure syntax highlighting for ghcmod#detect_module()
 syntax sync fromstart
-
-function! s:echo(msg)
-  if !empty(a:msg)
-    echo a:msg
-  endif
-endfunction
 
 function! s:check_and_lint_async()
   if !ghcmod#async#exist_session()
