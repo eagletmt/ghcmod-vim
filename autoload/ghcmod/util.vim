@@ -29,3 +29,11 @@ else
     return split(glob(a:pat, 0), '\n')
   endfunction
 endif "}}}
+
+function! ghcmod#util#join_path(dir, path) "{{{
+  if ghcmod#util#is_abspath(a:path)
+    return a:path
+  else
+    return a:dir . '/' . a:path
+  endif
+endfunction "}}}
