@@ -65,7 +65,8 @@ function! ghcmod#command#type_insert(force) "{{{
     endif
   endif
 
-  let l:types = ghcmod#type(line('.'), col('.'), expand('%:p'), ghcmod#detect_module())
+  let l:module = ghcmod#detect_module()
+  let l:types = ghcmod#type(line('.'), col('.'), l:path, l:module)
   if empty(l:types) " Everything failed so let's just abort
     call ghcmod#util#print_error('ghcmod#command#type_insert: Cannot guess type')
     return
@@ -75,7 +76,7 @@ function! ghcmod#command#type_insert(force) "{{{
   let [_, l:offset, _, _] = l:locsym
 
   if l:offset == 1 " We're doing top-level, let's try to use :info instead
-    let l:info = ghcmod#info(l:fexp)
+    let l:info = ghcmod#info(l:fexp, l:path, l:module)
     if l:info !~# '^Dummy:0:0:Error' " Continue only if we don't find errors
       let l:info = substitute(l:info, '\n\|\t.*', "", "g") " Remove extra lines
       let l:info = substitute(l:info, '\s\+', " ", "g") " Compress whitespace
@@ -84,4 +85,22 @@ function! ghcmod#command#type_insert(force) "{{{
     endif
   endif
   call append(line(".")-1, repeat(' ', l:offset-1) . l:signature)
+endfunction "}}}
+
+function! ghcmod#command#info(fexp) "{{{
+  if &l:modified
+    call ghcmod#util#print_warning('ghcmod#command#info: the buffer has been modified but not written')
+  endif
+
+  let l:path = expand('%:p')
+  if l:path ==# ''
+    call ghcmod#util#print_error("current version of ghcmod.vim doesn't support running on an unnamed buffer.")
+    return
+  endif
+
+  let l:fexp = a:fexp
+  if empty(l:fexp)
+    let l:fexp = ghcmod#getHaskellIdentifier()
+  end
+  echo ghcmod#info(l:fexp, l:path, ghcmod#detect_module())
 endfunction "}}}

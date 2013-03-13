@@ -14,23 +14,12 @@ function! ghcmod#getHaskellIdentifier()"{{{
   return ll1.ll2
 endfunction"}}}
 
-function! ghcmod#info(fexp)"{{{
-  if &l:modified
-    call ghcmod#util#print_warning('ghcmod#info: the buffer has been modified but not written')
-  endif
-  let l:file = expand('%:p')
-  if l:file ==# ''
-    call ghcmod#util#print_warning("current version of ghcmod.vim doesn't support running on an unnamed buffer.")
-    return ''
-  endif
-  let l:mod = ghcmod#detect_module()
-  let l:cmd = ghcmod#build_command(['info', l:file, l:mod, a:fexp])
+function! ghcmod#info(fexp, path, module) "{{{
+  let l:cmd = ghcmod#build_command(['info', a:path, a:module, a:fexp])
   let l:output = s:system(l:cmd)
-  " Remove trailing newlines to prevent empty lines from being echoed
-  let l:output = substitute(l:output, '\n*$', '', '')
-
-  return l:output
-endfunction"}}}
+  " Remove trailing newlines to prevent empty lines
+  return substitute(l:output, '\n*$', '', '')
+endfunction "}}}
 
 function! ghcmod#type(line, col, path, module) "{{{
   let l:cmd = ghcmod#build_command(['type', a:path, a:module, a:line, a:col])
