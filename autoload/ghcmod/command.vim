@@ -87,7 +87,7 @@ function! ghcmod#command#type_insert(force) "{{{
   call append(line(".")-1, repeat(' ', l:offset-1) . l:signature)
 endfunction "}}}
 
-function! ghcmod#command#info(fexp) "{{{
+function! s:info(fexp) "{{{
   if &l:modified
     call ghcmod#util#print_warning('ghcmod#command#info: the buffer has been modified but not written')
   endif
@@ -102,7 +102,48 @@ function! ghcmod#command#info(fexp) "{{{
   if empty(l:fexp)
     let l:fexp = ghcmod#getHaskellIdentifier()
   end
-  echo ghcmod#info(l:fexp, l:path, ghcmod#detect_module())
+  return ghcmod#info(l:fexp, l:path, ghcmod#detect_module())
+endfunction "}}}
+
+function! ghcmod#command#info(fexp) "{{{
+  let l:info = s:info(a:fexp)
+  if !empty(l:info)
+    echo l:info
+  endif
+endfunction "}}}
+
+function! ghcmod#command#preview(fexp, ...) "{{{
+  if a:0 == 0
+    let l:size = get(g:, 'ghcmod_max_preview_size', 10)
+  else
+    let l:size = a:000[0]
+  endif
+
+  let l:info = s:info(a:fexp)
+
+  silent! wincmd P
+  if !(&previewwindow && expand("%:t") == "GHC-mod")
+    pclose
+    pedit GHC-mod
+    silent! wincmd P
+  endif
+  setlocal modifiable
+  setlocal buftype=nofile
+  " make sure buffer is deleted when view is closed
+  setlocal bufhidden=wipe
+  setlocal noswapfile
+  setlocal nobuflisted
+  setlocal nonumber
+  setlocal statusline=%F
+  setlocal nofoldenable
+  setlocal filetype=haskell
+  setlocal nolist
+  let l:info = escape(l:info, '"|')
+  silent 0put =l:info
+  setlocal nomodifiable
+  exec 'resize ' . min([line('$')+1, l:size])
+  normal! gg
+  wincmd p
 endfunction "}}}
 
 function! ghcmod#command#make(type) "{{{

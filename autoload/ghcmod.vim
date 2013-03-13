@@ -281,31 +281,4 @@ function! ghcmod#version()"{{{
   return [0, 4, 0]
 endfunction"}}}
 
-function! ghcmod#preview(str, size) "{{{
-  silent! wincmd P
-  if !(&previewwindow && expand("%:t") == "GHC-mod")
-    pclose
-    pedit GHC-mod
-    silent! wincmd P
-  endif
-  setlocal modifiable
-  setlocal buftype=nofile
-  " make sure buffer is deleted when view is closed
-  setlocal bufhidden=wipe
-  setlocal noswapfile
-  setlocal nobuflisted
-  setlocal nonumber
-  setlocal statusline=%F
-  setlocal nofoldenable
-  setlocal filetype=haskell
-  setlocal nolist
-  let l:str = escape(a:str, '"|')
-  silent 0put =l:str
-  setlocal nomodifiable
-  exec 'resize ' . min([line('$')+1, a:size])
-  normal gg
-  wincmd p
-  return
-endfunction "}}}
-
 " vim: set ts=2 sw=2 et fdm=marker:

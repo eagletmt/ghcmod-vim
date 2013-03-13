@@ -30,15 +30,11 @@ else
   let b:undo_ftplugin = ''
 endif
 
-if !exists('g:ghcmod_max_preview_size')
-  let g:ghcmod_max_preview_size = 10
-endif
-
 command! -buffer -nargs=0 -bang GhcModType call ghcmod#command#type(<bang>0)
 command! -buffer -nargs=0 -bang GhcModTypeInsert call ghcmod#command#type_insert(<bang>0)
 command! -buffer -nargs=? GhcModInfo call ghcmod#command#info(<q-args>)
 command! -buffer -nargs=0 GhcModTypeClear call ghcmod#command#type_clear()
-command! -buffer -nargs=? GhcModInfoPreview call ghcmod#preview(s:info(<q-args>), g:ghcmod_max_preview_size)
+command! -buffer -nargs=? GhcModInfoPreview call ghcmod#command#preview(<q-args>)
 command! -buffer -nargs=0 GhcModCheck call ghcmod#command#make('check')
 command! -buffer -nargs=0 GhcModLint call ghcmod#command#make('lint')
 command! -buffer -nargs=0 GhcModCheckAsync call ghcmod#command#async_make('check', '')
