@@ -34,8 +34,8 @@ if !exists('g:ghcmod_max_preview_size')
   let g:ghcmod_max_preview_size = 10
 endif
 
-command! -buffer -nargs=0 GhcModType call s:echo(ghcmod#type()[1])
-command! -buffer -nargs=0 GhcModTypeInsert call ghcmod#type_insert()
+command! -buffer -nargs=0 -bang GhcModType call s:type(<bang>0)
+command! -buffer -nargs=0 -bang GhcModTypeInsert call ghcmod#type_insert(<bang>0)
 command! -buffer -nargs=? GhcModInfo call s:echo(s:info(<q-args>))
 command! -buffer -nargs=0 GhcModTypeClear call ghcmod#type_clear()
 command! -buffer -nargs=? GhcModInfoPreview call ghcmod#preview(s:info(<q-args>), g:ghcmod_max_preview_size)
@@ -66,6 +66,13 @@ syntax sync fromstart
 function! s:echo(msg)
   if !empty(a:msg)
     echo a:msg
+  endif
+endfunction
+
+function! s:type(force)
+  let l:type = ghcmod#type(a:force)[1]
+  if !empty(l:type)
+    echo l:type
   endif
 endfunction
 

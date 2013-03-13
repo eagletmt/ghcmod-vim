@@ -78,9 +78,15 @@ function! ghcmod#info(fexp)"{{{
   return l:output
 endfunction"}}}
 
-function! ghcmod#type()"{{{
+function! ghcmod#type(force)"{{{
   if &l:modified
-    call ghcmod#print_warning('ghcmod#type: the buffer has been modified but not written')
+    let l:msg = 'ghcmod#type: the buffer has been modified but not written'
+    if a:force
+      call ghcmod#print_warning(l:msg)
+    else
+      call ghcmod#print_error(l:msg)
+      return ['', '']
+    endif
   endif
   let l:line = line('.')
   let l:col = col('.')
@@ -506,7 +512,7 @@ function! ghcmod#version()"{{{
   return [0, 3, 0]
 endfunction"}}}
 
-function! ghcmod#type_insert() "{{{
+function! ghcmod#type_insert(force) "{{{
   let fexp = ghcmod#getHaskellIdentifier()
   if !exists('fexp') || fexp  == ''
     call ghcmod#print_error('Failed to determine identifier under cursor.')
@@ -516,7 +522,7 @@ function! ghcmod#type_insert() "{{{
   if exists("b:ghcmod_type")
     unlet b:ghcmod_type " Make sure we aren't doing some weird persistence tricks
   endif
-  let [locsym, type] = ghcmod#type()
+  let [locsym, type] = ghcmod#type(a:force)
   call ghcmod#clear_highlight()
   if type == "" " Everything failed so let's just abort
     return

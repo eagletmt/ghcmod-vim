@@ -48,6 +48,21 @@ If you'd like to give GHC options, set |g:ghcmod_ghc_options|.
 	Sub-expressions are highlighted as |hl-Search| by default. You can
 	customize it by setting |g:ghcmod_type_highlight|.
 
+	If the current buffer is modified, this command is disabled.
+
+:GhcModType!                                                    *:GhcModType!*
+	Same as |:GhcModType|, but this command is executed even if the
+	current buffer is modified.
+
+:GhcModTypeInsert                                          *:GhcModTypeInsert*
+	Insert a type signature under the cursor.
+
+	If the current buffer is modified, this command is disabled.
+
+:GhcModTypeInsert!                                        *:GhcModTypeInsert!*
+	Same as |:GhcModTypeInsert|, but this command is executed even if the
+	current buffer is modified.
+
 :GhcModInfo                                                      *:GhcModInfo*
 	Information about the identifier under the cursor is echoed.
 
