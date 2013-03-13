@@ -1,3 +1,23 @@
+function! s:buffer_path(force) "{{{
+  let l:path = expand('%:p')
+  if empty(l:path)
+    call ghcmod#util#print_warning("current version of ghcmod.vim doesn't support running on an unnamed buffer.")
+    return ''
+  endif
+
+  if &l:modified
+    let l:msg = 'the current buffer has been modified but not written'
+    if a:force
+      call ghcmod#util#print_warning(l:msg)
+    else
+      call ghcmod#util#print_error(l:msg)
+      return ''
+    endif
+  endif
+
+  return l:path
+endfunction "}}}
+
 function! ghcmod#command#type(force) "{{{
   let l:line = line('.')
   let l:col = col('.')
@@ -12,24 +32,12 @@ function! ghcmod#command#type(force) "{{{
     call b:ghcmod_type.clear_highlight()
   endif
 
-  if &l:modified
-    let l:msg = 'ghcmod#type: the buffer has been modified but not written'
-    if a:force
-      call ghcmod#util#print_warning(l:msg)
-    else
-      call ghcmod#util#print_error(l:msg)
-      return
-    endif
+  let l:path = s:buffer_path(a:force)
+  if empty(l:path)
+    return
   endif
 
-  let l:file = expand('%:p')
-  if l:file ==# ''
-    call ghcmod#util#print_warning("current version of ghcmod.vim doesn't support running on an unnamed buffer.")
-    return ['', '']
-  endif
-
-  let l:mod = ghcmod#detect_module()
-  let l:types = ghcmod#type(l:line, l:col, l:file, l:mod)
+  let l:types = ghcmod#type(l:line, l:col, l:path, ghcmod#detect_module())
   if empty(l:types)
     call ghcmod#util#print_error('ghcmod#command#type: Cannot guess type')
     return
@@ -49,20 +57,15 @@ function! ghcmod#command#type_clear() "{{{
 endfunction "}}}
 
 function! ghcmod#command#type_insert(force) "{{{
+  let l:path = s:buffer_path(a:force)
+  if empty(l:path)
+    return
+  endif
+
   let l:fexp = ghcmod#getHaskellIdentifier()
   if empty(l:fexp)
     call ghcmod#util#print_error('Failed to determine identifier under cursor.')
-    return 0
-  endif
-
-  if &l:modified
-    let l:msg = 'ghcmod#type_insert: the buffer has been modified but not written'
-    if a:force
-      call ghcmod#util#print_warning(l:msg)
-    else
-      call ghcmod#util#print_error(l:msg)
-      return
-    endif
+    return
   endif
 
   let l:module = ghcmod#detect_module()
@@ -88,16 +91,10 @@ function! ghcmod#command#type_insert(force) "{{{
 endfunction "}}}
 
 function! s:info(fexp) "{{{
-  if &l:modified
-    call ghcmod#util#print_warning('ghcmod#command#info: the buffer has been modified but not written')
-  endif
-
-  let l:path = expand('%:p')
-  if l:path ==# ''
-    call ghcmod#util#print_error("current version of ghcmod.vim doesn't support running on an unnamed buffer.")
+  let l:path = s:buffer_path(1)
+  if empty(l:path)
     return
   endif
-
   let l:fexp = a:fexp
   if empty(l:fexp)
     let l:fexp = ghcmod#getHaskellIdentifier()
@@ -146,13 +143,9 @@ function! ghcmod#command#preview(fexp, ...) "{{{
 endfunction "}}}
 
 function! ghcmod#command#make(type) "{{{
-  let l:path = expand('%:p')
+  let l:path = s:buffer_path(1)
   if empty(l:path)
-    call ghcmod#util#print_warning("ghcmod#make doesn't support running on an unnamed buffer.")
     return
-  endif
-  if &l:modified
-    call ghcmod#util#print_warning('ghcmod#make: the buffer has been modified but not written')
   endif
 
   let l:qflist = ghcmod#make(a:type, l:path)
@@ -164,14 +157,9 @@ function! ghcmod#command#make(type) "{{{
 endfunction "}}}
 
 function! ghcmod#command#async_make(type, action) "{{{
-  let l:path = expand('%:p')
+  let l:path = s:buffer_path(1)
   if empty(l:path)
-    call ghcmod#util#print_warning("ghcmod#async_make doesn't support running on an unnamed buffer.")
     return
-  endif
-
-  if &l:modified
-    call ghcmod#util#print_warning('ghcmod#async_make: the buffer has been modified but not written')
   endif
 
   let l:callback = { 'action': a:action, 'type': a:type }
@@ -191,14 +179,9 @@ function! ghcmod#command#async_make(type, action) "{{{
 endfunction "}}}
 
 function! ghcmod#command#expand() "{{{
-  let l:path = expand('%:p')
+  let l:path = s:buffer_path(1)
   if empty(l:path)
-    call ghcmod#util#print_warning("ghcmod#expand doesn't support running on an unnamed buffer.")
     return
-  endif
-
-  if &l:modified
-    call ghcmod#util#print_warning('ghcmod#expand: the buffer has been modified but not written')
   endif
 
   call setqflist(ghcmod#expand(l:path))
