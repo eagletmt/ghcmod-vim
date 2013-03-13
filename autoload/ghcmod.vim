@@ -62,11 +62,11 @@ endfunction"}}}
 
 function! ghcmod#info(fexp)"{{{
   if &l:modified
-    call ghcmod#print_warning('ghcmod#info: the buffer has been modified but not written')
+    call ghcmod#util#print_warning('ghcmod#info: the buffer has been modified but not written')
   endif
   let l:file = expand('%:p')
   if l:file ==# ''
-    call ghcmod#print_warning("current version of ghcmod.vim doesn't support running on an unnamed buffer.")
+    call ghcmod#util#print_warning("current version of ghcmod.vim doesn't support running on an unnamed buffer.")
     return ''
   endif
   let l:mod = ghcmod#detect_module()
@@ -82,9 +82,9 @@ function! ghcmod#type(force)"{{{
   if &l:modified
     let l:msg = 'ghcmod#type: the buffer has been modified but not written'
     if a:force
-      call ghcmod#print_warning(l:msg)
+      call ghcmod#util#print_warning(l:msg)
     else
-      call ghcmod#print_error(l:msg)
+      call ghcmod#util#print_error(l:msg)
       return ['', '']
     endif
   endif
@@ -98,7 +98,7 @@ function! ghcmod#type(force)"{{{
 
   let l:file = expand('%:p')
   if l:file ==# ''
-    call ghcmod#print_warning("current version of ghcmod.vim doesn't support running on an unnamed buffer.")
+    call ghcmod#util#print_warning("current version of ghcmod.vim doesn't support running on an unnamed buffer.")
     return ['', '']
   endif
   let l:mod = ghcmod#detect_module()
@@ -113,7 +113,7 @@ function! ghcmod#type(force)"{{{
   endfor
   let l:len = len(l:types)
   if l:len == 0
-    call ghcmod#print_error('ghcmod#type: Cannot guess type')
+    call ghcmod#util#print_error('ghcmod#type: Cannot guess type')
     return ['', '']
   endif
 
@@ -185,7 +185,7 @@ function! ghcmod#parse_make(lines, basedir)"{{{
       break
     end
     let [l:qf.filename, l:qf.lnum, l:qf.col, l:rest] = l:m[1 : 4]
-    let l:qf.filename = s:join_path(a:basedir, l:qf.filename)
+    let l:qf.filename = ghcmod#util#join_path(a:basedir, l:qf.filename)
     if l:rest =~# '^Warning:'
       let l:qf.type = 'W'
       let l:rest = matchstr(l:rest, '^Warning:\s*\zs.*$')
@@ -216,24 +216,6 @@ function! ghcmod#parse_make(lines, basedir)"{{{
   return l:qflist
 endfunction"}}}
 
-if vimproc#util#is_windows()" s:is_abspath {{{
-  function! s:is_abspath(path)
-    return a:path =~? '^[a-z]:[\/]'
-  endfunction
-else
-  function! s:is_abspath(path)
-    return a:path[0] ==# '/'
-  endfunction
-endif"}}}
-
-function! s:join_path(dir, path)"{{{
-  if s:is_abspath(a:path)
-    return a:path
-  else
-    return a:dir . '/' . a:path
-  endif
-endfunction"}}}
-
 function! s:build_make_command(type, path)"{{{
   let l:cmd = ghcmod#build_command([a:type])
   if a:type ==# 'lint'
@@ -247,11 +229,11 @@ endfunction"}}}
 
 function! ghcmod#make(type)"{{{
   if &l:modified
-    call ghcmod#print_warning('ghcmod#make: the buffer has been modified but not written')
+    call ghcmod#util#print_warning('ghcmod#make: the buffer has been modified but not written')
   endif
   let l:path = expand('%:p')
   if empty(l:path)
-    call ghcmod#print_warning("ghcmod#make doesn't support running on an unnamed buffer.")
+    call ghcmod#util#print_warning("ghcmod#make doesn't support running on an unnamed buffer.")
     return []
   endif
   let l:dir = fnamemodify(l:path, ':h')
@@ -274,7 +256,7 @@ function! ghcmod#make(type)"{{{
     endwhile
     return ghcmod#parse_make(readfile(l:tmpfile), b:ghcmod_basedir)
   catch
-    call ghcmod#print_error(printf('%s %s', v:throwpoint, v:exception))
+    call ghcmod#util#print_error(printf('%s %s', v:throwpoint, v:exception))
   finally
     call delete(l:tmpfile)
   endtry
@@ -290,11 +272,11 @@ endfunction"}}}
 
 function! ghcmod#async_make(type, action)"{{{
   if &l:modified
-    call ghcmod#print_warning('ghcmod#async_make: the buffer has been modified but not written')
+    call ghcmod#util#print_warning('ghcmod#async_make: the buffer has been modified but not written')
   endif
   let l:path = expand('%:p')
   if empty(l:path)
-    call ghcmod#print_warning("ghcmod#async_make doesn't support running on an unnamed buffer.")
+    call ghcmod#util#print_warning("ghcmod#async_make doesn't support running on an unnamed buffer.")
     return
   endif
 
@@ -352,11 +334,11 @@ endfunction"}}}
 
 function! ghcmod#expand()"{{{
   if &l:modified
-    call ghcmod#print_warning('ghcmod#expand: the buffer has been modified but not written')
+    call ghcmod#util#print_warning('ghcmod#expand: the buffer has been modified but not written')
   endif
   let l:path = expand('%:p')
   if empty(l:path)
-    call ghcmod#print_warning("ghcmod#expand doesn't support running on an unnamed buffer.")
+    call ghcmod#util#print_warning("ghcmod#expand doesn't support running on an unnamed buffer.")
     return []
   endif
   let l:dir = fnamemodify(l:path, ':h')
@@ -381,7 +363,7 @@ function! ghcmod#expand()"{{{
       endif
     endif
     if has_key(l:qf, 'filename')
-      let l:qf.filename = s:join_path(l:dir, l:qf.filename)
+      let l:qf.filename = ghcmod#util#join_path(l:dir, l:qf.filename)
     endif
     call s:fix_qf_lnum_col(l:qf)
     call add(l:qflist, l:qf)
@@ -407,16 +389,6 @@ function! ghcmod#check_version(version)"{{{
   return 1
 endfunction"}}}
 
-if v:version > 703 || (v:version == 703 && has('patch465'))"{{{
-  function! s:globlist(pat)
-    return glob(a:pat, 0, 1)
-  endfunction
-else
-  function! s:globlist(pat)
-    return split(glob(a:pat, 0), '\n')
-  endfunction
-endif"}}}
-
 function! ghcmod#build_command(args)"{{{
   let l:cmd = ['ghc-mod']
 
@@ -432,7 +404,7 @@ function! ghcmod#build_command(args)"{{{
       endif
     endif
 
-    let l:tmps = s:globlist(l:build_dir . '/*/*-tmp')
+    let l:tmps = ghcmod#util#globlist(l:build_dir . '/*/*-tmp')
     if !empty(l:tmps)
       " add *-tmp directory to include path for executable project
       for l:tmp in l:tmps
@@ -496,18 +468,6 @@ function! s:find_basedir()"{{{
   return b:ghcmod_basedir
 endfunction"}}}
 
-function! ghcmod#print_error(msg)"{{{
-  echohl ErrorMsg
-  echomsg a:msg
-  echohl None
-endfunction"}}}
-
-function! ghcmod#print_warning(msg)"{{{
-  echohl WarningMsg
-  echomsg a:msg
-  echohl None
-endfunction"}}}
-
 function! ghcmod#version()"{{{
   return [0, 4, 0]
 endfunction"}}}
@@ -515,7 +475,7 @@ endfunction"}}}
 function! ghcmod#type_insert(force) "{{{
   let fexp = ghcmod#getHaskellIdentifier()
   if !exists('fexp') || fexp  == ''
-    call ghcmod#print_error('Failed to determine identifier under cursor.')
+    call ghcmod#util#print_error('Failed to determine identifier under cursor.')
     return 0
   endif
 
