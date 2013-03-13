@@ -167,19 +167,11 @@ function! ghcmod#async_make(type, path, callback) "{{{
   endif
 endfunction "}}}
 
-function! ghcmod#expand()"{{{
-  if &l:modified
-    call ghcmod#util#print_warning('ghcmod#expand: the buffer has been modified but not written')
-  endif
-  let l:path = expand('%:p')
-  if empty(l:path)
-    call ghcmod#util#print_warning("ghcmod#expand doesn't support running on an unnamed buffer.")
-    return []
-  endif
-  let l:dir = fnamemodify(l:path, ':h')
+function! ghcmod#expand(path) "{{{
+  let l:dir = fnamemodify(a:path, ':h')
 
   let l:qflist = []
-  let l:cmd = ghcmod#build_command(['expand', l:path])
+  let l:cmd = ghcmod#build_command(['expand', a:path])
   for l:line in split(s:system(l:cmd), '\n')
     let l:qf = {}
     " path:line:col1-col2: message
@@ -204,7 +196,7 @@ function! ghcmod#expand()"{{{
     call add(l:qflist, l:qf)
   endfor
   return l:qflist
-endfunction"}}}
+endfunction "}}}
 
 function! ghcmod#check_version(version)"{{{
   if !exists('s:ghc_mod_version')

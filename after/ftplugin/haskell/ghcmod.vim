@@ -44,7 +44,7 @@ command! -buffer -nargs=0 GhcModLint call ghcmod#command#make('lint')
 command! -buffer -nargs=0 GhcModCheckAsync call ghcmod#command#async_make('check', '')
 command! -buffer -nargs=0 GhcModLintAsync call ghcmod#command#async_make('lint', '')
 command! -buffer -nargs=0 GhcModCheckAndLintAsync call s:check_and_lint_async()
-command! -buffer -nargs=0 GhcModExpand call setqflist(ghcmod#expand()) | cwindow
+command! -buffer -nargs=0 GhcModExpand call ghcmod#command#expand()
 let b:undo_ftplugin .= join(map([
       \ 'GhcModType',
       \ 'GhcModTypeInsert',

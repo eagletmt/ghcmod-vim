@@ -149,3 +149,18 @@ function! ghcmod#command#async_make(type, action) "{{{
 
   call ghcmod#async_make(a:type, l:path, l:callback)
 endfunction "}}}
+
+function! ghcmod#command#expand() "{{{
+  let l:path = expand('%:p')
+  if empty(l:path)
+    call ghcmod#util#print_warning("ghcmod#expand doesn't support running on an unnamed buffer.")
+    return
+  endif
+
+  if &l:modified
+    call ghcmod#util#print_warning('ghcmod#expand: the buffer has been modified but not written')
+  endif
+
+  call setqflist(ghcmod#expand(l:path))
+  cwindow
+endfunction "}}}
