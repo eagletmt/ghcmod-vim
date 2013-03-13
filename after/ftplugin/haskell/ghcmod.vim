@@ -41,8 +41,8 @@ command! -buffer -nargs=0 GhcModTypeClear call ghcmod#command#type_clear()
 command! -buffer -nargs=? GhcModInfoPreview call ghcmod#preview(s:info(<q-args>), g:ghcmod_max_preview_size)
 command! -buffer -nargs=0 GhcModCheck call ghcmod#command#make('check')
 command! -buffer -nargs=0 GhcModLint call ghcmod#command#make('lint')
-command! -buffer -nargs=0 GhcModCheckAsync call ghcmod#async_make('check', '')
-command! -buffer -nargs=0 GhcModLintAsync call ghcmod#async_make('lint', '')
+command! -buffer -nargs=0 GhcModCheckAsync call ghcmod#command#async_make('check', '')
+command! -buffer -nargs=0 GhcModLintAsync call ghcmod#command#async_make('lint', '')
 command! -buffer -nargs=0 GhcModCheckAndLintAsync call s:check_and_lint_async()
 command! -buffer -nargs=0 GhcModExpand call setqflist(ghcmod#expand()) | cwindow
 let b:undo_ftplugin .= join(map([
@@ -72,7 +72,7 @@ endfunction
 function! s:check_and_lint_async()
   if !ghcmod#async#exist_session()
     call setqflist([])
-    call ghcmod#async_make('check', 'a')
-    call ghcmod#async_make('lint', 'a')
+    call ghcmod#command#async_make('check', 'a')
+    call ghcmod#command#async_make('lint', 'a')
   endif
 endfunction

@@ -122,3 +122,30 @@ function! ghcmod#command#make(type) "{{{
     echo printf('ghc-mod %s: No errors found', a:type)
   endif
 endfunction "}}}
+
+function! ghcmod#command#async_make(type, action) "{{{
+  let l:path = expand('%:p')
+  if empty(l:path)
+    call ghcmod#util#print_warning("ghcmod#async_make doesn't support running on an unnamed buffer.")
+    return
+  endif
+
+  if &l:modified
+    call ghcmod#util#print_warning('ghcmod#async_make: the buffer has been modified but not written')
+  endif
+
+  let l:callback = { 'action': a:action, 'type': a:type }
+  function! l:callback.on_finish(qflist)
+    call setqflist(a:qflist, self.action)
+    cwindow
+    if &l:buftype ==# 'quickfix'
+      " go back to original window
+      wincmd p
+    endif
+    if empty(a:qflist)
+      echomsg printf('ghc-mod %s(async): No errors found', self.type)
+    endif
+  endfunction
+
+  call ghcmod#async_make(a:type, l:path, l:callback)
+endfunction "}}}

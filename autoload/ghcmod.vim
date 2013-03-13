@@ -143,55 +143,29 @@ function! ghcmod#make(type, path) "{{{
   endtry
 endfunction "}}}
 
-function! s:SID_PREFIX()"{{{
-  return matchstr(expand('<sfile>'), '<SNR>\d\+_\zeSID_PREFIX$')
-endfunction"}}}
-
-function! s:funcref(funcname)"{{{
-  return function(s:SID_PREFIX() . a:funcname)
-endfunction"}}}
-
-function! ghcmod#async_make(type, action)"{{{
-  if &l:modified
-    call ghcmod#util#print_warning('ghcmod#async_make: the buffer has been modified but not written')
-  endif
-  let l:path = expand('%:p')
-  if empty(l:path)
-    call ghcmod#util#print_warning("ghcmod#async_make doesn't support running on an unnamed buffer.")
-    return
-  endif
-
+function! ghcmod#async_make(type, path, callback) "{{{
   let l:tmpfile = tempname()
-  let l:args = s:build_make_command(a:type, l:path)
+  let l:args = s:build_make_command(a:type, a:path)
   let l:proc = s:plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
   let l:obj = {
         \ 'proc': l:proc,
         \ 'tmpfile': l:tmpfile,
-        \ 'action': a:action,
+        \ 'callback': a:callback,
         \ 'type': a:type,
-        \ 'basedir': b:ghcmod_basedir,
-        \ 'on_finish': s:funcref('on_finish'),
+        \ 'basedir': ghcmod#basedir(),
         \ }
+  function! l:obj.on_finish(cond, status)
+    let l:qflist = ghcmod#parse_make(readfile(self.tmpfile), self.basedir)
+    call delete(self.tmpfile)
+    call self.callback.on_finish(l:qflist)
+  endfunction
+
   if !ghcmod#async#register(l:obj)
     call l:proc.kill(15)
     call l:proc.waitpid()
     call delete(l:tmpfile)
   endif
-endfunction"}}}
-
-function! s:on_finish(cond, status) dict"{{{
-  let l:qflist = ghcmod#parse_make(readfile(self.tmpfile), self.basedir)
-  call setqflist(l:qflist, self.action)
-  call delete(self.tmpfile)
-  cwindow
-  if &l:buftype ==# 'quickfix'
-    " go back to original window
-    wincmd p
-  endif
-  if empty(l:qflist)
-    echomsg printf('ghc-mod %s(async): No errors found', self.type)
-  endif
-endfunction"}}}
+endfunction "}}}
 
 function! ghcmod#expand()"{{{
   if &l:modified
@@ -336,9 +310,9 @@ endfunction"}}}
 function! ghcmod#preview(str, size) "{{{
   silent! wincmd P
   if !(&previewwindow && expand("%:t") == "GHC-mod")
-      pclose
-      pedit GHC-mod
-      silent! wincmd P
+    pclose
+    pedit GHC-mod
+    silent! wincmd P
   endif
   setlocal modifiable
   setlocal buftype=nofile
