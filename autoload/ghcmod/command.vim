@@ -109,7 +109,7 @@ function! ghcmod#command#info(fexp) "{{{
   endif
 endfunction "}}}
 
-function! ghcmod#command#preview(fexp, ...) "{{{
+function! ghcmod#command#info_preview(fexp, ...) "{{{
   if a:0 == 0
     let l:size = get(g:, 'ghcmod_max_preview_size', 10)
   else
