@@ -144,7 +144,7 @@ function! ghcmod#make(type)"{{{
   try
     let l:args = s:build_make_command(a:type, l:path)
     let l:proc = s:plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
-    let [l:cond, l:status] = ghcmod#wait(l:proc)
+    let [l:cond, l:status] = ghcmod#util#wait(l:proc)
     let l:tries = 1
     while l:cond ==# 'run'
       if l:tries >= 50
@@ -153,7 +153,7 @@ function! ghcmod#make(type)"{{{
         throw printf('ghcmod#make: `ghc-mod %s` takes too long time!', a:type)
       endif
       sleep 100m
-      let [l:cond, l:status] = ghcmod#wait(l:proc)
+      let [l:cond, l:status] = ghcmod#util#wait(l:proc)
       let l:tries += 1
     endwhile
     return ghcmod#parse_make(readfile(l:tmpfile), b:ghcmod_basedir)
@@ -211,26 +211,6 @@ function! s:on_finish(cond, status) dict"{{{
   endif
   if empty(l:qflist)
     echomsg printf('ghc-mod %s(async): No errors found', self.type)
-  endif
-endfunction"}}}
-
-function! ghcmod#wait(proc)"{{{
-  if has_key(a:proc, 'checkpid')
-    return a:proc.checkpid()
-  else
-    " old vimproc
-    if !exists('s:libcall')
-      redir => l:output
-      silent! scriptnames
-      redir END
-      for l:line in split(l:output, '\n')
-        if l:line =~# 'autoload/vimproc\.vim$'
-          let s:libcall = function('<SNR>' . matchstr(l:line, '^\s*\zs\d\+') . '_libcall')
-          break
-        endif
-      endfor
-    endif
-    return s:libcall('vp_waitpid', [a:proc.pid])
   endif
 endfunction"}}}
 

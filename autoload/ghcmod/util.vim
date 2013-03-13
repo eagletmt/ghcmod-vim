@@ -37,3 +37,23 @@ function! ghcmod#util#join_path(dir, path) "{{{
     return a:dir . '/' . a:path
   endif
 endfunction "}}}
+
+function! ghcmod#util#wait(proc) "{{{
+  if has_key(a:proc, 'checkpid')
+    return a:proc.checkpid()
+  else
+    " old vimproc
+    if !exists('s:libcall')
+      redir => l:output
+      silent! scriptnames
+      redir END
+      for l:line in split(l:output, '\n')
+        if l:line =~# 'autoload/vimproc\.vim$'
+          let s:libcall = function('<SNR>' . matchstr(l:line, '^\s*\zs\d\+') . '_libcall')
+          break
+        endif
+      endfor
+    endif
+    return s:libcall('vp_waitpid', [a:proc.pid])
+  endif
+endfunction "}}}
