@@ -104,3 +104,21 @@ function! ghcmod#command#info(fexp) "{{{
   end
   echo ghcmod#info(l:fexp, l:path, ghcmod#detect_module())
 endfunction "}}}
+
+function! ghcmod#command#make(type) "{{{
+  let l:path = expand('%:p')
+  if empty(l:path)
+    call ghcmod#util#print_warning("ghcmod#make doesn't support running on an unnamed buffer.")
+    return
+  endif
+  if &l:modified
+    call ghcmod#util#print_warning('ghcmod#make: the buffer has been modified but not written')
+  endif
+
+  let l:qflist = ghcmod#make(a:type, l:path)
+  call setqflist(l:qflist)
+  cwindow
+  if empty(l:qflist)
+    echo printf('ghc-mod %s: No errors found', a:type)
+  endif
+endfunction "}}}

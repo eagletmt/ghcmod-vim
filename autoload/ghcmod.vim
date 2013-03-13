@@ -118,20 +118,10 @@ function! s:build_make_command(type, path)"{{{
   return l:cmd
 endfunction"}}}
 
-function! ghcmod#make(type)"{{{
-  if &l:modified
-    call ghcmod#util#print_warning('ghcmod#make: the buffer has been modified but not written')
-  endif
-  let l:path = expand('%:p')
-  if empty(l:path)
-    call ghcmod#util#print_warning("ghcmod#make doesn't support running on an unnamed buffer.")
-    return []
-  endif
-  let l:dir = fnamemodify(l:path, ':h')
-
+function! ghcmod#make(type, path) "{{{
   let l:tmpfile = tempname()
   try
-    let l:args = s:build_make_command(a:type, l:path)
+    let l:args = s:build_make_command(a:type, a:path)
     let l:proc = s:plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
     let [l:cond, l:status] = ghcmod#util#wait(l:proc)
     let l:tries = 1
@@ -151,7 +141,7 @@ function! ghcmod#make(type)"{{{
   finally
     call delete(l:tmpfile)
   endtry
-endfunction"}}}
+endfunction "}}}
 
 function! s:SID_PREFIX()"{{{
   return matchstr(expand('<sfile>'), '<SNR>\d\+_\zeSID_PREFIX$')

@@ -39,8 +39,8 @@ command! -buffer -nargs=0 -bang GhcModTypeInsert call ghcmod#command#type_insert
 command! -buffer -nargs=? GhcModInfo call ghcmod#command#info(<q-args>)
 command! -buffer -nargs=0 GhcModTypeClear call ghcmod#command#type_clear()
 command! -buffer -nargs=? GhcModInfoPreview call ghcmod#preview(s:info(<q-args>), g:ghcmod_max_preview_size)
-command! -buffer -nargs=0 GhcModCheck call s:make('check')
-command! -buffer -nargs=0 GhcModLint call s:make('lint')
+command! -buffer -nargs=0 GhcModCheck call ghcmod#command#make('check')
+command! -buffer -nargs=0 GhcModLint call ghcmod#command#make('lint')
 command! -buffer -nargs=0 GhcModCheckAsync call ghcmod#async_make('check', '')
 command! -buffer -nargs=0 GhcModLintAsync call ghcmod#async_make('lint', '')
 command! -buffer -nargs=0 GhcModCheckAndLintAsync call s:check_and_lint_async()
@@ -66,15 +66,6 @@ syntax sync fromstart
 function! s:echo(msg)
   if !empty(a:msg)
     echo a:msg
-  endif
-endfunction
-
-function! s:make(type)
-  let l:qflist = ghcmod#make(a:type)
-  call setqflist(l:qflist)
-  cwindow
-  if empty(l:qflist)
-    echo printf('ghc-mod %s: No errors found', a:type)
   endif
 endfunction
 
