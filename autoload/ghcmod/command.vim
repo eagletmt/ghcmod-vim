@@ -138,7 +138,6 @@ function! ghcmod#command#preview(fexp, ...) "{{{
   setlocal nofoldenable
   setlocal filetype=haskell
   setlocal nolist
-  let l:info = escape(l:info, '"|')
   silent 0put =l:info
   setlocal nomodifiable
   exec 'resize ' . min([line('$')+1, l:size])
