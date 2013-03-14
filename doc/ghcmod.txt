@@ -40,7 +40,7 @@ DETAILS                                                       *ghcmod-details*
 
 If you'd like to give GHC options, set |g:ghcmod_ghc_options|.
 
-:GhcModType                                                      *:GhcModType*
+:GhcModType[!]                                                   *:GhcModType*
 	The sub-expression under the cursor is highlighted and its type is
 	echoed. If you type |:GhcModType| multiple times, the sub-expression
 	changes.
@@ -48,60 +48,79 @@ If you'd like to give GHC options, set |g:ghcmod_ghc_options|.
 	Sub-expressions are highlighted as |hl-Search| by default. You can
 	customize it by setting |g:ghcmod_type_highlight|.
 
-	If the current buffer is modified, this command is disabled.
+	When the current buffer is modified, this command is disabled unless
+	"!" is given.
 
-:GhcModType!                                                    *:GhcModType!*
-	Same as |:GhcModType|, but this command is executed even if the
-	current buffer is modified.
-
-:GhcModTypeInsert                                          *:GhcModTypeInsert*
+:GhcModTypeInsert[!]                                       *:GhcModTypeInsert*
 	Insert a type signature under the cursor.
 
-	If the current buffer is modified, this command is disabled.
+	When the current buffer is modified, this command is disabled unless
+	"!" is given.
 
-:GhcModTypeInsert!                                        *:GhcModTypeInsert!*
-	Same as |:GhcModTypeInsert|, but this command is executed even if the
-	current buffer is modified.
+:GhcModInfo[!] [{identifier}]                                    *:GhcModInfo*
+	Information about {identifier} is echoed. If {identifier} isn't given,
+	the word under the cursor is used.
 
-:GhcModInfo                                                      *:GhcModInfo*
-	Information about the identifier under the cursor is echoed.
+	When the current buffer is modified, this command is disabled unless
+	"!" is given.
 
-:GhcModInfo {identifier}
 	Information about {identifier} is echoed.
 
-:GhcModInfoPreview                                        *:GhcModInfoPreview*
-	Information about the identifier under the cursor is displayed in
-	the preview window. Info accumulates until the preview window is
-	closed or renamed, for example by a different command.
+:GhcModInfoPreview[!] [{identifier}]                      *:GhcModInfoPreview*
+	Information about the {identifier} is displayed in the preview window.
+	If {identifier} isn't given, the word under the cursor is used. Info
+	accumulates until the preview window is closed or renamed, for example
+	by a different command.
 
-:GhcModInfoPreview {identifier}
+	When the current buffer is modified, this command is disabled unless
+	"!" is given.
+
+:GhcModInfoPreview[!] {identifier}
 	Information about {identifier} is displayed in the preview window.
 	Info accumulates until the preview window is closed or renamed,
 	for example by a different command.
 
+	When the current buffer is modified, this command is disabled unless
+	"!" is given.
+
 :GhcModTypeClear                                            *:GhcModTypeClear*
 	Clear the highlight created by |:GhcModType|.
 
-:GhcModCheck                                                    *:GhcModCheck*
+:GhcModCheck[!]                                                 *:GhcModCheck*
 	Display compiler errors/warnings in |quickfix|.
 
-:GhcModLint                                                      *:GhcModLint*
+	When the current buffer is modified, this command is disabled unless
+	"!" is given.
+
+:GhcModLint[!]                                                   *:GhcModLint*
 	Display hlint suggestions in |quickfix|. If you'd like to pass options
 	to hlint, set |g:ghcmod_hlint_options|.
 
-:GhcModCheckAsync                                          *:GhcModCheckAsync*
+	When the current buffer is modified, this command is disabled unless
+	"!" is given.
+
+:GhcModCheckAsync[!]                                       *:GhcModCheckAsync*
 	Asynchronous variant of |:GhcModCheck|. This would be useful when
 	you'd like to run check and/or lint automatically (especially on
 	|BufWritePost|).  See |ghcmod-customize| wiki page for more detail.
 
-:GhcModLintAsync                                            *:GhcModLintAsync*
+	When the current buffer is modified, this command is disabled unless
+	"!" is given.
+
+:GhcModLintAsync[!]                                         *:GhcModLintAsync*
 	Asynchronous variant of |:GhcModLint|.
+
+	When the current buffer is modified, this command is disabled unless
+	"!" is given.
 
 :GhcModCheckAndLintAsync                            *:GhcModCheckAndLintAsync*
 	Perform |:GhcModCheck| and |:GhcModLint| asynchronously.
 
-:GhcModExpand                                                  *:GhcModExpand*
+:GhcModExpand[!]                                               *:GhcModExpand*
 	Display the expansion of splices in |quickfix|.
+
+	When the current buffer is modified, this command is disabled unless
+	"!" is given.
 
 ==============================================================================
 GLOBAL VARIABLES                                     *ghcmod-global-variables*

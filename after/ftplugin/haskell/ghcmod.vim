@@ -32,15 +32,15 @@ endif
 
 command! -buffer -nargs=0 -bang GhcModType call ghcmod#command#type(<bang>0)
 command! -buffer -nargs=0 -bang GhcModTypeInsert call ghcmod#command#type_insert(<bang>0)
-command! -buffer -nargs=? GhcModInfo call ghcmod#command#info(<q-args>)
+command! -buffer -nargs=? -bang GhcModInfo call ghcmod#command#info(<q-args>, <bang>0)
 command! -buffer -nargs=0 GhcModTypeClear call ghcmod#command#type_clear()
-command! -buffer -nargs=? GhcModInfoPreview call ghcmod#command#info_preview(<q-args>)
-command! -buffer -nargs=0 GhcModCheck call ghcmod#command#make('check')
-command! -buffer -nargs=0 GhcModLint call ghcmod#command#make('lint')
-command! -buffer -nargs=0 GhcModCheckAsync call ghcmod#command#async_make('check', '')
-command! -buffer -nargs=0 GhcModLintAsync call ghcmod#command#async_make('lint', '')
-command! -buffer -nargs=0 GhcModCheckAndLintAsync call s:check_and_lint_async()
-command! -buffer -nargs=0 GhcModExpand call ghcmod#command#expand()
+command! -buffer -nargs=? -bang GhcModInfoPreview call ghcmod#command#info_preview(<q-args>, <bang>0)
+command! -buffer -nargs=0 -bang GhcModCheck call ghcmod#command#make('check', <bang>0)
+command! -buffer -nargs=0 -bang GhcModLint call ghcmod#command#make('lint', <bang>0)
+command! -buffer -nargs=0 -bang GhcModCheckAsync call ghcmod#command#async_make('check', '', <bang>0)
+command! -buffer -nargs=0 -bang GhcModLintAsync call ghcmod#command#async_make('lint', '', <bang>0)
+command! -buffer -nargs=0 -bang GhcModCheckAndLintAsync call s:check_and_lint_async()
+command! -buffer -nargs=0 -bang GhcModExpand call ghcmod#command#expand(<bang>0)
 let b:undo_ftplugin .= join(map([
       \ 'GhcModType',
       \ 'GhcModTypeInsert',

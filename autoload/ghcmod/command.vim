@@ -90,8 +90,8 @@ function! ghcmod#command#type_insert(force) "{{{
   call append(line(".")-1, repeat(' ', l:offset-1) . l:signature)
 endfunction "}}}
 
-function! s:info(fexp) "{{{
-  let l:path = s:buffer_path(1)
+function! s:info(fexp, force) "{{{
+  let l:path = s:buffer_path(a:force)
   if empty(l:path)
     return
   endif
@@ -102,21 +102,24 @@ function! s:info(fexp) "{{{
   return ghcmod#info(l:fexp, l:path, ghcmod#detect_module())
 endfunction "}}}
 
-function! ghcmod#command#info(fexp) "{{{
-  let l:info = s:info(a:fexp)
+function! ghcmod#command#info(fexp, force) "{{{
+  let l:info = s:info(a:fexp, a:force)
   if !empty(l:info)
     echo l:info
   endif
 endfunction "}}}
 
-function! ghcmod#command#info_preview(fexp, ...) "{{{
+function! ghcmod#command#info_preview(fexp, force, ...) "{{{
+  let l:info = s:info(a:fexp, a:force)
+  if empty(l:info)
+    return
+  endif
+
   if a:0 == 0
     let l:size = get(g:, 'ghcmod_max_preview_size', 10)
   else
     let l:size = a:000[0]
   endif
-
-  let l:info = s:info(a:fexp)
 
   silent! wincmd P
   if !(&previewwindow && expand("%:t") == "GHC-mod")
@@ -142,8 +145,8 @@ function! ghcmod#command#info_preview(fexp, ...) "{{{
   wincmd p
 endfunction "}}}
 
-function! ghcmod#command#make(type) "{{{
-  let l:path = s:buffer_path(1)
+function! ghcmod#command#make(type, force) "{{{
+  let l:path = s:buffer_path(a:force)
   if empty(l:path)
     return
   endif
@@ -156,8 +159,8 @@ function! ghcmod#command#make(type) "{{{
   endif
 endfunction "}}}
 
-function! ghcmod#command#async_make(type, action) "{{{
-  let l:path = s:buffer_path(1)
+function! ghcmod#command#async_make(type, action, force) "{{{
+  let l:path = s:buffer_path(a:force)
   if empty(l:path)
     return
   endif
@@ -178,8 +181,8 @@ function! ghcmod#command#async_make(type, action) "{{{
   call ghcmod#async_make(a:type, l:path, l:callback)
 endfunction "}}}
 
-function! ghcmod#command#expand() "{{{
-  let l:path = s:buffer_path(1)
+function! ghcmod#command#expand(force) "{{{
+  let l:path = s:buffer_path(a:force)
   if empty(l:path)
     return
   endif
