@@ -50,3 +50,5 @@ function! s:finalize(key)
     unlet s:updatetime
   endif
 endfunction
+
+" vim: set ts=2 sw=2 et fdm=marker:

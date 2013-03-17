@@ -66,3 +66,5 @@ function! s:check_and_lint_async()
     call ghcmod#command#async_make('lint', 'a')
   endif
 endfunction
+
+" vim: set ts=2 sw=2 et fdm=marker:

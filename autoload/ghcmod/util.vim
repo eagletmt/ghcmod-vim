@@ -75,3 +75,5 @@ function! ghcmod#util#check_version(version) "{{{
   endfor
   return 1
 endfunction "}}}
+
+" vim: set ts=2 sw=2 et fdm=marker:

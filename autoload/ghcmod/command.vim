@@ -190,3 +190,5 @@ function! ghcmod#command#expand(force) "{{{
   call setqflist(ghcmod#expand(l:path))
   cwindow
 endfunction "}}}
+
+" vim: set ts=2 sw=2 et fdm=marker:

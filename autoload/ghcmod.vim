@@ -3,7 +3,7 @@ function! ghcmod#highlight_group() "{{{
 endfunction "}}}
 
 " Return the current haskell identifier
-function! ghcmod#getHaskellIdentifier()"{{{
+function! ghcmod#getHaskellIdentifier() "{{{
   let c = col ('.')-1
   let l = line('.')
   let ll = getline(l)
@@ -12,7 +12,7 @@ function! ghcmod#getHaskellIdentifier()"{{{
   let ll2 = strpart(ll,c,strlen(ll)-c+1)
   let ll2 = matchstr(ll2,"^[a-zA-Z0-9_'.]*")
   return ll1.ll2
-endfunction"}}}
+endfunction "}}}
 
 function! ghcmod#info(fexp, path, module) "{{{
   let l:cmd = ghcmod#build_command(['info', a:path, a:module, a:fexp])
@@ -34,7 +34,7 @@ function! ghcmod#type(line, col, path, module) "{{{
   return l:types
 endfunction "}}}
 
-function! ghcmod#detect_module()"{{{
+function! ghcmod#detect_module() "{{{
   let l:regex = '^\C\s*module\s\+\zs[A-Za-z0-9.]\+'
   for l:lineno in range(1, line('$'))
     let l:line = getline(l:lineno)
@@ -48,9 +48,9 @@ function! ghcmod#detect_module()"{{{
     let l:lineno += 1
   endfor
   return 'Main'
-endfunction"}}}
+endfunction "}}}
 
-function! s:fix_qf_lnum_col(qf)"{{{
+function! s:fix_qf_lnum_col(qf) "{{{
   " ghc-mod reports dummy error message with lnum=0 and col=0.
   " This is not suitable for Vim, so tweak them.
   for l:key in ['lnum', 'col']
@@ -58,9 +58,9 @@ function! s:fix_qf_lnum_col(qf)"{{{
       let a:qf[l:key] = 1
     endif
   endfor
-endfunction"}}}
+endfunction "}}}
 
-function! ghcmod#parse_make(lines, basedir)"{{{
+function! ghcmod#parse_make(lines, basedir) "{{{
   " `ghc-mod check` and `ghc-mod lint` produces <NUL> characters but Vim cannot
   " treat them correctly.  Vim converts <NUL> characters to <NL> in readfile().
   " See also :help readfile() and :help NL-used-for-Nul.
@@ -105,9 +105,9 @@ function! ghcmod#parse_make(lines, basedir)"{{{
     endif
   endfor
   return l:qflist
-endfunction"}}}
+endfunction "}}}
 
-function! s:build_make_command(type, path)"{{{
+function! s:build_make_command(type, path) "{{{
   let l:cmd = ghcmod#build_command([a:type])
   if a:type ==# 'lint'
     for l:hopt in get(g:, 'ghcmod_hlint_options', [])
@@ -116,7 +116,7 @@ function! s:build_make_command(type, path)"{{{
   endif
   call add(l:cmd, a:path)
   return l:cmd
-endfunction"}}}
+endfunction "}}}
 
 function! ghcmod#make(type, path) "{{{
   let l:tmpfile = tempname()
@@ -198,7 +198,7 @@ function! ghcmod#expand(path) "{{{
   return l:qflist
 endfunction "}}}
 
-function! ghcmod#build_command(args)"{{{
+function! ghcmod#build_command(args) "{{{
   let l:cmd = ['ghc-mod']
 
   let l:build_dir = s:find_basedir() . '/dist/build'
@@ -235,32 +235,32 @@ function! ghcmod#build_command(args)"{{{
   endfor
   call extend(l:cmd, a:args)
   return l:cmd
-endfunction"}}}
+endfunction "}}}
 
-function! s:system(...)"{{{
+function! s:system(...) "{{{
   lcd `=ghcmod#basedir()`
   let l:ret = call('vimproc#system', a:000)
   lcd -
   return l:ret
-endfunction"}}}
+endfunction "}}}
 
-function! s:plineopen2(...)"{{{
+function! s:plineopen2(...) "{{{
   lcd `=ghcmod#basedir()`
   let l:ret = call('vimproc#plineopen2', a:000)
   lcd -
   return l:ret
-endfunction"}}}
+endfunction "}}}
 
-function! ghcmod#basedir()"{{{
+function! ghcmod#basedir() "{{{
   let l:use_basedir = get(g:, 'ghcmod_use_basedir', '')
   if empty(l:use_basedir)
     return s:find_basedir()
   else
     return l:use_basedir
   endif
-endfunction"}}}
+endfunction "}}}
 
-function! s:find_basedir()"{{{
+function! s:find_basedir() "{{{
   " search Cabal file
   if !exists('b:ghcmod_basedir')
     let l:ghcmod_basedir = expand('%:p:h')
@@ -275,10 +275,10 @@ function! s:find_basedir()"{{{
     let b:ghcmod_basedir = l:ghcmod_basedir
   endif
   return b:ghcmod_basedir
-endfunction"}}}
+endfunction "}}}
 
-function! ghcmod#version()"{{{
+function! ghcmod#version() "{{{
   return [0, 4, 0]
-endfunction"}}}
+endfunction "}}}
 
 " vim: set ts=2 sw=2 et fdm=marker:

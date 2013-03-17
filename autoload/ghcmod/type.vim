@@ -1,18 +1,16 @@
-function! ghcmod#type#new(types, group)
+function! ghcmod#type#new(types, group) "{{{
   let l:obj = deepcopy(s:ghcmod_type)
   let l:obj.types = a:types
   let l:obj.group = a:group
 
   augroup ghcmod-type-highlight
     autocmd! * <buffer>
-    autocmd BufEnter <buffer> call s:on_enter()
-    autocmd WinEnter <buffer> call s:on_enter()
-    autocmd BufLeave <buffer> call s:on_leave()
-    autocmd WinLeave <buffer> call s:on_leave()
+    autocmd BufEnter,WinEnter <buffer> call s:on_enter()
+    autocmd BufLeave,WinLeave <buffer> call s:on_leave()
   augroup END
 
   return l:obj
-endfunction
+endfunction "}}}
 
 function! s:on_enter() "{{{
   if exists('b:ghcmod_type')
@@ -63,3 +61,5 @@ function! s:ghcmod_type.clear_highlight() "{{{
     let self.match_id = -1
   endif
 endfunction "}}}
+
+" vim: set ts=2 sw=2 et fdm=marker:
