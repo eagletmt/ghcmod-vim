@@ -20,6 +20,6 @@ do
   fi
 done
 
-cat verbose.log
+[ $retval -eq 0 ] || cat verbose.log
 
 exit $retval
