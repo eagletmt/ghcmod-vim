@@ -28,7 +28,7 @@ function! ghcmod#type(line, col, path, module) "{{{
   for l:line in split(l:output, '\n')
     let l:m = matchlist(l:line, '\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\([^"]\+\)"')
     if !empty(l:m)
-      call add(l:types, [l:m[1 : 4], l:m[5]])
+      call add(l:types, [map(l:m[1 : 4], 'str2nr(v:val, 10)'), l:m[5]])
     endif
   endfor
   return l:types
