@@ -1,1 +1,1 @@
-set runtimepath+=vimproc,.
+let &runtimepath = printf('%s,%s,%s', &runtimepath, fnamemodify('vimproc', ':p'), fnamemodify('.', ':p'))
