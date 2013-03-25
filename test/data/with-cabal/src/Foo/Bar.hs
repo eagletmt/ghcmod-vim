@@ -1,3 +1,5 @@
 module Foo.Bar (bar) where
 
-bar = "bar"
+bar = x
+  where
+    x = id $ "bar"
