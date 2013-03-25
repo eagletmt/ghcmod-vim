@@ -206,10 +206,10 @@ function! ghcmod#build_command(args) "{{{
     " detect autogen directory
     let l:autogen_dir = l:build_dir . '/autogen'
     if isdirectory(l:autogen_dir)
-      call extend(l:cmd, ['-g', '-i' . l:autogen_dir, '-g', '-I' . l:autogen_dir])
+      call extend(l:cmd, ['-g', '-i', '-g', l:autogen_dir, '-g', '-I', '-g', l:autogen_dir])
       let l:macros_path = l:autogen_dir . '/cabal_macros.h'
       if filereadable(l:macros_path)
-        call extend(l:cmd, ['-g', '-optP-include', '-g', '-optP' . l:macros_path])
+        call extend(l:cmd, ['-g', '-optP-include', '-g', '-optP', '-g', l:macros_path])
       endif
     endif
 
@@ -217,11 +217,11 @@ function! ghcmod#build_command(args) "{{{
     if !empty(l:tmps)
       " add *-tmp directory to include path for executable project
       for l:tmp in l:tmps
-        call extend(l:cmd, ['-g', '-i' . l:tmp, '-g', '-I' . l:tmp])
+        call extend(l:cmd, ['-g', '-i', '-g', l:tmp, '-g', '-I', '-g', l:tmp])
       endfor
     else
       " add build directory to include path for library project
-      call extend(l:cmd, ['-g', '-i' . l:build_dir, '-g', '-I' . l:build_dir])
+      call extend(l:cmd, ['-g', '-i', '-g', l:build_dir, '-g', '-I', '-g', l:build_dir])
     endif
   endif
 
