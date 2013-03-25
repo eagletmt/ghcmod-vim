@@ -20,6 +20,10 @@ function! s:main()
     call system('cd test/data/with-cabal; rm -rf dist')
   endtry
 
+  let g:ghcmod_ghc_options = ['-Wall']
+  edit test/data/without-cabal/Main.hs
+  call s:write()
+
   call writefile(s:outputs, 'test/output/build_command.out')
 endfunction
 

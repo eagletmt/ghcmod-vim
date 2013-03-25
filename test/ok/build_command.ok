@@ -29,3 +29,8 @@ test/data/with-cabal/dist/build
 test/data/with-cabal/dist/build
 do
 ######
+ghc-mod
+-g
+-Wall
+do
+######

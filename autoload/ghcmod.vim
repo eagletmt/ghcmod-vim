@@ -228,7 +228,7 @@ function! ghcmod#build_command(args) "{{{
   if exists('b:ghcmod_ghc_options')
     let l:opts = b:ghcmod_ghc_options
   else
-    let l:opts = []
+    let l:opts = get(g:, 'ghcmod_ghc_options', [])
   endif
   for l:opt in l:opts
     call extend(l:cmd, ['-g', l:opt])
