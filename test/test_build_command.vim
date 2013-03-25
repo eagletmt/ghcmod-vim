@@ -24,6 +24,12 @@ function! s:main()
   edit test/data/without-cabal/Main.hs
   call s:write()
 
+  " If b:ghcmod_ghc_options is set, g:ghcmod_ghc_options is ignored
+  edit test/data/without-cabal/Main.hs
+  let g:ghcmod_ghc_options = ['-Wall']
+  let b:ghcmod_ghc_options = ['-W']
+  call s:write()
+
   call writefile(s:outputs, 'test/output/build_command.out')
 endfunction
 

@@ -34,3 +34,8 @@ ghc-mod
 -Wall
 do
 ######
+ghc-mod
+-g
+-W
+do
+######
