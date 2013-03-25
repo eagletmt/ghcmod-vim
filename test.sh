@@ -4,6 +4,7 @@ shopt -s nullglob
 
 rm -rf test/output
 mkdir -p test/output
+rm -f verbose.log
 
 retval=0
 for f in test/test_*.vim
@@ -18,5 +19,7 @@ do
     retval=$[retval + 1]
   fi
 done
+
+cat verbose.log
 
 exit $retval
