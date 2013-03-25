@@ -2,6 +2,9 @@
 
 shopt -s nullglob
 
+rm -rf test/output
+mkdir -p test/output
+
 retval=0
 for f in test/test_*.vim
 do
