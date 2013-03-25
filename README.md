@@ -26,20 +26,20 @@ See `:help :filetype-overview` for more details.
 https://github.com/Shougo/vimproc
 
 ### ghc-mod
-~~~sh
+```sh
 cabal install ghc-mod
-~~~
+```
 
 ## Details
 If you'd like to give GHC options, set `g:ghcmod_ghc_options`.
 
-~~~vim
+```vim
 let g:ghcmod_ghc_options = ['-idir1', '-idir2']
-~~~
+```
 
 Also, there's buffer-local version `b:ghcmod_ghc_options`.
 
-~~~vim
+```vim
 autocmd BufRead,BufNewFile ~/.xmonad/* call s:add_xmonad_path()
 function! s:add_xmonad_path()
   if !exists('b:ghcmod_ghc_options')
@@ -47,7 +47,7 @@ function! s:add_xmonad_path()
   endif
   call add(b:ghcmod_ghc_options, '-i' . expand('~/.xmonad/lib'))
 endfunction
-~~~
+```
 
 ### :GhcModType, :GhcModTypeClear
 Type `:GhcModType` on a expression, then the sub-expression is highlighted and its type is echoed.
@@ -69,10 +69,10 @@ Type `:GhcModTypeClear` to clear sub-expression's highlight.
 Sub-expressions are highlighted as `Search` by default.
 You can customize it by setting `g:ghcmod_type_highlight` .
 
-~~~vim
+```vim
 hi ghcmodType ctermbg=yellow
 let g:ghcmod_type_highlight = 'ghcmodType'
-~~~
+```
 
 ### :GhcModCheck, :GhcModLint
 You can get compiler errors/warnings by `:GhcModCheck` and they are available in quickfix window.
@@ -83,9 +83,9 @@ Similarly, type `:GhcModLint` to get suggestions by `ghc-mod lint`.
 
 If you'd like to pass options to hlint, set `g:ghcmod_hlint_options`.
 
-~~~vim
+```vim
 let g:ghcmod_hlint_options = ['--ignore=Redundant $']
-~~~
+```
 
 ![lint](http://cache.gyazo.com/3b64724ce2587e03761fe618457f1c2e.png)
 
@@ -109,4 +109,4 @@ See wiki page [Customize](https://github.com/eagletmt/ghcmod-vim/wiki/Customize)
 ## License
 [BSD3 License](http://www.opensource.org/licenses/BSD-3-Clause), the same license as ghc-mod.
 
-Copyright (c) 2012, eagletmt
+Copyright (c) 2012-2013, eagletmt
