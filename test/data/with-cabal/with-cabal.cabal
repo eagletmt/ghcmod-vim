@@ -1,0 +1,16 @@
+name: with-cabal
+version: 0.1.0
+synopsis: with-cabal
+description: with-cabal
+build-type: Simple
+maintainer: eagletmt@gmail.com
+category: Testing
+license: BSD3
+cabal-version: >= 1.6
+
+library
+  build-depends: base == 4.*
+  hs-source-dirs: src
+  exposed-modules:
+    Foo
+    Foo.Bar
