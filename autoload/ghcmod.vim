@@ -18,7 +18,9 @@ function! ghcmod#info(fexp, path, module) "{{{
   let l:cmd = ghcmod#build_command(['info', a:path, a:module, a:fexp])
   let l:output = s:system(l:cmd)
   " Remove trailing newlines to prevent empty lines
-  return substitute(l:output, '\n*$', '', '')
+  let l:output = substitute(l:output, '\n*$', '', '')
+  " Remove 'Dummy:0:0:' prefix.
+  return substitute(l:output, '^Dummy:0:0:', '', '')
 endfunction "}}}
 
 function! ghcmod#type(line, col, path, module) "{{{

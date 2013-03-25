@@ -14,6 +14,9 @@ function! s:main()
   edit test/data/with-cabal/src/Foo.hs
   call s:check('bar', '^bar :: \[Char\]')
 
+  edit test/data/failure/Main.hs
+  call s:check('main', '^Error:')
+
   call writefile(s:outputs, 'test/output/info.out')
 endfunction
 
