@@ -5,8 +5,6 @@ function! s:write(qflist)
     if has_key(l:qf, 'filename')
       let l:qf.filename = fnamemodify(l:qf.filename, ':.')
       call add(s:outputs, printf('%d %d %s %s', l:qf.lnum, l:qf.col, l:qf.type, l:qf.filename))
-    else
-      call add(s:outputs, '')
     endif
   endfor
   call add(s:outputs, '######')

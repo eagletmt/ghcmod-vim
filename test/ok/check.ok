@@ -2,15 +2,9 @@
 4 1 W test/data/with-cabal/src/Foo.hs
 ######
 3 22 E test/data/failure/Main.hs
-
-
-
 ######
 3 1 W test/data/with-cabal/src/Foo/Bar.hs
 4 1 W test/data/with-cabal/src/Foo.hs
 ######
 3 22 E test/data/failure/Main.hs
-
-
-
 ######
