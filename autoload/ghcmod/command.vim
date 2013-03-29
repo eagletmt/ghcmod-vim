@@ -159,15 +159,15 @@ function! ghcmod#command#make(type, force) "{{{
   endif
 endfunction "}}}
 
-function! ghcmod#command#async_make(type, action, force) "{{{
+function! ghcmod#command#async_make(type, force) "{{{
   let l:path = s:buffer_path(a:force)
   if empty(l:path)
     return
   endif
 
-  let l:callback = { 'action': a:action, 'type': a:type }
+  let l:callback = { 'type': a:type }
   function! l:callback.on_finish(qflist)
-    call setqflist(a:qflist, self.action)
+    call setqflist(a:qflist)
     cwindow
     if &l:buftype ==# 'quickfix'
       " go back to original window
@@ -179,6 +179,36 @@ function! ghcmod#command#async_make(type, action, force) "{{{
   endfunction
 
   call ghcmod#async_make(a:type, l:path, l:callback)
+endfunction "}}}
+
+function! ghcmod#command#check_and_lint_async(force) "{{{
+  let l:path = s:buffer_path(a:force)
+  if empty(l:path)
+    return
+  endif
+
+  let l:callback = { 'first': 1 }
+  function! l:callback.on_finish(qflist)
+    if self.first
+      call setqflist(a:qflist)
+      let self.first = 0
+    else
+      call setqflist(a:qflist, 'a')
+      cwindow
+      if &l:buftype ==# 'quickfix'
+        " go back to original window
+        wincmd p
+      endif
+      if empty(getqflist())
+        echomsg 'ghc-mod check and lint(async): No errors found'
+      endif
+    endif
+  endfunction
+
+  if !ghcmod#async#exist_session()
+    call ghcmod#async_make('check', l:path, l:callback)
+    call ghcmod#async_make('lint', l:path, l:callback)
+  endif
 endfunction "}}}
 
 function! ghcmod#command#expand(force) "{{{

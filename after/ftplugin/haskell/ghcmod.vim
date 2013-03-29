@@ -37,9 +37,9 @@ command! -buffer -nargs=0 GhcModTypeClear call ghcmod#command#type_clear()
 command! -buffer -nargs=? -bang GhcModInfoPreview call ghcmod#command#info_preview(<q-args>, <bang>0)
 command! -buffer -nargs=0 -bang GhcModCheck call ghcmod#command#make('check', <bang>0)
 command! -buffer -nargs=0 -bang GhcModLint call ghcmod#command#make('lint', <bang>0)
-command! -buffer -nargs=0 -bang GhcModCheckAsync call ghcmod#command#async_make('check', '', <bang>0)
-command! -buffer -nargs=0 -bang GhcModLintAsync call ghcmod#command#async_make('lint', '', <bang>0)
-command! -buffer -nargs=0 -bang GhcModCheckAndLintAsync call s:check_and_lint_async()
+command! -buffer -nargs=0 -bang GhcModCheckAsync call ghcmod#command#async_make('check', <bang>0)
+command! -buffer -nargs=0 -bang GhcModLintAsync call ghcmod#command#async_make('lint', <bang>0)
+command! -buffer -nargs=0 -bang GhcModCheckAndLintAsync call ghcmod#command#check_and_lint_async(<bang>0)
 command! -buffer -nargs=0 -bang GhcModExpand call ghcmod#command#expand(<bang>0)
 let b:undo_ftplugin .= join(map([
       \ 'GhcModType',
@@ -58,13 +58,5 @@ let b:undo_ftplugin .= ' | unlet b:did_ftplugin_ghcmod'
 
 " Ensure syntax highlighting for ghcmod#detect_module()
 syntax sync fromstart
-
-function! s:check_and_lint_async()
-  if !ghcmod#async#exist_session()
-    call setqflist([])
-    call ghcmod#command#async_make('check', 'a')
-    call ghcmod#command#async_make('lint', 'a')
-  endif
-endfunction
 
 " vim: set ts=2 sw=2 et fdm=marker:
