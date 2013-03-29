@@ -6,7 +6,7 @@ function! s:buffer_path(force) "{{{
   endif
 
   if &l:modified
-    let l:msg = 'the current buffer has been modified but not written'
+    let l:msg = 'ghcmod.vim: the current buffer has been modified but not written'
     if a:force
       call ghcmod#util#print_warning(l:msg)
     else
