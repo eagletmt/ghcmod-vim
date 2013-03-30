@@ -1,33 +1,52 @@
-let s:outputs = []
-
-function! s:write()
+function! s:basedir()
   " normalize path
-  call add(s:outputs, fnamemodify(ghcmod#basedir(), ':.'))
+  return fnamemodify(ghcmod#basedir(), ':.')
 endfunction
 
-function! s:without_cabal()
-  edit test/data/without-cabal/Main.hs
-  call s:write()
-  edit test/data/without-cabal/Foo/Bar.hs
-  call s:write()
+let s:unit = tinytest#new()
+
+function! s:unit.teardown()
+  bdelete
 endfunction
 
-function! s:with_cabal()
+function! s:unit.test_with_cabal()
   edit test/data/with-cabal/src/Foo.hs
-  call s:write()
+  call self.assert.equal('test/data/with-cabal', s:basedir())
+endfunction
+
+function! s:unit.test_with_cabal_subdir()
   edit test/data/with-cabal/src/Foo/Bar.hs
-  call s:write()
+  call self.assert.equal('test/data/with-cabal', s:basedir())
 endfunction
 
-function! s:main()
-  call s:without_cabal()
-  call s:with_cabal()
+function! s:unit.test_without_cabal()
+  edit test/data/without-cabal/Main.hs
+  call self.assert.equal('test/data/without-cabal', s:basedir())
+endfunction
 
+function! s:unit.test_without_cabal_subdir()
+  edit test/data/without-cabal/Foo/Bar.hs
+  call self.assert.equal('test/data/without-cabal/Foo', s:basedir())
+endfunction
+
+function! s:unit.test_with_cabal_opt()
   let g:ghcmod_use_basedir = 'test/data'
-  call s:without_cabal()
-  call s:with_cabal()
-
-  call writefile(s:outputs, 'test/output/basedir.out')
+  try
+    edit test/data/with-cabal/src/Foo/Bar.hs
+    call self.assert.equal(g:ghcmod_use_basedir, s:basedir())
+  finally
+    unlet g:ghcmod_use_basedir
+  endtry
 endfunction
 
-call s:main()
+function! s:unit.test_without_cabal_opt()
+  let g:ghcmod_use_basedir = 'test/data'
+  try
+    edit test/data/without-cabal/Foo/Bar.hs
+    call self.assert.equal(g:ghcmod_use_basedir, s:basedir())
+  finally
+    unlet g:ghcmod_use_basedir
+  endtry
+endfunction
+
+call s:unit.run()

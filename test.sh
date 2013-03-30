@@ -2,24 +2,21 @@
 
 shopt -s nullglob
 
-rm -rf test/output
-mkdir -p test/output
-rm -f verbose.log
-
 retval=0
 for f in test/test_*.vim
 do
   testname=${f#test/test_}
   testname=${testname%.vim}
-  if vim -e -N -u NONE -S test/before.vim -S "$f" -c quit < /dev/null; then
-    diff -u test/ok/$testname.ok test/output/$testname.out
-    retval=$[retval + $?]
+  echo "Running $testname"
+  rm -f verbose.log
+  if vim -e -N -u NONE -S test/before.vim -S "$f" < /dev/null; then
+    cat stdout.log
   else
-    echo "$testname: vim exited with $?"
     retval=$[retval + 1]
+    cat stdout.log
+    cat verbose.log
+    echo
   fi
 done
-
-[ $retval -eq 0 ] || cat verbose.log
 
 exit $retval

@@ -1,5 +1,3 @@
-let s:outputs = []
-
 function! s:capture(cmd)
   let l:result = ''
   redir => l:result
@@ -17,59 +15,74 @@ function! s:match_group(match_id)
   return ''
 endfunction
 
-function! s:write()
+function! s:type()
   let [l:type] = s:capture('GhcModType')
-  call add(s:outputs, printf('%s %s', s:match_group(b:ghcmod_type.match_id), l:type))
+  return [l:type, s:match_group(b:ghcmod_type.match_id)]
 endfunction
 
-function! s:main()
-  " default highlight group is Search
-  new test/data/with-cabal/src/Foo.hs
-  call cursor(4, 7)
-  call s:write()
-  bdelete
+let s:unit = tinytest#new()
 
-  " toggles
-  new test/data/with-cabal/src/Foo.hs
+function! s:unit.teardown()
+  bdelete
+endfunction
+
+function! s:unit.test_command_type()
+  edit test/data/with-cabal/src/Foo.hs
+  call cursor(4, 7)
+  let [l:type, l:group] = s:type()
+  call self.assert.equal(l:type, '[Char]')
+  call self.assert.equal(l:group, 'Search')
+endfunction
+
+function! s:unit.test_command_type_toggle()
+  edit test/data/with-cabal/src/Foo.hs
   call cursor(4, 11)
-  call s:write()
-  call s:write()
-  bdelete
+  let [l:type, _] = s:type()
+  call self.assert.equal('[Char] -> [Char] -> [Char]', l:type)
+  let [l:type, _] = s:type()
+  call self.assert.equal('[Char]', l:type)
+endfunction
 
+function! s:unit.test_command_type_highlight()
   let g:ghcmod_type_highlight = 'WildMenu'
-  new test/data/with-cabal/src/Foo.hs
-  call cursor(4, 7)
-  call s:write()
-  bdelete
-  unlet g:ghcmod_type_highlight
+  try
+    edit test/data/with-cabal/src/Foo.hs
+    call cursor(4, 7)
+    let [_, l:group] = s:type()
+    call self.assert.equal('WildMenu', l:group)
+  finally
+    unlet g:ghcmod_type_highlight
+  endtry
+endfunction
 
-  " match changes on leaving windows
+function! s:unit.test_command_type_match_change()
   new test/data/with-cabal/src/Foo.hs
   call cursor(4, 7)
-  GhcModType
+  silent GhcModType
   let l:prev_id = b:ghcmod_type.match_id
   let l:prev_group = s:match_group(l:prev_id)
   let l:bufnr = bufnr('%')
   wincmd p
   let l:id = getbufvar(l:bufnr, 'ghcmod_type').match_id
   let l:group = s:match_group(l:prev_id)
-  call add(s:outputs, join([l:prev_group, l:group, l:prev_id == l:id], ' '))
   wincmd p
-  bdelete
 
-  " clear
-  new test/data/with-cabal/src/Foo.hs
-  let l:prev_matches = getmatches()
-  call cursor(4, 7)
-  GhcModType
-  let l:exist_ghcmod_type1 = exists('b:ghcmod_type')
-  GhcModTypeClear
-  let l:exist_ghcmod_type2 = exists('b:ghcmod_type')
-  let l:matches = getmatches()
-  call add(s:outputs, join([l:exist_ghcmod_type1, l:exist_ghcmod_type2, l:prev_matches == l:matches], ' '))
-  bdelete
-
-  call writefile(s:outputs, 'test/output/command_type.out')
+  call self.assert.equal('Search', l:prev_group)
+  call self.assert.equal('', l:group)
+  call self.assert.not_equal(-1, l:prev_id)
+  call self.assert.equal(-1, l:id)
 endfunction
 
-call s:main()
+function! s:unit.test_command_type_clear()
+  edit test/data/with-cabal/src/Foo.hs
+  let l:prev_matches = getmatches()
+  call cursor(4, 7)
+  silent GhcModType
+  call self.assert.exist('b:ghcmod_type')
+  GhcModTypeClear
+  call self.assert.not_exist('b:ghcmod_type')
+  let l:matches = getmatches()
+  call self.assert.equal(l:prev_matches, l:matches)
+endfunction
+
+call s:unit.run()

@@ -1,4 +1,5 @@
 doc/tags
-test/output
 vimproc
+tinytest
 verbose.log
+stdout.log

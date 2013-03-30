@@ -1,17 +1,23 @@
-let s:outputs = []
+let s:unit = tinytest#new()
 
-function! s:check(line, col)
-  call add(s:outputs, string(ghcmod#type(a:line, a:col, expand('%:p'), ghcmod#detect_module())))
+function! s:unit.teardown()
+  bdelete
 endfunction
 
-function! s:main()
+function! s:unit.test_type()
   edit test/data/with-cabal/src/Foo.hs
-  call s:check(4, 7)
-
-  edit test/data/failure/Main.hs
-  call s:check(5, 1)
-
-  call writefile(s:outputs, 'test/output/type.out')
+  let l:types = ghcmod#type(4, 7, expand('%:p'), ghcmod#detect_module())
+  call self.assert.equal([
+        \ [[4, 7, 4, 10], '[Char]'],
+        \ [[4, 7, 4, 16], '[Char]'],
+        \ [[4, 1, 4, 16], '[Char]'],
+        \ ], l:types)
 endfunction
 
-call s:main()
+function! s:unit.test_type_compilation_failure()
+  edit test/data/failure/Main.hs
+  let l:types = ghcmod#type(4, 7, expand('%:p'), ghcmod#detect_module())
+  call self.assert.empty(l:types)
+endfunction
+
+call s:unit.run()

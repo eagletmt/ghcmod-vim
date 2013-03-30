@@ -1,23 +1,21 @@
-let s:outputs = []
-
-function! s:check(fexp, regexp)
-  let l:x = ghcmod#info(a:fexp, expand('%:p'), ghcmod#detect_module())
-  if l:x =~# a:regexp
-    call add(s:outputs, 'OK')
-  else
-    " Avoid NUL character
-    call add(s:outputs, substitute(l:x, '\n', '@', 'g'))
-  endif
+function! s:info(fexp)
+  return ghcmod#info(a:fexp, expand('%:p'), ghcmod#detect_module())
 endfunction
 
-function! s:main()
+let s:unit = tinytest#new()
+
+function! s:unit.teardown()
+  bdelete
+endfunction
+
+function! s:unit.test_info()
   edit test/data/with-cabal/src/Foo.hs
-  call s:check('bar', '^bar :: \[Char\]')
-
-  edit test/data/failure/Main.hs
-  call s:check('main', '^Error:')
-
-  call writefile(s:outputs, 'test/output/info.out')
+  call self.assert.match('^bar :: \[Char\]', s:info('bar'))
 endfunction
 
-call s:main()
+function! s:unit.test_info_compilation_error()
+  edit test/data/failure/Main.hs
+  call self.assert.match('^Error:', s:info('main'))
+endfunction
+
+call s:unit.run()

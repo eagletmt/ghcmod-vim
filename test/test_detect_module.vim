@@ -1,23 +1,27 @@
-let s:outputs = []
+let s:unit = tinytest#new()
 
-function! s:write()
-  call add(s:outputs, ghcmod#detect_module())
+function! s:unit.teardown()
+  bdelete
 endfunction
 
-function! s:main()
+function! s:unit.test_normal()
   edit test/data/detect_module/Normal.hs
-  call s:write()
-
-  edit test/data/detect_module/NoModuleDecl.hs
-  call s:write()
-
-  edit test/data/detect_module/ModuleDeclInComment.hs
-  call s:write()
-
-  edit test/data/detect_module/ModuleWithSpace.hs
-  call s:write()
-
-  call writefile(s:outputs, 'test/output/detect_module.out')
+  call self.assert.equal('Normal', ghcmod#detect_module())
 endfunction
 
-call s:main()
+function! s:unit.test_no_module_decl()
+  edit test/data/detect_module/NoModuleDecl.hs
+  call self.assert.equal('Main', ghcmod#detect_module())
+endfunction
+
+function! s:unit.test_module_decl_in_comment()
+  edit test/data/detect_module/ModuleDeclInComment.hs
+  call self.assert.equal('ActualModule', ghcmod#detect_module())
+endfunction
+
+function! s:unit.test_module_with_space()
+  edit test/data/detect_module/ModuleWithSpace.hs
+  call self.assert.equal('ModuleWithSpace', ghcmod#detect_module())
+endfunction
+
+call s:unit.run()
