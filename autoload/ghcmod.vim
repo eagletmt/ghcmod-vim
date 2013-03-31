@@ -175,27 +175,43 @@ function! ghcmod#expand(path) "{{{
   let l:qflist = []
   let l:cmd = ghcmod#build_command(['expand', a:path])
   for l:line in split(s:system(l:cmd), '\n')
-    let l:qf = {}
     " path:line:col1-col2: message
     " or path:line:col: message
-    let l:m = matchlist(l:line, '^\s*\(\f\+\):\(\d\+\):\(\d\+\)\%(-\d\+\)\?\%(:\s*\(.*\)\)\?$')
+    let l:m = matchlist(l:line, '^\s*\(\f\+\):\(\d\+\):\(\d\+\)\%(-\(\d\+\)\)\?\%(:\s*\(.*\)\)\?$')
     if !empty(l:m)
-      let [l:qf.filename, l:qf.lnum, l:qf.col, l:qf.text] = l:m[1 : 4]
+      let l:qf = {}
+      let [l:qf.filename, l:qf.lnum, l:qf.col, l:col2, l:qf.text] = l:m[1 : 5]
+      call add(l:qflist, l:qf)
+      if !empty(l:col2)
+        let l:qf2 = deepcopy(l:qf)
+        let l:qf2.col = l:col2
+        let l:qf2.text = 'Splicing end here'
+        call add(l:qflist, l:qf2)
+      endif
     else
-      " path:(line1,col1):(line2,col2): message
-      let l:m = matchlist(l:line, '^\s*\(\f\+\):(\(\d\+\),\(\d\+\))-(\d\+,\d\+)\%(:\s*\(.*\)\)\?$')
+      " path:(line1,col1)-(line2,col2): message
+      let l:m = matchlist(l:line, '^\s*\(\f\+\):(\(\d\+\),\(\d\+\))-(\(\d\+\),\(\d\+\))\%(:\s*\(.*\)\)\?$')
       if !empty(l:m)
-        let [l:qf.filename, l:qf.lnum, l:qf.col, l:qf.text] = l:m[1 : 4]
+        let [l:filename, l:lnum1, l:col1, l:lnum2, l:col2, l:text] = l:m[1 : 6]
+        call add(l:qflist, { 'filename': l:filename, 'lnum': l:lnum1, 'col': l:col1, 'text': l:text })
+        call add(l:qflist, { 'filename': l:filename, 'lnum': l:lnum2, 'col': l:col2, 'text': 'Splicing end here' })
       else
         " message
-        let l:qf.text = substitute(l:line, '^\s\{2\}', '', '')
+        let l:text = substitute(l:line, '^\s\{2\}', '', '')
+        call add(l:qflist, { 'text': l:text })
       endif
     endif
+  endfor
+
+  for l:qf in l:qflist
     if has_key(l:qf, 'filename')
       let l:qf.filename = ghcmod#util#join_path(l:dir, l:qf.filename)
     endif
+    if has_key(l:qf, 'lnum')
+      let l:qf.lnum = str2nr(l:qf.lnum)
+      let l:qf.col = str2nr(l:qf.col)
+    endif
     call s:fix_qf_lnum_col(l:qf)
-    call add(l:qflist, l:qf)
   endfor
   return l:qflist
 endfunction "}}}
