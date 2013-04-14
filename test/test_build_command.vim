@@ -1,5 +1,5 @@
 function! s:build()
-  return map(ghcmod#build_command(['do']), 'fnamemodify(v:val, ":.")')
+  return ghcmod#build_command(['do'])
 endfunction
 
 let s:unit = tinytest#new()
@@ -18,12 +18,12 @@ function! s:unit.test_build_with_dist_dir()
     call system('cd test/data/with-cabal; cabal configure; cabal build')
     edit test/data/with-cabal/src/Foo/Bar.hs
     call self.assert.equal(['ghc-mod',
-          \ '-g', '-i', '-g', 'test/data/with-cabal/dist/build/autogen',
-          \ '-g', '-I', '-g', 'test/data/with-cabal/dist/build/autogen',
+          \ '-g', '-i' . fnamemodify('test/data/with-cabal/dist/build/autogen', ':p:h'),
+          \ '-g', '-I' . fnamemodify('test/data/with-cabal/dist/build/autogen', ':p:h'),
           \ '-g', '-optP-include',
-          \ '-g', '-optP', '-g', 'test/data/with-cabal/dist/build/autogen/cabal_macros.h',
-          \ '-g', '-i', '-g', 'test/data/with-cabal/dist/build',
-          \ '-g', '-I', '-g', 'test/data/with-cabal/dist/build',
+          \ '-g', '-optP' . fnamemodify('test/data/with-cabal/dist/build/autogen/cabal_macros.h', ':p'),
+          \ '-g', '-i' . fnamemodify('test/data/with-cabal/dist/build', ':p:h'),
+          \ '-g', '-I' . fnamemodify('test/data/with-cabal/dist/build', ':p:h'),
           \ 'do'], s:build())
   finally
     call system('cd test/data/with-cabal; rm -rf dist')
