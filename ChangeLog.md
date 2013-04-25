@@ -1,4 +1,18 @@
 # ChangeLog
+## 1.0.0 (2013-04-25)
+- Refactor many autoload functions
+  - ghcmod.vim is an interface to ghc-mod
+  - ghcmod/command.vim contains definitions of commands
+  - ghcmod/type.vim is an implementation of `:GhcModType`
+    - Now `w:ghcmod_type_matchid` is not needed and deleted
+  - ghcmod/util.vim is a collection of utilities
+- Add test cases
+- Speed up boot time by moving autoload functions used at loading ftplugins
+- Add commands with `!` that is executed even if the current buffer is modified
+- Show splicing end locations in `:GhcModExpand`
+- Fix escaping in `:GhcModInfoPreview`
+- Fix ignorance of `g:ghcmod_ghc_options`
+
 ## 0.4.0 (2013-03-13)
 - Suppress empty line when `ghcmod#type()` fails
 - Disable `:GhcModType` and `:GhcModTypeInsert` if the current buffer is modified
