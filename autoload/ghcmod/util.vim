@@ -62,7 +62,7 @@ function! ghcmod#util#check_version(version) "{{{
   if !exists('s:ghc_mod_version')
     call vimproc#system(['ghc-mod'])
     let l:m = matchlist(vimproc#get_last_errmsg(), 'version \(\d\+\)\.\(\d\+\)\.\(\d\+\)')
-    let s:ghc_mod_version = l:m[1 : 3]
+    let s:ghc_mod_version = empty(l:m) ? [0, 0, 0] : l:m[1 : 3]
     call map(s:ghc_mod_version, 'str2nr(v:val)')
   endif
 
