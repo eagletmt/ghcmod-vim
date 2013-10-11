@@ -173,7 +173,7 @@ function! ghcmod#expand(path) "{{{
   let l:dir = fnamemodify(a:path, ':h')
 
   let l:qflist = []
-  let l:cmd = ghcmod#build_command(['expand', a:path])
+  let l:cmd = ghcmod#build_command(['expand', "-b '\n'", a:path])
   for l:line in split(s:system(l:cmd), '\n')
     " path:line:col1-col2: message
     " or path:line:col: message
