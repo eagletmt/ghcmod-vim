@@ -3,7 +3,8 @@
 
 Happy Haskell programming on Vim, powered by [ghc-mod](https://github.com/kazu-yamamoto/ghc-mod)
 
-[http://www.vim.org/scripts/script.php?script\_id=4473](http://www.vim.org/scripts/script.php?script_id=4473)
+- [http://www.vim.org/scripts/script.php?script\_id=4473](http://www.vim.org/scripts/script.php?script_id=4473)
+- https://github.com/eagletmt/ghcmod-vim/releases
 
 ## Features
 
