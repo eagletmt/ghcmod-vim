@@ -1,11 +1,15 @@
 # ChangeLog
+## 1.1.0 (2013-10-16)
+- Specify line separator by "-b" option (@preygel)
+    - This requires ghc-mod >= 2.1.2
+
 ## 1.0.0 (2013-04-25)
 - Refactor many autoload functions
-  - ghcmod.vim is an interface to ghc-mod
-  - ghcmod/command.vim contains definitions of commands
-  - ghcmod/type.vim is an implementation of `:GhcModType`
-    - Now `w:ghcmod_type_matchid` is not needed and deleted
-  - ghcmod/util.vim is a collection of utilities
+    - ghcmod.vim is an interface to ghc-mod
+    - ghcmod/command.vim contains definitions of commands
+    - ghcmod/type.vim is an implementation of `:GhcModType`
+        - Now `w:ghcmod_type_matchid` is not needed and deleted
+    - ghcmod/util.vim is a collection of utilities
 - Add test cases
 - Speed up boot time by moving autoload functions used at loading ftplugins
 - Add commands with `!` that is executed even if the current buffer is modified
@@ -16,8 +20,8 @@
 ## 0.4.0 (2013-03-13)
 - Suppress empty line when `ghcmod#type()` fails
 - Disable `:GhcModType` and `:GhcModTypeInsert` if the current buffer is modified
-  - Add new variant `:GhcModType!` and `:GhcModTypeInsert!` which is executed even if the current buffer is modified.
-  - Change `ghcmod#type()` and `ghcmod#type_insert()` to take an argument determining the behavior when the buffer is modified.
+    - Add new variant `:GhcModType!` and `:GhcModTypeInsert!` which is executed even if the current buffer is modified.
+    - Change `ghcmod#type()` and `ghcmod#type_insert()` to take an argument determining the behavior when the buffer is modified.
 - Fix `ghcmod#detect_module()` to detect the module name more correctly
 - Change the default directory to execute ghc-mod from (@drchaos)
 

@@ -296,7 +296,7 @@ function! s:find_basedir() "{{{
 endfunction "}}}
 
 function! ghcmod#version() "{{{
-  return [1, 0, 0]
+  return [1, 1, 0]
 endfunction "}}}
 
 " vim: set ts=2 sw=2 et fdm=marker:
