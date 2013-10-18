@@ -232,7 +232,7 @@ function! ghcmod#build_command(args) "{{{
   let l:cmd = ['ghc-mod']
 
   let l:dist_top  = s:find_basedir() . '/dist'
-  let l:sandboxes = glob(l:dist_top . '/dist-*', 1, 1)
+  let l:sandboxes = split(glob(l:dist_top . '/dist-*', 1), '\n')
   for l:dist_dir in [l:dist_top] + l:sandboxes
     let l:build_dir = l:dist_dir . '/build'
     if isdirectory(l:build_dir)
