@@ -98,7 +98,7 @@ If you'd like to open in another way the quickfix, set `g:ghcmod_open_quickfix_f
 let g:ghcmod_open_quickfix_function = 'GhcModQuickFix'
 function! GhcModQuickFix()
   " for unite.vim and unite-quickfix
-  execute 'Unite quickfix'
+  execute 'Unite -no-empty quickfix'
 
   " for ctrlp
   "execute 'CtrlPQuickfix'
