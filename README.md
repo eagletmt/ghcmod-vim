@@ -92,6 +92,21 @@ let g:ghcmod_hlint_options = ['--ignore=Redundant $']
 
 ![lint](http://cache.gyazo.com/3b64724ce2587e03761fe618457f1c2e.png)
 
+If you'd like to open in another way the quickfix, set `g:ghcmod_open_quickfix_function`.
+
+```vim
+let g:ghcmod_open_quickfix_function = 'GhcModQuickFix'
+function! GhcModQuickFix()
+  " for unite.vim and unite-quickfix
+  execute 'Unite quickfix'
+
+  " for ctrlp
+  "execute 'CtrlPQuickfix'
+
+  " for FuzzyFinder
+  "execute 'FufQuickfix'
+endfunction
+```
 
 ### :GhcModCheckAsync, :GhcModLintAsync, :GhcModCheckAndLintAsync
 You can run check and/or lint asynchronously.

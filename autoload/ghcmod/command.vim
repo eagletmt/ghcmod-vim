@@ -153,7 +153,7 @@ function! ghcmod#command#make(type, force) "{{{
 
   let l:qflist = ghcmod#make(a:type, l:path)
   call setqflist(l:qflist)
-  cwindow
+  call s:open_quickfix()
   if empty(l:qflist)
     echo printf('ghc-mod %s: No errors found', a:type)
   endif
@@ -168,7 +168,7 @@ function! ghcmod#command#async_make(type, force) "{{{
   let l:callback = { 'type': a:type }
   function! l:callback.on_finish(qflist)
     call setqflist(a:qflist)
-    cwindow
+    call s:open_quickfix()
     if &l:buftype ==# 'quickfix'
       " go back to original window
       wincmd p
@@ -194,7 +194,7 @@ function! ghcmod#command#check_and_lint_async(force) "{{{
       let self.first = 0
     else
       call setqflist(a:qflist, 'a')
-      cwindow
+      call s:open_quickfix()
       if &l:buftype ==# 'quickfix'
         " go back to original window
         wincmd p
@@ -218,7 +218,16 @@ function! ghcmod#command#expand(force) "{{{
   endif
 
   call setqflist(ghcmod#expand(l:path))
-  cwindow
+  call s:open_quickfix()
 endfunction "}}}
+
+function! s:open_quickfix()
+  let l:func = get(g:, 'ghcmod_open_quickfix_function', '')
+  if empty(l:func)
+    cwindow
+  elseif exists('*'.l:func)
+    call function(l:func)()
+  endif
+endfunction
 
 " vim: set ts=2 sw=2 et fdm=marker:
