@@ -225,8 +225,13 @@ function! s:open_quickfix()
   let l:func = get(g:, 'ghcmod_open_quickfix_function', '')
   if empty(l:func)
     cwindow
-  elseif exists('*'.l:func)
-    call function(l:func)()
+  else
+    try
+      call call(l:func, [])
+    catch
+      echomsg substitute(v:exception, '^.*:[WE]\d\+: ', '', '')
+            \ .': Please check g:ghcmod_open_quickfix_function'
+    endtry
   endif
 endfunction
 
