@@ -185,6 +185,18 @@ g:ghcmod_max_preview_size                          *g:ghcmod_max_preview_size*
 >
 	:GhcModInfoPreview Eq
 <
+g:ghcmod_open_quickfix_function              *g:ghcmod_open_quickfix_function*
+	The function name used for showing the |quickfix| list.
+	If undefined or empty, the quickfix list is shown by |:cwindow|.
+
+	Example: show quickfix by ctrlp.vim
+	<https://github.com/kien/ctrlp.vim>.
+>
+	let g:ghcmod_open_quickfix_function = 'GhcModQuickFixByCtrlP'
+	function! GhcModQuickFixByCtrlP()
+	  CtrlPQuickfix
+	endfunction
+<
 ==============================================================================
 CUSTOMIZE                                                   *ghcmod-customize*
 
