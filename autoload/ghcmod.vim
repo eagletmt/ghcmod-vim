@@ -216,7 +216,7 @@ function! ghcmod#expand(path) "{{{
   return l:qflist
 endfunction "}}}
 
-function! ghcmod#add_autogen_dir(path, cmd)
+function! ghcmod#add_autogen_dir(path, cmd) "{{{
   " detect autogen directory
   let l:autogen_dir = a:path . '/autogen'
   if isdirectory(l:autogen_dir)
@@ -226,7 +226,7 @@ function! ghcmod#add_autogen_dir(path, cmd)
       call extend(a:cmd, ['-g', '-optP-include', '-g', '-optP' . l:macros_path])
     endif
   endif
-endfunction
+endfunction "}}}
 
 function! ghcmod#build_command(args) "{{{
   let l:cmd = ['ghc-mod']

@@ -221,7 +221,7 @@ function! ghcmod#command#expand(force) "{{{
   call s:open_quickfix()
 endfunction "}}}
 
-function! s:open_quickfix()
+function! s:open_quickfix() "{{{
   let l:func = get(g:, 'ghcmod_open_quickfix_function', '')
   if empty(l:func)
     cwindow
@@ -233,6 +233,6 @@ function! s:open_quickfix()
             \ .': Please check g:ghcmod_open_quickfix_function'
     endtry
   endif
-endfunction
+endfunction "}}}
 
 " vim: set ts=2 sw=2 et fdm=marker:
