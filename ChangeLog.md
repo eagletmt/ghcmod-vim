@@ -1,6 +1,12 @@
 # ChangeLog
+## 1.2.0 (2014-02-02)
+- Support Cabal sandbox (@andy-morris, #33)
+- Support lhaskell (@carlohamalainen, #36)
+- Add another way to open the quickfix (@shiena, #37)
+- Workaround `ghcmod#util#is_abspath()` on Windows with Vim < 7.4.001 (@Grivr, #41)
+
 ## 1.1.0 (2013-10-16)
-- Specify line separator by "-b" option (@preygel)
+- Specify line separator by "-b" option (@preygel, #32)
     - This requires ghc-mod >= 2.1.2
 
 ## 1.0.0 (2013-04-25)
@@ -23,19 +29,19 @@
     - Add new variant `:GhcModType!` and `:GhcModTypeInsert!` which is executed even if the current buffer is modified.
     - Change `ghcmod#type()` and `ghcmod#type_insert()` to take an argument determining the behavior when the buffer is modified.
 - Fix `ghcmod#detect_module()` to detect the module name more correctly
-- Change the default directory to execute ghc-mod from (@drchaos)
+- Change the default directory to execute ghc-mod from (@drchaos, #25)
 
 ## 0.3.0 (2013-03-06)
-- Add `:GhcModTypeInsert` and `ghcmod#type_insert()` that inserts a type signature under the cursor (@johntyree)
-- Add `:GhcModInfoPreview` that shows information in preview window (@johntyree)
-- Make the parsing of check command more robust (@marcmo)
+- Add `:GhcModTypeInsert` and `ghcmod#type_insert()` that inserts a type signature under the cursor (@johntyree, #15)
+- Add `:GhcModInfoPreview` that shows information in preview window (@johntyree, #15)
+- Make the parsing of check command more robust (@marcmo, #21)
 - Add buffer-local version of `g:ghcmod_ghc_options`
 
 ## 0.2.0 (2012-09-12)
-- Fix the wrong comparison of versions in `ghcmod#check_version` (@yuttie)
+- Fix the wrong comparison of versions in `ghcmod#check_version` (@yuttie, #11)
 - Fix `ghcmod#type()` on a program with compilation errors
-- Add `g:ghcmod_use_basedir` option (@adimit)
-- Add `:GhcModInfo [{identifier}]` command (@ajnsit)
+- Add `g:ghcmod_use_basedir` option (@adimit, #12)
+- Add `:GhcModInfo [{identifier}]` command (@ajnsit, #14)
 
 ## 0.1.2 (2012-06-04)
 - Move ftplugin/haskell into after/ in order to co-exist with other ftplugins
