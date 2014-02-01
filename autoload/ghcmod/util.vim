@@ -11,9 +11,17 @@ function! ghcmod#util#print_error(msg) "{{{
 endfunction "}}}
 
 if vimproc#util#is_windows() " s:is_abspath {{{
-  function! ghcmod#util#is_abspath(path)
-    return a:path =~? '^[A-Za-z]:[\/]'
-  endfunction
+  if v:version > 704 || (v:version == 704 && has('patch001'))
+    function! ghcmod#util#is_abspath(path)
+      return a:path =~? '^[a-z]:[\/]'
+    endfunction
+  else
+    " NFA regexp engine had a bug and fixed in 7.4.001.
+    " http://code.google.com/p/vim/source/detail?r=3e9107b86b68d83bfa94e43afffbf17623afe55e
+    function! ghcmod#util#is_abspath(path)
+      return a:path =~# '^[A-Za-z]:[\/]'
+    endfunction
+  endif
 else
   function! ghcmod#util#is_abspath(path)
     return a:path[0] ==# '/'
