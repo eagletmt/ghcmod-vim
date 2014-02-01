@@ -12,7 +12,7 @@ endfunction "}}}
 
 if vimproc#util#is_windows() " s:is_abspath {{{
   function! ghcmod#util#is_abspath(path)
-    return a:path =~? '^[a-z]:[\/]'
+    return a:path =~? '^[A-Za-z]:[\/]'
   endfunction
 else
   function! ghcmod#util#is_abspath(path)
