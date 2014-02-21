@@ -22,7 +22,7 @@ FEATURES                                                    *ghcmod-features*
 - Displaying the expansion of splices (ghc-mod expand)
 
 Completions are supported by another plugin. See neco-ghc
-<https://github.com/ujihisa/neco-ghc>.
+<https://github.com/eagletmt/neco-ghc>.
 
 ==============================================================================
 REQUIREMENTS                                             *ghcmod-requirements*

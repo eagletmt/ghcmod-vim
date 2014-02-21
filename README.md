@@ -13,7 +13,7 @@ Happy Haskell programming on Vim, powered by [ghc-mod](https://github.com/kazu-y
 - Displaying the expansion of splices (`ghc-mod expand`)
 
 Completions are supported by another plugin.
-See [neco-ghc](https://github.com/ujihisa/neco-ghc) .
+See [neco-ghc](https://github.com/eagletmt/neco-ghc) .
 
 ## Requirements
 
