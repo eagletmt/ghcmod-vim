@@ -122,6 +122,9 @@ If you'd like to give GHC options, set |g:ghcmod_ghc_options|.
 	When the current buffer is modified, this command is disabled unless
 	"!" is given.
 
+:GhcModDiagnostics                                        *:GhcModDiagnostics*
+	Show diagnostics.
+
 ==============================================================================
 GLOBAL VARIABLES                                     *ghcmod-global-variables*
 

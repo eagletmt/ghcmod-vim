@@ -1,4 +1,7 @@
 # ChangeLog
+## x.x.x (xxxx-xx-xx)
+- Add `:GhcModDiagnostics` command
+
 ## 1.2.0 (2014-02-02)
 - Support Cabal sandbox (@andy-morris, #33)
 - Support lhaskell (@carlohamalainen, #36)
