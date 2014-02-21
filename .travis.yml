@@ -2,3 +2,10 @@ language: haskell
 install: ./install-deps.sh
 before_script: vim --version
 script: ./test.sh
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/cfa02866390ca23ea84c
+    on_success: always
+    on_failure: always
+    on_start: true
