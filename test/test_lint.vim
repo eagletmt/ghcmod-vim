@@ -63,6 +63,23 @@ function! s:unit.test_lint()
         \ }), l:qflist)
 endfunction
 
+function! s:unit.test_lint_whitespace()
+  edit test/data/with\ whitespace/src/Foo/Bar.hs
+  let l:qflist = s:normalize(ghcmod#make('lint', expand('%:p')))
+  call self.assert.any(s:make_qf_pred({
+        \ 'lnum': 5,
+        \ 'col': 9,
+        \ 'filename': 'test/data/with whitespace/src/Foo/Bar.hs',
+        \ 'text': 'Evaluate',
+        \ }), l:qflist)
+  call self.assert.any(s:make_qf_pred({
+        \ 'lnum': 5,
+        \ 'col': 9,
+        \ 'filename': 'test/data/with whitespace/src/Foo/Bar.hs',
+        \ 'text': 'Redundant $',
+        \ }), l:qflist)
+endfunction
+
 function! s:unit.test_lint_async()
   edit test/data/with-cabal/src/Foo/Bar.hs
   let l:callback = { 'assert': self.assert }

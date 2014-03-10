@@ -28,4 +28,15 @@ function! s:unit.test_expand()
   call self.assert.any(s:make_qf_pred({ 'lnum': 13, 'col': 31, 'text': l:end_message }), l:qflist)
 endfunction
 
+function! s:unit.test_expand_whitespace()
+  edit test/data/th\ with\ whitespace/Fuga.hs
+  call self.assert.exist(':GhcModExpand')
+  let l:qflist = ghcmod#expand(expand('%:p'))
+  let l:end_message = 'Splicing end here'
+  call self.assert.any(s:make_qf_pred({ 'lnum': 6, 'col': 8 }), l:qflist)
+  call self.assert.any(s:make_qf_pred({ 'lnum': 10, 'col': 2, 'text': l:end_message }), l:qflist)
+  call self.assert.any(s:make_qf_pred({ 'lnum': 13, 'col': 8 }), l:qflist)
+  call self.assert.any(s:make_qf_pred({ 'lnum': 13, 'col': 31, 'text': l:end_message }), l:qflist)
+endfunction
+
 call s:unit.run()

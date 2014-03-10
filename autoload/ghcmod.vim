@@ -69,15 +69,15 @@ function! ghcmod#parse_make(lines, basedir) "{{{
   let l:qflist = []
   for l:output in a:lines
     let l:qf = {}
-    let l:m = matchlist(l:output, '^\(\f\+\):\(\d\+\):\(\d\+\):\s*\(.*\)$')
-    if len(l:m) < 4
+    let l:m = matchlist(l:output, '^\(\(\f\| \)\+\):\(\d\+\):\(\d\+\):\s*\(.*\)$')
+    if len(l:m) < 5
       let l:qf.bufnr = 0
       let l:qf.type = 'E'
       let l:qf.text = 'parse error in ghcmod! Could not parse the following ghc-mod output:' .  l:output
       call add(l:qflist, l:qf)
       break
     end
-    let [l:qf.filename, l:qf.lnum, l:qf.col, l:rest] = l:m[1 : 4]
+    let [l:qf.filename, _, l:qf.lnum, l:qf.col, l:rest] = l:m[1 : 5]
     let l:qf.filename = ghcmod#util#join_path(a:basedir, l:qf.filename)
     if l:rest =~# '^Warning:'
       let l:qf.type = 'W'
@@ -177,10 +177,10 @@ function! ghcmod#expand(path) "{{{
   for l:line in split(s:system(l:cmd), '\n')
     " path:line:col1-col2: message
     " or path:line:col: message
-    let l:m = matchlist(l:line, '^\s*\(\f\+\):\(\d\+\):\(\d\+\)\%(-\(\d\+\)\)\?\%(:\s*\(.*\)\)\?$')
+    let l:m = matchlist(l:line, '^\s*\(\(\f\| \)\+\):\(\d\+\):\(\d\+\)\%(-\(\d\+\)\)\?\%(:\s*\(.*\)\)\?$')
     if !empty(l:m)
       let l:qf = {}
-      let [l:qf.filename, l:qf.lnum, l:qf.col, l:col2, l:qf.text] = l:m[1 : 5]
+      let [l:qf.filename, _, l:qf.lnum, l:qf.col, l:col2, l:qf.text] = l:m[1 : 6]
       call add(l:qflist, l:qf)
       if !empty(l:col2)
         let l:qf2 = deepcopy(l:qf)
@@ -190,9 +190,9 @@ function! ghcmod#expand(path) "{{{
       endif
     else
       " path:(line1,col1)-(line2,col2): message
-      let l:m = matchlist(l:line, '^\s*\(\f\+\):(\(\d\+\),\(\d\+\))-(\(\d\+\),\(\d\+\))\%(:\s*\(.*\)\)\?$')
+      let l:m = matchlist(l:line, '^\s*\(\(\f\| \)\+\):(\(\d\+\),\(\d\+\))-(\(\d\+\),\(\d\+\))\%(:\s*\(.*\)\)\?$')
       if !empty(l:m)
-        let [l:filename, l:lnum1, l:col1, l:lnum2, l:col2, l:text] = l:m[1 : 6]
+        let [l:filename, _, l:lnum1, l:col1, l:lnum2, l:col2, l:text] = l:m[1 : 7]
         call add(l:qflist, { 'filename': l:filename, 'lnum': l:lnum1, 'col': l:col1, 'text': l:text })
         call add(l:qflist, { 'filename': l:filename, 'lnum': l:lnum2, 'col': l:col2, 'text': 'Splicing end here' })
       else

@@ -56,6 +56,20 @@ function! s:unit.test_check()
         \ }), l:qflist)
 endfunction
 
+function! s:unit.test_check_whitespace()
+  new test/data/with\ whitespace/src/Foo.hs
+  let l:qflist = ghcmod#make('check', expand('%:p'))
+  call s:normalize(l:qflist)
+  call self.assert.any(s:make_qf_pred({
+        \ 'lnum': 3, 'col': 1, 'type': 'W',
+        \ 'filename': 'test/data/with whitespace/src/Foo/Bar.hs',
+        \ }), l:qflist)
+  call self.assert.any(s:make_qf_pred({
+        \ 'lnum': 4, 'col': 1, 'type': 'W',
+        \ 'filename': 'test/data/with whitespace/src/Foo.hs',
+        \ }), l:qflist)
+endfunction
+
 function! s:unit.test_check_compilation_error()
   new test/data/failure/Main.hs
   let l:qflist = ghcmod#make('check', expand('%:p'))
