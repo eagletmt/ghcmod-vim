@@ -1,5 +1,5 @@
 # ghcmod.vim
-[![Build Status](https://travis-ci.org/eagletmt/ghcmod-vim.png)](https://travis-ci.org/eagletmt/ghcmod-vim)
+[![Build Status](https://api.travis-ci.org/eagletmt/ghcmod-vim.svg)](https://travis-ci.org/eagletmt/ghcmod-vim)
 [![Gitter chat](https://badges.gitter.im/eagletmt/ghcmod-vim.png)](https://gitter.im/eagletmt/ghcmod-vim)
 
 Happy Haskell programming on Vim, powered by [ghc-mod](https://github.com/kazu-yamamoto/ghc-mod)
