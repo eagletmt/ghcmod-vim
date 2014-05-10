@@ -13,8 +13,8 @@ function! s:unit.test_info()
   call self.assert.match('^bar :: \[Char\]', s:info('bar'))
 endfunction
 
-function! s:unit.test_info_compilation_error()
-  edit test/data/failure/Main.hs
+function! s:unit.test_info_syntax_error()
+  edit test/data/failure/SyntaxError.hs
   call self.assert.match('^Cannot show info', s:info('main'))
 endfunction
 
