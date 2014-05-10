@@ -15,7 +15,7 @@ endfunction
 
 function! s:unit.test_info_compilation_error()
   edit test/data/failure/Main.hs
-  call self.assert.match('^Error:', s:info('main'))
+  call self.assert.match('^Cannot show info', s:info('main'))
 endfunction
 
 call s:unit.run()
