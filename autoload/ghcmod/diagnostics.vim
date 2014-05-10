@@ -30,6 +30,12 @@ function! ghcmod#diagnostics#report()
   else
     call ghcmod#util#print_warning('Run this command in the buffer opening a Haskell file')
   endif
+
+  let l:cmd = ghcmod#build_command(['debug'])
+  echomsg 'ghc-mod debug command:' join(l:cmd, ' ')
+  for l:line in split(ghcmod#system(l:cmd), '\n')
+    echomsg l:line
+  endfor
 endfunction
 
 function! s:check_filetype()

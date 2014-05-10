@@ -16,7 +16,7 @@ endfunction "}}}
 
 function! ghcmod#info(fexp, path, module) "{{{
   let l:cmd = ghcmod#build_command(['info', a:path, a:module, a:fexp])
-  let l:output = s:system(l:cmd)
+  let l:output = ghcmod#system(l:cmd)
   " Remove trailing newlines to prevent empty lines
   let l:output = substitute(l:output, '\n*$', '', '')
   " Remove 'Dummy:0:0:' prefix.
@@ -25,7 +25,7 @@ endfunction "}}}
 
 function! ghcmod#type(line, col, path, module) "{{{
   let l:cmd = ghcmod#build_command(['type', a:path, a:module, a:line, a:col])
-  let l:output = s:system(l:cmd)
+  let l:output = ghcmod#system(l:cmd)
   let l:types = []
   for l:line in split(l:output, '\n')
     let l:m = matchlist(l:line, '\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\([^"]\+\)"')
@@ -174,7 +174,7 @@ function! ghcmod#expand(path) "{{{
 
   let l:qflist = []
   let l:cmd = ghcmod#build_command(['expand', "-b '\n'", a:path])
-  for l:line in split(s:system(l:cmd), '\n')
+  for l:line in split(ghcmod#system(l:cmd), '\n')
     " path:line:col1-col2: message
     " or path:line:col: message
     let l:m = matchlist(l:line, '^\s*\(\(\f\| \)\+\):\(\d\+\):\(\d\+\)\%(-\(\d\+\)\)\?\%(:\s*\(.*\)\)\?$')
@@ -263,7 +263,7 @@ function! ghcmod#build_command(args) "{{{
   return l:cmd
 endfunction "}}}
 
-function! s:system(...) "{{{
+function! ghcmod#system(...) "{{{
   lcd `=ghcmod#basedir()`
   let l:ret = call('vimproc#system', a:000)
   lcd -
