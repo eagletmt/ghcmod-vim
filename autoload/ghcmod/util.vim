@@ -87,8 +87,6 @@ function! ghcmod#util#ghc_mod_version() "{{{
     endwhile
     call l:p.waitpid()
     let l:m = matchlist(l:r, 'version \(\d\+\)\.\(\d\+\)\.\(\d\+\)')
-    "call vimproc#system(['ghc-mod'])
-    "let l:m = matchlist(vimproc#get_last_errmsg(), 'version \(\d\+\)\.\(\d\+\)\.\(\d\+\)')
     let s:ghc_mod_version = l:m[1 : 3]
     call map(s:ghc_mod_version, 'str2nr(v:val)')
   endif
