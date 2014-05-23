@@ -80,8 +80,13 @@ endfunction "}}}
 
 function! ghcmod#util#ghc_mod_version() "{{{
   if !exists('s:ghc_mod_version')
-    call vimproc#system(['ghc-mod'])
-    let l:m = matchlist(vimproc#get_last_errmsg(), 'version \(\d\+\)\.\(\d\+\)\.\(\d\+\)')
+    let l:p = vimproc#popen2(['ghc-mod', 'version'])
+    let l:r = ''
+    while !l:p.stdout.eof
+      let l:r .= l:p.stdout.read()
+    endwhile
+    call l:p.waitpid()
+    let l:m = matchlist(l:r, 'version \(\d\+\)\.\(\d\+\)\.\(\d\+\)')
     let s:ghc_mod_version = l:m[1 : 3]
     call map(s:ghc_mod_version, 'str2nr(v:val)')
   endif
