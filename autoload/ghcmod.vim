@@ -15,7 +15,7 @@ function! ghcmod#getHaskellIdentifier() "{{{
 endfunction "}}}
 
 function! ghcmod#info(fexp, path, module) "{{{
-  let l:cmd = ghcmod#build_command(['info', a:path, a:module, a:fexp])
+  let l:cmd = ghcmod#build_command(['info', "-b \n", a:path, a:module, a:fexp])
   let l:output = ghcmod#system(l:cmd)
   " Remove trailing newlines to prevent empty lines
   let l:output = substitute(l:output, '\n*$', '', '')
