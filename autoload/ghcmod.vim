@@ -1,3 +1,9 @@
+if !exists("g:ghcmod_should_use_ghc_modi")
+  let g:ghcmod_should_use_ghc_modi = 1
+endif
+
+let s:use_modi = g:ghcmod_should_use_ghc_modi && executable('ghc-modi') == 1
+
 function! ghcmod#highlight_group() "{{{
   return get(g:, 'ghcmod_type_highlight', 'Search')
 endfunction "}}}
@@ -15,8 +21,12 @@ function! ghcmod#getHaskellIdentifier() "{{{
 endfunction "}}}
 
 function! ghcmod#info(fexp, path, module) "{{{
-  let l:cmd = ghcmod#build_command(['info', "-b \n", a:path, a:module, a:fexp])
-  let l:output = ghcmod#system(l:cmd)
+  if s:use_modi
+    let l:output = join(s:modi_command(['info', a:path, a:fexp]), "\n")
+  else
+    let l:cmd = ghcmod#build_command(['info', "-b \n", a:path, a:module, a:fexp])
+    let l:output = ghcmod#system(l:cmd)
+  endif
   " Remove trailing newlines to prevent empty lines
   let l:output = substitute(l:output, '\n*$', '', '')
   " Remove 'Dummy:0:0:Error:' prefix.
@@ -24,8 +34,12 @@ function! ghcmod#info(fexp, path, module) "{{{
 endfunction "}}}
 
 function! ghcmod#type(line, col, path, module) "{{{
-  let l:cmd = ghcmod#build_command(['type', a:path, a:module, a:line, a:col])
-  let l:output = ghcmod#system(l:cmd)
+  if s:use_modi
+    let l:output = join(s:modi_command(['type', a:path, a:line, a:col]), "\n")
+  else
+    let l:cmd = ghcmod#build_command(['type', a:path, a:module, a:line, a:col])
+    let l:output = ghcmod#system(l:cmd)
+  endif
   let l:types = []
   for l:line in split(l:output, '\n')
     let l:m = matchlist(l:line, '\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\([^"]\+\)"')
@@ -232,7 +246,11 @@ function! ghcmod#add_autogen_dir(path, cmd) "{{{
 endfunction "}}}
 
 function! ghcmod#build_command(args) "{{{
-  let l:cmd = ['ghc-mod']
+  return s:build_command('ghc-mod', a:args)
+endfunction "}}}
+
+function! s:build_command(cmd, args) "{{{
+  let l:cmd = [a:cmd]
 
   let l:dist_top  = s:find_basedir() . '/dist'
   let l:sandboxes = split(glob(l:dist_top . '/dist-*', 1), '\n')
@@ -264,6 +282,34 @@ function! ghcmod#build_command(args) "{{{
   endfor
   call extend(l:cmd, a:args)
   return l:cmd
+endfunction "}}}
+
+" Cache a handle to the ghc-modi process.
+let s:ghc_modi_proc = {}
+
+function! s:modi_command(args) "{{{
+  if s:ghc_modi_proc == {}
+    let l:ghcmodi_prog = s:build_command('ghc-modi', ['-b \n'])
+    lcd `=ghcmod#basedir()`
+    let s:ghc_modi_proc = vimproc#popen2(ghcmodi_prog)
+    lcd -
+  endif
+
+  call s:ghc_modi_proc.stdin.write(join(a:args) . "\n")
+
+  let l:res = []
+  while 1
+    for l:line in s:ghc_modi_proc.stdout.read_lines()
+      if l:line == "OK"
+        return l:res
+      elseif line =~ "^NG "
+        echoerr "ghc-modi terminated with message: " . join(l:res, "\n")
+        return ''
+      elseif len(line) > 0
+        let l:res += [l:line]
+      endif
+    endfor
+  endwhile
 endfunction "}}}
 
 function! ghcmod#system(...) "{{{
