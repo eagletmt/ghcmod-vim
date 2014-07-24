@@ -289,7 +289,7 @@ let s:ghc_modi_proc = {}
 
 function! s:modi_command(args) "{{{
   if s:ghc_modi_proc == {}
-    let l:ghcmodi_prog = s:build_command('ghc-modi', ['-b \n'])
+    let l:ghcmodi_prog = s:build_command('ghc-modi', ["-b \n"])
     lcd `=ghcmod#basedir()`
     let s:ghc_modi_proc = vimproc#popen2(ghcmodi_prog)
     lcd -
