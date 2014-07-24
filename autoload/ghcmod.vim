@@ -1,3 +1,9 @@
+if !exists("g:ghcmod_should_use_ghc_modi")
+  let g:ghcmod_should_use_ghc_modi = 1
+endif
+
+let s:use_modi = g:ghcmod_should_use_ghc_modi
+
 function! ghcmod#highlight_group() "{{{
   return get(g:, 'ghcmod_type_highlight', 'Search')
 endfunction "}}}
@@ -15,8 +21,13 @@ function! ghcmod#getHaskellIdentifier() "{{{
 endfunction "}}}
 
 function! ghcmod#info(fexp, path, ...) "{{{
-  let l:cmd = ghcmod#build_command(['info', a:path, a:fexp])
-  let l:output = join(split(s:system('info', l:cmd)[0], '\\n'), "\n")
+  if s:use_modi
+    let l:lines = s:modi_command(['info', a:path, a:fexp])
+  else
+    let l:cmd = ghcmod#build_command(['info', a:path, a:fexp])
+    let l:lines = s:system('info', l:cmd)
+  endif
+  let l:output = join(split(l:lines[0], '\\n'), "\n")
   " Remove trailing newlines to prevent empty lines
   let l:output = substitute(l:output, '\n*$', '', '')
   return s:remove_dummy_prefix(l:output)
@@ -47,9 +58,14 @@ function! ghcmod#sig(line, col, path, ...) "{{{
 endfunction "}}}
 
 function! ghcmod#type(line, col, path, ...) "{{{
-  let l:cmd = ghcmod#build_command(['type', a:path, a:line, a:col])
+  if s:use_modi
+    let l:lines = s:modi_command(['type', a:path, a:line, a:col])
+  else
+    let l:cmd = ghcmod#build_command(['type', a:path, a:line, a:col])
+    let l:lines = s:system('type', l:cmd)
+  endif
   let l:types = []
-  for l:line in s:system('type', l:cmd)
+  for l:line in l:lines
     let l:m = matchlist(l:line, '^\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\([^"]\+\)"$')
     if !empty(l:m)
       call add(l:types, [map(l:m[1 : 4], 'str2nr(v:val, 10)'), l:m[5]])
@@ -276,6 +292,34 @@ function! ghcmod#build_command(args) "{{{
   endfor
   call extend(l:cmd, a:args)
   return l:cmd
+endfunction "}}}
+
+" Cache a handle to the ghc-modi process.
+let s:ghc_modi_proc = {}
+
+function! s:modi_command(args) "{{{
+  if s:ghc_modi_proc == {}
+    let l:ghcmodi_prog = ghcmod#build_command(["legacy-interactive"])
+    lcd `=ghcmod#basedir()`
+    let s:ghc_modi_proc = vimproc#popen2(ghcmodi_prog)
+    lcd -
+  endif
+
+  call s:ghc_modi_proc.stdin.write(join(a:args) . "\n")
+
+  let l:res = []
+  while 1
+    for l:line in s:ghc_modi_proc.stdout.read_lines()
+      if l:line == "OK"
+        return l:res
+      elseif line =~ "^NG "
+        echoerr "ghc-modi terminated with message: " . join(l:res, "\n")
+        return ''
+      elseif len(line) > 0
+        let l:res += [l:line]
+      endif
+    endfor
+  endwhile
 endfunction "}}}
 
 function! ghcmod#system(...) "{{{
