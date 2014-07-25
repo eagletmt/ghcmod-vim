@@ -322,6 +322,16 @@ function! s:modi_command(args) "{{{
   endwhile
 endfunction "}}}
 
+function! ghcmod#kill_modi(sig) "{{{
+  if s:ghc_modi_proc == {}
+    return
+  endif
+  let l:ret = s:ghc_modi_proc.kill(a:sig)
+  call s:ghc_modi_proc.waitpid()
+  let s:ghc_modi_proc = {}
+  return l:ret
+endfunction "}}}
+
 function! ghcmod#system(...) "{{{
   let l:dir = getcwd()
   try
