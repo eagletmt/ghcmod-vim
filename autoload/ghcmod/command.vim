@@ -221,6 +221,18 @@ function! ghcmod#command#expand(force) "{{{
   call s:open_quickfix()
 endfunction "}}}
 
+function! ghcmod#command#kill_modi(force) "{{{
+  if a:force
+    let l:sig = g:vimproc#SIGKILL
+  else
+    let l:sig = g:vimproc#SIGTERM
+  endif
+  let l:ret = ghcmod#kill_modi(l:sig)
+  if l:ret
+    echoerr vimproc#get_last_errmsg()
+  endif
+endfunction "}}}
+
 function! s:open_quickfix() "{{{
   let l:func = get(g:, 'ghcmod_open_quickfix_function', '')
   if empty(l:func)

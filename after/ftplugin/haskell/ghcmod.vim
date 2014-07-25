@@ -57,6 +57,7 @@ command! -buffer -nargs=0 -bang GhcModCheckAsync call ghcmod#command#async_make(
 command! -buffer -nargs=0 -bang GhcModLintAsync call ghcmod#command#async_make('lint', <bang>0)
 command! -buffer -nargs=0 -bang GhcModCheckAndLintAsync call ghcmod#command#check_and_lint_async(<bang>0)
 command! -buffer -nargs=0 -bang GhcModExpand call ghcmod#command#expand(<bang>0)
+command! -buffer -nargs=0 -bang GhcModKillModi call ghcmod#command#kill_modi(<bang>0)
 let b:undo_ftplugin .= join(map([
       \ 'GhcModType',
       \ 'GhcModTypeInsert',
@@ -68,7 +69,8 @@ let b:undo_ftplugin .= join(map([
       \ 'GhcModCheckAsync',
       \ 'GhcModLintAsync',
       \ 'GhcModCheckAndLintAsync',
-      \ 'GhcModExpand'
+      \ 'GhcModExpand',
+      \ 'GhcModKillModi'
       \ ], '"delcommand " . v:val'), ' | ')
 let b:undo_ftplugin .= ' | unlet b:did_ftplugin_ghcmod'
 
