@@ -80,6 +80,10 @@ endfunction "}}}
 
 function! ghcmod#util#ghc_mod_version() "{{{
   if !exists('s:ghc_mod_version')
+    let l:ver = vimproc#system(['ghc-mod'])  " works for ghc-mod versions >= 2.1.2  && < 5
+    if (!(match(l:ver, 'version') >= 0))
+      let l:ver = vimproc#system(['ghc-mod','version']) " alternative for ghc-mod versions >= 5
+    endif
     let l:m = matchlist(vimproc#system(['ghc-mod','version']), 'version \(\d\+\)\.\(\d\+\)\.\(\d\+\)')
     let s:ghc_mod_version = l:m[1 : 3]
     call map(s:ghc_mod_version, 'str2nr(v:val)')
