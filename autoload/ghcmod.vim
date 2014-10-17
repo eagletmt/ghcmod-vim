@@ -15,7 +15,7 @@ function! ghcmod#getHaskellIdentifier() "{{{
 endfunction "}}}
 
 function! ghcmod#info(fexp, path, module) "{{{
-  let l:cmd = ghcmod#build_command(['info', "-b \n", a:path, a:module, a:fexp])
+  let l:cmd = ghcmod#build_command('info', ["-b \n", a:path, a:module, a:fexp])
   let l:output = ghcmod#system(l:cmd)
   " Remove trailing newlines to prevent empty lines
   let l:output = substitute(l:output, '\n*$', '', '')
@@ -24,7 +24,7 @@ function! ghcmod#info(fexp, path, module) "{{{
 endfunction "}}}
 
 function! ghcmod#type(line, col, path, module) "{{{
-  let l:cmd = ghcmod#build_command(['type', a:path, a:module, a:line, a:col])
+  let l:cmd = ghcmod#build_command('type', [a:path, a:module, a:line, a:col])
   let l:output = ghcmod#system(l:cmd)
   let l:types = []
   for l:line in split(l:output, '\n')
@@ -113,7 +113,7 @@ function! ghcmod#parse_make(lines, basedir) "{{{
 endfunction "}}}
 
 function! s:build_make_command(type, path) "{{{
-  let l:cmd = ghcmod#build_command([a:type])
+  let l:cmd = ghcmod#build_command(a:type,[])
   if a:type ==# 'lint'
     for l:hopt in get(g:, 'ghcmod_hlint_options', [])
       call extend(l:cmd, ['-h', l:hopt])
@@ -176,7 +176,7 @@ function! ghcmod#expand(path) "{{{
   let l:dir = fnamemodify(a:path, ':h')
 
   let l:qflist = []
-  let l:cmd = ghcmod#build_command(['expand', "-b '\n'", a:path])
+  let l:cmd = ghcmod#build_command('expand', ["-b '\n'", a:path])
   for l:line in split(ghcmod#system(l:cmd), '\n')
     " path:line:col1-col2: message
     " or path:line:col: message
@@ -231,8 +231,8 @@ function! ghcmod#add_autogen_dir(path, cmd) "{{{
   endif
 endfunction "}}}
 
-function! ghcmod#build_command(args) "{{{
-  let l:cmd = ['ghc-mod']
+function! ghcmod#build_command(cmd, cmdargs) "{{{
+  let l:cmd = ['ghc-mod', a:cmd]
 
   let l:dist_top  = s:find_basedir() . '/dist'
   let l:sandboxes = split(glob(l:dist_top . '/dist-*', 1), '\n')
@@ -262,7 +262,7 @@ function! ghcmod#build_command(args) "{{{
   for l:opt in l:opts
     call extend(l:cmd, ['-g', l:opt])
   endfor
-  call extend(l:cmd, a:args)
+  call extend(l:cmd, a:cmdargs)
   return l:cmd
 endfunction "}}}
 
