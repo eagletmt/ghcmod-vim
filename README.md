@@ -29,7 +29,7 @@ See `:help :filetype-overview` for more details.
 ### vimproc
 https://github.com/Shougo/vimproc
 
-### ghc-mod >= 2.1.2
+### ghc-mod >= 4.1.0
 ```sh
 cabal install ghc-mod
 ```
