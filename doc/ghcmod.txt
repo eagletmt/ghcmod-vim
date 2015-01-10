@@ -20,6 +20,7 @@ FEATURES                                                    *ghcmod-features*
 - Displaying error/warning messages and their locations (ghc-mod check and
   ghc-mod lint)
 - Displaying the expansion of splices (ghc-mod expand)
+- Insert split function cases (ghc-mod split)
 
 Completions are supported by another plugin. See neco-ghc
 <https://github.com/eagletmt/neco-ghc>.
@@ -53,6 +54,23 @@ If you'd like to give GHC options, set |g:ghcmod_ghc_options|.
 
 :GhcModTypeInsert[!]                                       *:GhcModTypeInsert*
 	Insert a type signature under the cursor.
+
+	When the current buffer is modified, this command is disabled unless
+	"!" is given.
+
+:GhcModSplitFunCase[!]
+	Insert split function cases for the variable under the cursor.
+	Example:
+
+	    f :: [a] -> a
+	    f x = _body
+
+	When invoked with the cursor placed on x the following will be
+	inserted:
+
+	    f :: [a] -> a
+	    f [] = _body
+	    f (x:xs) = _ body
 
 	When the current buffer is modified, this command is disabled unless
 	"!" is given.

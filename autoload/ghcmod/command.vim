@@ -56,6 +56,18 @@ function! ghcmod#command#type_clear() "{{{
   endif
 endfunction "}}}
 
+function! ghcmod#command#split_function_case(force) "{{{
+  let l:path = s:buffer_path(a:force)
+  if empty(l:path)
+    return
+  endif
+
+  let l:module = ghcmod#detect_module()
+  let l:decls = ghcmod#split(line('.'), col('.'), l:path, l:module)
+  echo l:decls
+
+endfunction "}}}
+
 function! ghcmod#command#type_insert(force) "{{{
   let l:path = s:buffer_path(a:force)
   if empty(l:path)

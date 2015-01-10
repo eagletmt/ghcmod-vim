@@ -23,6 +23,39 @@ function! ghcmod#info(fexp, path, module) "{{{
   return substitute(l:output, '^Dummy:0:0:Error:', '', '')
 endfunction "}}}
 
+function! ghcmod#split(line, col, path, module) "{{{
+  let l:tmpfile = tempname()
+  let l:cmd = ghcmod#build_command(['split', a:path, a:module, a:line, a:col])
+  let l:proc = s:plineopen2([{'args': l:cmd,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
+  let [l:cond, l:status] = ghcmod#util#wait(l:proc)
+
+  let l:tries = 1
+  while l:cond ==# 'run'
+    if l:tries >= 50
+      call l:proc.kill(15)  " SIGTERM
+      call l:proc.waitpid()
+      call delete(l:tmpfile)
+      throw printf('ghcmod#make: `ghc-mod split` takes too long time!')
+    endif
+    sleep 100m
+    let [l:cond, l:status] = ghcmod#util#wait(l:proc)
+    let l:tries += 1
+  endwhile
+
+  let l:output = readfile(l:tmpfile)
+  call delete(l:tmpfile)
+  let l:parsed = matchlist(l:output, '\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\(.*\)"')
+  if len(l:parsed) < 5
+    return
+  endif
+  let l:decls = l:parsed[5]
+  normal dd
+  for l:line in split(l:decls, '\n')
+    call append(line(".")-1, l:line)
+  endfor
+endfunction "}}}
+
+
 function! ghcmod#type(line, col, path, module) "{{{
   let l:cmd = ghcmod#build_command(['type', a:path, a:module, a:line, a:col])
   let l:output = ghcmod#system(l:cmd)
@@ -270,6 +303,7 @@ function! ghcmod#system(...) "{{{
   lcd `=ghcmod#basedir()`
   let l:ret = call('vimproc#system', a:000)
   lcd -
+  echomsg len(l:ret)
   return l:ret
 endfunction "}}}
 
