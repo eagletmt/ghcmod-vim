@@ -80,7 +80,7 @@ function! ghcmod#command#type_insert(force) "{{{
 
   if l:offset == 1 " We're doing top-level, let's try to use :info instead
     let l:info = ghcmod#info(l:fexp, l:path, l:module)
-    if l:info !~# '^Dummy:0:0:Error' " Continue only if we don't find errors
+    if !empty(l:info) " Continue only if we don't find errors
       let l:info = substitute(l:info, '\n\|\t.*', "", "g") " Remove extra lines
       let l:info = substitute(l:info, '\s\+', " ", "g") " Compress whitespace
       let l:info = substitute(l:info, '\s\+$', "", "g") " Remove trailing whitespace
