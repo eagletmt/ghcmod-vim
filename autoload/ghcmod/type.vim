@@ -52,6 +52,8 @@ function! s:ghcmod_type.highlight() "{{{
   endif
   call self.clear_highlight()
   let [l:line1, l:col1, l:line2, l:col2] = self.types[self.ix][0]
+  let l:col1 = ghcmod#util#tocol(l:line1, l:col1)
+  let l:col2 = ghcmod#util#tocol(l:line2, l:col2)
   let self.match_id = matchadd(self.group, '\%' . l:line1 . 'l\%' . l:col1 . 'c\_.*\%' . l:line2 . 'l\%' . l:col2 . 'c')
 endfunction "}}}
 

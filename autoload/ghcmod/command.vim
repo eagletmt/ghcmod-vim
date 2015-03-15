@@ -20,7 +20,7 @@ endfunction "}}}
 
 function! ghcmod#command#type(force) "{{{
   let l:line = line('.')
-  let l:col = col('.')
+  let l:col = ghcmod#util#getcol()
 
   if exists('b:ghcmod_type')
     if b:ghcmod_type.spans(l:line, l:col)
@@ -69,7 +69,7 @@ function! ghcmod#command#type_insert(force) "{{{
   endif
 
   let l:module = ghcmod#detect_module()
-  let l:types = ghcmod#type(line('.'), col('.'), l:path, l:module)
+  let l:types = ghcmod#type(line('.'), ghcmod#util#getcol(), l:path, l:module)
   if empty(l:types) " Everything failed so let's just abort
     call ghcmod#util#print_error('ghcmod#command#type_insert: Cannot guess type')
     return
