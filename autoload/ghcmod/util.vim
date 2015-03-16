@@ -46,6 +46,26 @@ function! ghcmod#util#join_path(dir, path) "{{{
   endif
 endfunction "}}}
 
+function! ghcmod#util#getcol() "{{{
+  let l:line = line('.')
+  let l:col = col('.')
+  let l:str = getline(l:line)[:(l:col - 1)]
+  let l:tabcnt = len(substitute(l:str, '[^\t]', '', 'g'))
+  return l:col + 7 * l:tabcnt
+endfunction "}}}
+
+function! ghcmod#util#tocol(line, col) "{{{
+  let l:str = getline(a:line)
+  let l:col = 0
+  for l:i in range(1, len(l:str))
+    let l:col += (l:str[l:i - 1] ==# "\t" ? 8 : 1)
+    if l:col >= a:col
+      return l:i
+    endif
+  endfor
+  return l:i + 1
+endfunction "}}}
+
 function! ghcmod#util#wait(proc) "{{{
   if has_key(a:proc, 'checkpid')
     return a:proc.checkpid()
