@@ -1,6 +1,12 @@
 # ChangeLog
-## x.x.x (xxxx-xx-xx)
+## 1.3.0 (2015-03-17)
 - Add `:GhcModDiagnostics` command
+- Allow whitespaces in filename (#43)
+- Add newlines to ghc-mod's info command (#51, @cdepillabout)
+- Fix detection of version of ghc-mod (#57, @ts468)
+- Require ghc-mod >= 4.1.0
+- Fix type insertion for top level types (#70, @eddking)
+- Fix `:GhcModType` and `:GhcModTypeInsert` for hard tabs (#71, @itchyny)
 
 ## 1.2.0 (2014-02-02)
 - Support Cabal sandbox (@andy-morris, #33)
