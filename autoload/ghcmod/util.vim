@@ -88,6 +88,11 @@ endfunction "}}}
 
 function! ghcmod#util#check_version(version) "{{{
   let l:ghc_mod_version = ghcmod#util#ghc_mod_version()
+  if l:ghc_mod_version == [0, 0, 0]
+    " 'version 0' should support all features.
+    return 1
+  end
+
   for l:i in range(0, 2)
     if a:version[l:i] > l:ghc_mod_version[l:i]
       return 0
@@ -102,8 +107,18 @@ function! ghcmod#util#ghc_mod_version() "{{{
   if !exists('s:ghc_mod_version')
     let l:ghcmod = vimproc#system(['ghc-mod','version'])
     let l:m = matchlist(l:ghcmod, 'version \(\d\+\)\.\(\d\+\)\.\(\d\+\)')
-    let s:ghc_mod_version = l:m[1 : 3]
-    call map(s:ghc_mod_version, 'str2nr(v:val)')
+    if empty(l:m)
+      if match(l:ghcmod, 'version 0 ') == -1
+        call ghcmod#util#print_error(printf('ghcmod-vim: Cannot detect ghc-mod version from %s', l:ghcmod))
+      else
+        " 'version 0' means master
+        " https://github.com/eagletmt/ghcmod-vim/issues/66
+        let s:ghc_mod_version = [0, 0, 0]
+      endif
+    else
+      let s:ghc_mod_version = l:m[1 : 3]
+      call map(s:ghc_mod_version, 'str2nr(v:val)')
+    endif
   endif
   return s:ghc_mod_version
 endfunction "}}}
