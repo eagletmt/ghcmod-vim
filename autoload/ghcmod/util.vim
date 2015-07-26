@@ -56,14 +56,15 @@ endfunction "}}}
 
 function! ghcmod#util#tocol(line, col) "{{{
   let l:str = getline(a:line)
+  let l:len = len(l:str)
   let l:col = 0
-  for l:i in range(1, len(l:str))
+  for l:i in range(1, l:len)
     let l:col += (l:str[l:i - 1] ==# "\t" ? 8 : 1)
     if l:col >= a:col
       return l:i
     endif
   endfor
-  return l:i + 1
+  return l:len + 1
 endfunction "}}}
 
 function! ghcmod#util#wait(proc) "{{{
