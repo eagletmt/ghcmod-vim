@@ -293,7 +293,9 @@ function! s:find_basedir() "{{{
   " search Cabal file
   if !exists('b:ghcmod_basedir')
     " `ghc-mod root` is available since v4.0.0.
+    lcd `=expand('%:p:h')`
     let b:ghcmod_basedir = substitute(vimproc#system(['ghc-mod', 'root']), '\n*$', '', '')
+    lcd -
   endif
   return b:ghcmod_basedir
 endfunction "}}}
