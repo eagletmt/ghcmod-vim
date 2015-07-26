@@ -1,4 +1,5 @@
 language: haskell
+sudo: false
 install: ./install-deps.sh
 before_script: vim --version
 script: ./test.sh
