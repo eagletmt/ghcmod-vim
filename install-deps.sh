@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set -ex
 
 if [ -d tinytest ]; then
   (cd tinytest; git pull origin master)
