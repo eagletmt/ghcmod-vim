@@ -36,6 +36,16 @@ function! ghcmod#split(line, col, path, module) "{{{
   return split(l:parsed[5], '\n')
 endfunction "}}}
 
+function! ghcmod#sig(line, col, path, module) "{{{
+  " `ghc-mod sig` is available since v5.0.0.
+  let l:cmd = ghcmod#build_command(['sig', a:path, a:module, a:line, a:col])
+  let l:lines = s:system('sig', l:cmd)
+  if len(l:lines) < 3
+    return []
+  endif
+  return [l:lines[0], l:lines[2 :]]
+endfunction "}}}
+
 function! ghcmod#type(line, col, path, module) "{{{
   let l:cmd = ghcmod#build_command(['type', a:path, a:module, a:line, a:col])
   let l:output = ghcmod#system(l:cmd)

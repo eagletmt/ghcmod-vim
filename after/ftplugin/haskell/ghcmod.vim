@@ -49,6 +49,7 @@ endif
 command! -buffer -nargs=0 -bang GhcModType call ghcmod#command#type(<bang>0)
 command! -buffer -nargs=0 -bang GhcModTypeInsert call ghcmod#command#type_insert(<bang>0)
 command! -buffer -nargs=0 -bang GhcModSplitFunCase call ghcmod#command#split_function_case(<bang>0)
+command! -buffer -nargs=0 -bang GhcModSigCodegen call ghcmod#command#initial_code_from_signature(<bang>0)
 command! -buffer -nargs=? -bang GhcModInfo call ghcmod#command#info(<q-args>, <bang>0)
 command! -buffer -nargs=0 GhcModTypeClear call ghcmod#command#type_clear()
 command! -buffer -nargs=? -bang GhcModInfoPreview call ghcmod#command#info_preview(<q-args>, <bang>0)
@@ -61,6 +62,8 @@ command! -buffer -nargs=0 -bang GhcModExpand call ghcmod#command#expand(<bang>0)
 let b:undo_ftplugin .= join(map([
       \ 'GhcModType',
       \ 'GhcModTypeInsert',
+      \ 'GhcModSplitFunCase',
+      \ 'GhcModSigCodegen',
       \ 'GhcModInfo',
       \ 'GhcModInfoPreview',
       \ 'GhcModTypeClear',

@@ -73,6 +73,27 @@ function! ghcmod#command#split_function_case(force) "{{{
   delete _
 endfunction "}}}
 
+function! ghcmod#command#initial_code_from_signature(force) "{{{
+  let l:path = s:buffer_path(a:force)
+  if empty(l:path)
+    return
+  endif
+
+  let l:initial_code = ghcmod#sig(line('.'), col('.'), l:path, ghcmod#detect_module())
+  if empty(l:initial_code)
+    call ghcmod#util#print_warning('Cannot generate initial code')
+    return
+  endif
+
+  let [l:sort, l:codes] = l:initial_code
+  if l:sort == 'instance'
+    let l:sw = exists('*shifwidth') ? shiftwidth() : &shiftwidth
+    let l:indent = repeat(' ', l:sw)
+    call map(l:codes, 'l:indent . v:val')
+  endif
+  call append('.', l:codes)
+endfunction "}}}
+
 function! ghcmod#command#type_insert(force) "{{{
   let l:path = s:buffer_path(a:force)
   if empty(l:path)
