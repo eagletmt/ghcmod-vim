@@ -58,7 +58,7 @@ If you'd like to give GHC options, set |g:ghcmod_ghc_options|.
 	When the current buffer is modified, this command is disabled unless
 	"!" is given.
 
-:GhcModSplitFunCase[!]
+:GhcModSplitFunCase[!]                                   *:GhcModSplitFunCase*
 	Insert split function cases for the variable under the cursor.
 	Example:
 
@@ -71,6 +71,21 @@ If you'd like to give GHC options, set |g:ghcmod_ghc_options|.
 	    f :: [a] -> a
 	    f [] = _body
 	    f (x:xs) = _ body
+
+	When the current buffer is modified, this command is disabled unless
+	"!" is given.
+
+:GhcModSigCodegen[!]                                       *:GhcModSigCodegen*
+	Insert initial code from the given signature.
+
+	Example:
+
+	    func :: [a] -> Maybe b -> (a -> b) -> (a,b)
+
+	When invoked with the cursor placed on func the following will be
+	inserted:
+
+	    func x y z f = _func_body
 
 	When the current buffer is modified, this command is disabled unless
 	"!" is given.

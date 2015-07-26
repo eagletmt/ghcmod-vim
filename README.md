@@ -30,7 +30,7 @@ See `:help :filetype-overview` for more details.
 ### vimproc
 https://github.com/Shougo/vimproc
 
-### ghc-mod >= 4.1.0
+### ghc-mod >= 5.0.0
 ```sh
 cabal install ghc-mod
 ```
@@ -122,6 +122,54 @@ You can see the expansion of splices by `:GhcModExpand` and they are available i
 ![expand](http://cache.gyazo.com/bcbee2b84f956a87b636a67b5d5af488.png)
 
 This feature was introduced since ghc-mod 1.10.10.
+
+### GhcModSplitFunCase
+Split the function case by examining a type's constructors.
+
+```haskell
+f :: [a] -> a
+f x = _body
+```
+
+When you type `:GhcModSplitFunCase` at the `x` position, ghcmod-vim will replace it with:
+
+```haskell
+f :: [a] -> a
+f [] = _body
+f (x:xs) = _body
+```
+
+### GhcModSigCodegen
+Insert initial code from the given signature.
+
+```haskell
+func :: [a] -> Maybe b -> (a -> b) -> (a,b)
+```
+
+ghcmod-vim will insert initial code using typed holes.
+
+```haskell
+func x y z f = _func_body
+```
+
+Instance declarations are also supported.
+
+```haskell
+newtype D = D (Int,String)
+
+class C a where
+    cInt :: a -> Int
+    cString :: a -> String
+
+instance C D where
+```
+
+ghcmod-vim will insert:
+
+```haskell
+    cInt x = _cInt_body
+    cString x = _cString_body
+```
 
 ## Customize
 See wiki page [Customize](https://github.com/eagletmt/ghcmod-vim/wiki/Customize).
