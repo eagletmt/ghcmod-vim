@@ -26,25 +26,8 @@ function! ghcmod#split(line, col, path, module) "{{{
   let l:tmpfile = tempname()
   " `ghc-mod split` is available since v5.0.0.
   let l:cmd = ghcmod#build_command(['split', a:path, a:module, a:line, a:col])
-  let l:proc = s:plineopen2([{'args': l:cmd,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
-  let [l:cond, l:status] = ghcmod#util#wait(l:proc)
-
-  let l:tries = 1
-  while l:cond ==# 'run'
-    if l:tries >= 50
-      call l:proc.kill(15)  " SIGTERM
-      call l:proc.waitpid()
-      call delete(l:tmpfile)
-      throw printf('ghcmod#make: `ghc-mod split` takes too long time!')
-    endif
-    sleep 100m
-    let [l:cond, l:status] = ghcmod#util#wait(l:proc)
-    let l:tries += 1
-  endwhile
-
-  let l:output = readfile(l:tmpfile)
-  call delete(l:tmpfile)
-  let l:parsed = matchlist(l:output, '\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\(.*\)"')
+  let l:lines = s:system('split', l:cmd)
+  let l:parsed = matchlist(l:lines[0], '\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\(.*\)"')
   if len(l:parsed) < 5
     return
   endif
@@ -152,27 +135,11 @@ function! s:build_make_command(type, path) "{{{
 endfunction "}}}
 
 function! ghcmod#make(type, path) "{{{
-  let l:tmpfile = tempname()
   try
     let l:args = s:build_make_command(a:type, a:path)
-    let l:proc = s:plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
-    let [l:cond, l:status] = ghcmod#util#wait(l:proc)
-    let l:tries = 1
-    while l:cond ==# 'run'
-      if l:tries >= 50
-        call l:proc.kill(15)  " SIGTERM
-        call l:proc.waitpid()
-        throw printf('ghcmod#make: `ghc-mod %s` takes too long time!', a:type)
-      endif
-      sleep 100m
-      let [l:cond, l:status] = ghcmod#util#wait(l:proc)
-      let l:tries += 1
-    endwhile
-    return ghcmod#parse_make(readfile(l:tmpfile), b:ghcmod_basedir)
+    return ghcmod#parse_make(s:system(a:type, l:args), b:ghcmod_basedir)
   catch
     call ghcmod#util#print_error(printf('%s %s', v:throwpoint, v:exception))
-  finally
-    call delete(l:tmpfile)
   endtry
 endfunction "}}}
 
@@ -312,6 +279,29 @@ function! s:plineopen2(...) "{{{
   let l:ret = call('vimproc#plineopen2', a:000)
   lcd -
   return l:ret
+endfunction "}}}
+
+function! s:system(type, args) "{{{
+  let l:tmpfile = tempname()
+  try
+    let l:proc = s:plineopen2([{'args': a:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
+    let [l:cond, l:status] = ghcmod#util#wait(l:proc)
+    let l:tries = 1
+    while l:cond ==# 'run'
+      if l:tries >= 50
+        call l:proc.kill(15)  " SIGTERM
+        call l:proc.waitpid()
+        throw printf('ghcmod#make: `ghc-mod %s` takes too long time!', a:type)
+      endif
+      sleep 100m
+      let [l:cond, l:status] = ghcmod#util#wait(l:proc)
+      let l:tries += 1
+    endwhile
+    let l:lines = readfile(l:tmpfile)
+    return l:lines
+  finally
+    call delete(l:tmpfile)
+  endtry
 endfunction "}}}
 
 function! ghcmod#basedir() "{{{
