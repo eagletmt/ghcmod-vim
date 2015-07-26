@@ -10,6 +10,7 @@ cabal-version: >= 1.6
 
 library
   build-depends: base == 4.*
+  ghc-options: -W -Wall
   hs-source-dirs: src
   exposed-modules:
     Foo
