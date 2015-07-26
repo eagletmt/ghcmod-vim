@@ -1,4 +1,8 @@
 language: haskell
+ghc:
+  - 7.4
+  - 7.6
+  - 7.8
 sudo: false
 install: ./install-deps.sh
 before_script: vim --version
