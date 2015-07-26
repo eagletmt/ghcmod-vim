@@ -64,6 +64,10 @@ function! ghcmod#command#split_function_case(force) "{{{
 
   let l:module = ghcmod#detect_module()
   let l:decls = ghcmod#split(line('.'), col('.'), l:path, l:module)
+  if empty(l:decls)
+    call ghcmod#util#print_warning('No splittable constructor')
+    return
+  endif
 
   call append(line('.'), l:decls)
   delete _

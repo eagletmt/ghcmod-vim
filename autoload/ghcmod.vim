@@ -27,9 +27,12 @@ function! ghcmod#split(line, col, path, module) "{{{
   " `ghc-mod split` is available since v5.0.0.
   let l:cmd = ghcmod#build_command(['split', a:path, a:module, a:line, a:col])
   let l:lines = s:system('split', l:cmd)
+  if empty(l:lines)
+    return []
+  endif
   let l:parsed = matchlist(l:lines[0], '\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\(.*\)"')
   if len(l:parsed) < 5
-    return
+    return []
   endif
   return split(l:parsed[5], '\n')
 endfunction "}}}
