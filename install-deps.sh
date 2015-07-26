@@ -17,4 +17,5 @@ fi
 make -f make_unix.mak
 
 cabal update
-cabal install ghc-mod
+cabal install happy
+cabal install -j ghc-mod
