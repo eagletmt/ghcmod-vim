@@ -19,8 +19,7 @@ function! ghcmod#info(fexp, path, module) "{{{
   let l:output = ghcmod#system(l:cmd)
   " Remove trailing newlines to prevent empty lines
   let l:output = substitute(l:output, '\n*$', '', '')
-  " Remove 'Dummy:0:0:Error:' prefix.
-  return substitute(l:output, '^Dummy:0:0:Error:', '', '')
+  return s:remove_dummy_prefix(l:output)
 endfunction "}}}
 
 function! ghcmod#type(line, col, path, module) "{{{
@@ -178,6 +177,8 @@ function! ghcmod#expand(path) "{{{
   let l:qflist = []
   let l:cmd = ghcmod#build_command(['expand', "-b '\n'", a:path])
   for l:line in split(ghcmod#system(l:cmd), '\n')
+    let l:line = s:remove_dummy_prefix(l:line)
+
     " path:line:col1-col2: message
     " or path:line:col: message
     let l:m = matchlist(l:line, '^\s*\(\(\f\| \)\+\):\(\d\+\):\(\d\+\)\%(-\(\d\+\)\)\?\%(:\s*\(.*\)\)\?$')
@@ -217,6 +218,10 @@ function! ghcmod#expand(path) "{{{
     call s:fix_qf_lnum_col(l:qf)
   endfor
   return l:qflist
+endfunction "}}}
+
+function! s:remove_dummy_prefix(str) "{{{
+  return substitute(a:str, '^Dummy:0:0:Error:', '', '')
 endfunction "}}}
 
 function! ghcmod#add_autogen_dir(path, cmd) "{{{
