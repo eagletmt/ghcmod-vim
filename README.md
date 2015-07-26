@@ -12,6 +12,7 @@ Happy Haskell programming on Vim, powered by [ghc-mod](https://github.com/kazu-y
 - Displaying the type of sub-expressions (`ghc-mod type`)
 - Displaying error/warning messages and their locations (`ghc-mod check` and `ghc-mod lint`)
 - Displaying the expansion of splices (`ghc-mod expand`)
+- Insert split function cases (`ghc-mod split`)
 
 Completions are supported by another plugin.
 See [neco-ghc](https://github.com/eagletmt/neco-ghc) .
