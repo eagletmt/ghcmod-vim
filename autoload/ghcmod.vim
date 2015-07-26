@@ -23,7 +23,6 @@ function! ghcmod#info(fexp, path, module) "{{{
 endfunction "}}}
 
 function! ghcmod#split(line, col, path, module) "{{{
-  let l:tmpfile = tempname()
   " `ghc-mod split` is available since v5.0.0.
   let l:cmd = ghcmod#build_command(['split', a:path, a:module, a:line, a:col])
   let l:lines = s:system('split', l:cmd)
