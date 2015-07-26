@@ -1,4 +1,10 @@
 # ChangeLog
+## 1.3.1 (2015-07-26)
+- Fix out of scope variable in ghcmod#util#tocol (#74, @jimenezrick)
+- Fix base directory calculation in deep subdirectories (#75)
+- Fix ghc-mod feature detection with ghc-mod's master build (#66)
+- Fix locations in quickfix list for `ghc-mod expand`
+
 ## 1.3.0 (2015-03-17)
 - Add `:GhcModDiagnostics` command
 - Allow whitespaces in filename (#43)
