@@ -292,16 +292,8 @@ endfunction "}}}
 function! s:find_basedir() "{{{
   " search Cabal file
   if !exists('b:ghcmod_basedir')
-    let l:ghcmod_basedir = expand('%:p:h')
-    let l:dir = l:ghcmod_basedir
-    for _ in range(6)
-      if !empty(glob(l:dir . '/*.cabal', 0))
-        let l:ghcmod_basedir = l:dir
-        break
-      endif
-      let l:dir = fnamemodify(l:dir, ':h')
-    endfor
-    let b:ghcmod_basedir = l:ghcmod_basedir
+    " `ghc-mod root` is available since v4.0.0.
+    let b:ghcmod_basedir = substitute(vimproc#system(['ghc-mod', 'root']), '\n*$', '', '')
   endif
   return b:ghcmod_basedir
 endfunction "}}}
