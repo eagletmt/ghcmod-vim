@@ -24,6 +24,7 @@ endfunction "}}}
 
 function! ghcmod#split(line, col, path, module) "{{{
   let l:tmpfile = tempname()
+  " `ghc-mod split` is available since v5.0.0.
   let l:cmd = ghcmod#build_command(['split', a:path, a:module, a:line, a:col])
   let l:proc = s:plineopen2([{'args': l:cmd,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
   let [l:cond, l:status] = ghcmod#util#wait(l:proc)

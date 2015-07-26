@@ -27,7 +27,7 @@ if !exists('s:has_ghc_mod')
     finish
   endif
 
-  let s:required_version = [4, 1, 0]
+  let s:required_version = [5, 0, 0]
   if !ghcmod#util#check_version(s:required_version)
     call ghcmod#util#print_error(printf('ghcmod: requires ghc-mod %s or higher', join(s:required_version, '.')))
     finish
