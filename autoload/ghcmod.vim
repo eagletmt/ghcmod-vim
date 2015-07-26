@@ -47,13 +47,8 @@ function! ghcmod#split(line, col, path, module) "{{{
   if len(l:parsed) < 5
     return
   endif
-  let l:decls = l:parsed[5]
-  normal dd
-  for l:line in split(l:decls, '\n')
-    call append(line(".")-1, l:line)
-  endfor
+  return split(l:parsed[5], '\n')
 endfunction "}}}
-
 
 function! ghcmod#type(line, col, path, module) "{{{
   let l:cmd = ghcmod#build_command(['type', a:path, a:module, a:line, a:col])
@@ -308,7 +303,6 @@ function! ghcmod#system(...) "{{{
   lcd `=ghcmod#basedir()`
   let l:ret = call('vimproc#system', a:000)
   lcd -
-  echomsg len(l:ret)
   return l:ret
 endfunction "}}}
 

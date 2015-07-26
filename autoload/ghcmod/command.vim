@@ -64,8 +64,9 @@ function! ghcmod#command#split_function_case(force) "{{{
 
   let l:module = ghcmod#detect_module()
   let l:decls = ghcmod#split(line('.'), col('.'), l:path, l:module)
-  echo l:decls
 
+  call append(line('.'), l:decls)
+  delete _
 endfunction "}}}
 
 function! ghcmod#command#type_insert(force) "{{{
