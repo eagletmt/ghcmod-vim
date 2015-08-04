@@ -158,7 +158,7 @@ endfunction "}}}
 function! ghcmod#async_make(type, path, callback) "{{{
   let l:tmpfile = tempname()
   let l:args = s:build_make_command(a:type, a:path)
-  let l:proc = s:plineopen2([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
+  let l:proc = s:plineopen3([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
   let l:obj = {
         \ 'proc': l:proc,
         \ 'tmpfile': l:tmpfile,
@@ -286,9 +286,9 @@ function! ghcmod#system(...) "{{{
   return l:ret
 endfunction "}}}
 
-function! s:plineopen2(...) "{{{
+function! s:plineopen3(...) "{{{
   lcd `=ghcmod#basedir()`
-  let l:ret = call('vimproc#plineopen2', a:000)
+  let l:ret = call('vimproc#plineopen3', a:000)
   lcd -
   return l:ret
 endfunction "}}}
@@ -296,7 +296,7 @@ endfunction "}}}
 function! s:system(type, args) "{{{
   let l:tmpfile = tempname()
   try
-    let l:proc = s:plineopen2([{'args': a:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
+    let l:proc = s:plineopen3([{'args': a:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
     let [l:cond, l:status] = ghcmod#util#wait(l:proc)
     let l:tries = 1
     while l:cond ==# 'run'
