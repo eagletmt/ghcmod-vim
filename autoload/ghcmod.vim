@@ -280,16 +280,24 @@ function! ghcmod#build_command(args) "{{{
 endfunction "}}}
 
 function! ghcmod#system(...) "{{{
-  lcd `=ghcmod#basedir()`
-  let l:ret = call('vimproc#system', a:000)
-  lcd -
+  let l:dir = getcwd()
+  try
+    lcd `=ghcmod#basedir()`
+    let l:ret = call('vimproc#system', a:000)
+  finally
+    lcd `=l:dir`
+  endtry
   return l:ret
 endfunction "}}}
 
 function! s:plineopen3(...) "{{{
-  lcd `=ghcmod#basedir()`
-  let l:ret = call('vimproc#plineopen3', a:000)
-  lcd -
+  let l:dir = getcwd()
+  try
+    lcd `=ghcmod#basedir()`
+    let l:ret = call('vimproc#plineopen3', a:000)
+  finally
+    lcd `=l:dir`
+  endtry
   return l:ret
 endfunction "}}}
 
@@ -329,9 +337,14 @@ function! s:find_basedir() "{{{
   " search Cabal file
   if !exists('b:ghcmod_basedir')
     " `ghc-mod root` is available since v4.0.0.
-    lcd `=expand('%:p:h')`
-    let b:ghcmod_basedir = substitute(vimproc#system(['ghc-mod', 'root']), '\n*$', '', '')
-    lcd -
+    let l:dir = getcwd()
+    try
+      lcd `=expand('%:p:h')`
+      let b:ghcmod_basedir =
+        \ substitute(vimproc#system(['ghc-mod', 'root']), '\n*$', '', '')
+    finally
+      lcd `=l:dir`
+    endtry
   endif
   return b:ghcmod_basedir
 endfunction "}}}
