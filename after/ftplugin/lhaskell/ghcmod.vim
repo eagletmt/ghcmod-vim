@@ -1,0 +1,1 @@
+../haskell/ghcmod.vim
