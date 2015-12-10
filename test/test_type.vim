@@ -20,4 +20,10 @@ function! s:unit.test_type_compilation_failure()
   call self.assert.empty(l:types)
 endfunction
 
+function! s:unit.test_kill_recovery()
+  call s:unit.test_type()
+  call ghcmod#kill_modi(9)
+  call s:unit.test_type()
+endfunction
+
 call s:unit.run()
