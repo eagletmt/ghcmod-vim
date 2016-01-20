@@ -37,7 +37,7 @@ function! ghcmod#command#type(force) "{{{
     return
   endif
 
-  let l:types = ghcmod#type(l:line, l:col, l:path, ghcmod#detect_module())
+  let l:types = ghcmod#type(l:line, l:col, l:path)
   if empty(l:types)
     call ghcmod#util#print_error('ghcmod#command#type: Cannot guess type')
     return
@@ -62,8 +62,7 @@ function! ghcmod#command#split_function_case(force) "{{{
     return
   endif
 
-  let l:module = ghcmod#detect_module()
-  let l:decls = ghcmod#split(line('.'), col('.'), l:path, l:module)
+  let l:decls = ghcmod#split(line('.'), col('.'), l:path)
   if empty(l:decls)
     call ghcmod#util#print_warning('No splittable constructor')
     return
@@ -79,7 +78,7 @@ function! ghcmod#command#initial_code_from_signature(force) "{{{
     return
   endif
 
-  let l:initial_code = ghcmod#sig(line('.'), col('.'), l:path, ghcmod#detect_module())
+  let l:initial_code = ghcmod#sig(line('.'), col('.'), l:path)
   if empty(l:initial_code)
     call ghcmod#util#print_warning('Cannot generate initial code')
     return
@@ -106,8 +105,7 @@ function! ghcmod#command#type_insert(force) "{{{
     return
   endif
 
-  let l:module = ghcmod#detect_module()
-  let l:types = ghcmod#type(line('.'), ghcmod#util#getcol(), l:path, l:module)
+  let l:types = ghcmod#type(line('.'), ghcmod#util#getcol(), l:path)
   if empty(l:types) " Everything failed so let's just abort
     call ghcmod#util#print_error('ghcmod#command#type_insert: Cannot guess type')
     return
@@ -117,7 +115,7 @@ function! ghcmod#command#type_insert(force) "{{{
   let [_, l:offset, _, _] = l:locsym
 
   if l:offset == 1 " We're doing top-level, let's try to use :info instead
-    let l:info = ghcmod#info(l:fexp, l:path, l:module)
+    let l:info = ghcmod#info(l:fexp, l:path)
     if !empty(l:info) " Continue only if we don't find errors
       let l:info = substitute(l:info, '\n\|\t.*', "", "g") " Remove extra lines
       let l:info = substitute(l:info, '\s\+', " ", "g") " Compress whitespace
@@ -137,7 +135,7 @@ function! s:info(fexp, force) "{{{
   if empty(l:fexp)
     let l:fexp = ghcmod#getHaskellIdentifier()
   end
-  return ghcmod#info(l:fexp, l:path, ghcmod#detect_module())
+  return ghcmod#info(l:fexp, l:path)
 endfunction "}}}
 
 function! ghcmod#command#info(fexp, force) "{{{
