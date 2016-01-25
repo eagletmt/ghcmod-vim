@@ -1,5 +1,5 @@
 function! s:info(fexp)
-  return ghcmod#info(a:fexp, expand('%:p'), ghcmod#detect_module())
+  return ghcmod#info(a:fexp, expand('%:p'))
 endfunction
 
 let s:unit = tinytest#new()

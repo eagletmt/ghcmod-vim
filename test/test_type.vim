@@ -6,7 +6,7 @@ endfunction
 
 function! s:unit.test_type()
   edit test/data/with-cabal/src/Foo.hs
-  let l:types = ghcmod#type(4, 7, expand('%:p'), ghcmod#detect_module())
+  let l:types = ghcmod#type(4, 7, expand('%:p'))
   call self.assert.equal([
         \ [[4, 7, 4, 10], '[Char]'],
         \ [[4, 7, 4, 16], '[Char]'],
@@ -16,7 +16,7 @@ endfunction
 
 function! s:unit.test_type_compilation_failure()
   edit test/data/failure/Main.hs
-  let l:types = ghcmod#type(4, 7, expand('%:p'), ghcmod#detect_module())
+  let l:types = ghcmod#type(4, 7, expand('%:p'))
   call self.assert.empty(l:types)
 endfunction
 

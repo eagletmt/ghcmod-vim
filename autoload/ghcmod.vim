@@ -14,17 +14,17 @@ function! ghcmod#getHaskellIdentifier() "{{{
   return ll1.ll2
 endfunction "}}}
 
-function! ghcmod#info(fexp, path, module) "{{{
-  let l:cmd = ghcmod#build_command(["-b \n", 'info', a:path, a:module, a:fexp])
+function! ghcmod#info(fexp, path, ...) "{{{
+  let l:cmd = ghcmod#build_command(["-b \n", 'info', a:path, a:fexp])
   let l:output = ghcmod#system(l:cmd)
   " Remove trailing newlines to prevent empty lines
   let l:output = substitute(l:output, '\n*$', '', '')
   return s:remove_dummy_prefix(l:output)
 endfunction "}}}
 
-function! ghcmod#split(line, col, path, module) "{{{
+function! ghcmod#split(line, col, path, ...) "{{{
   " `ghc-mod split` is available since v5.0.0.
-  let l:cmd = ghcmod#build_command(['split', a:path, a:module, a:line, a:col])
+  let l:cmd = ghcmod#build_command(['split', a:path, a:line, a:col])
   let l:lines = s:system('split', l:cmd)
   if empty(l:lines)
     return []
@@ -36,9 +36,9 @@ function! ghcmod#split(line, col, path, module) "{{{
   return split(l:parsed[5], '\n')
 endfunction "}}}
 
-function! ghcmod#sig(line, col, path, module) "{{{
+function! ghcmod#sig(line, col, path, ...) "{{{
   " `ghc-mod sig` is available since v5.0.0.
-  let l:cmd = ghcmod#build_command(['sig', a:path, a:module, a:line, a:col])
+  let l:cmd = ghcmod#build_command(['sig', a:path, a:line, a:col])
   let l:lines = s:system('sig', l:cmd)
   if len(l:lines) < 3
     return []
@@ -46,8 +46,8 @@ function! ghcmod#sig(line, col, path, module) "{{{
   return [l:lines[0], l:lines[2 :]]
 endfunction "}}}
 
-function! ghcmod#type(line, col, path, module) "{{{
-  let l:cmd = ghcmod#build_command(['type', a:path, a:module, a:line, a:col])
+function! ghcmod#type(line, col, path, ...) "{{{
+  let l:cmd = ghcmod#build_command(['type', a:path, a:line, a:col])
   let l:output = ghcmod#system(l:cmd)
   let l:types = []
   for l:line in split(l:output, '\n')
