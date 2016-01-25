@@ -2,6 +2,28 @@ function! ghcmod#highlight_group() "{{{
   return get(g:, 'ghcmod_type_highlight', 'Search')
 endfunction "}}}
 
+" Cygwin compatibility: convert paths between Unix and Windows format as
+" necessary, assuming Vim is Cygwin Vim but ghc-mod is native Windows.
+" {{{
+if has("win32unix")
+  function! s:vimpath(path)
+    return substitute(vimproc#system(['cygpath', '-u', a:path]), '\r\?\n', '', '')
+  endfunction
+
+  function! s:ghcpath(path)
+    return substitute(vimproc#system(['cygpath', '-w', a:path]), '\r\?\n', '', '')
+  endfunction
+else
+  function! s:vimpath(path)
+    return a:path
+  endfunction
+
+  function! s:ghcpath(path)
+    return a:path
+  endfunction
+endif
+" }}}
+
 " Return the current haskell identifier
 function! ghcmod#getHaskellIdentifier() "{{{
   let c = col ('.')-1
@@ -95,7 +117,7 @@ function! ghcmod#parse_make(lines, basedir) "{{{
       continue
     endif
     let l:qf = {}
-    let l:m = matchlist(l:output, '^\(\(\f\| \)\+\):\(\d\+\):\(\d\+\):\s*\(.*\)$')
+    let l:m = matchlist(l:output, '^\(\(\f\|\\\| \)\+\):\(\d\+\):\(\d\+\):\s*\(.*\)$')
     if len(l:m) < 5
       let l:qf.bufnr = 0
       let l:qf.type = 'E'
@@ -142,7 +164,7 @@ function! s:build_make_command(type, path) "{{{
       call extend(l:cmd, ['-h', l:hopt])
     endfor
   endif
-  call add(l:cmd, a:path)
+  call add(l:cmd, s:ghcpath(a:path))
   return l:cmd
 endfunction "}}}
 
@@ -234,12 +256,12 @@ endfunction "}}}
 
 function! ghcmod#add_autogen_dir(path, cmd) "{{{
   " detect autogen directory
-  let l:autogen_dir = a:path . '/autogen'
+  let l:autogen_dir = s:vimpath(a:path . '/autogen')
   if isdirectory(l:autogen_dir)
-    call extend(a:cmd, ['-g', '-i' . l:autogen_dir, '-g', '-I' . l:autogen_dir])
-    let l:macros_path = l:autogen_dir . '/cabal_macros.h'
+    call extend(a:cmd, ['-g', '-i' . s:ghcpath(l:autogen_dir), '-g', '-I' . s:ghcpath(l:autogen_dir)])
+    let l:macros_path = s:vimpath(l:autogen_dir . '/cabal_macros.h')
     if filereadable(l:macros_path)
-      call extend(a:cmd, ['-g', '-optP-include', '-g', '-optP' . l:macros_path])
+      call extend(a:cmd, ['-g', '-optP-include', '-g', '-optP' . s:ghcpath(l:macros_path)])
     endif
   endif
 endfunction "}}}
@@ -248,21 +270,21 @@ function! ghcmod#build_command(args) "{{{
   let l:cmd = ['ghc-mod']
 
   let l:dist_top  = s:find_basedir() . '/dist'
-  let l:sandboxes = split(glob(l:dist_top . '/dist-*', 1), '\n')
+  let l:sandboxes = split(glob(s:vimpath(l:dist_top . '/dist-*'), 1), '\n')
   for l:dist_dir in [l:dist_top] + l:sandboxes
     let l:build_dir = l:dist_dir . '/build'
-    if isdirectory(l:build_dir)
+    if isdirectory(s:vimpath(l:build_dir))
       call ghcmod#add_autogen_dir(l:build_dir, l:cmd)
 
-      let l:tmps = ghcmod#util#globlist(l:build_dir . '/*/*-tmp')
+      let l:tmps = ghcmod#util#globlist(s:vimpath(l:build_dir . '/*/*-tmp'))
       if !empty(l:tmps)
         " add *-tmp directory to include path for executable project
         for l:tmp in l:tmps
-          call extend(l:cmd, ['-g', '-i' . l:tmp, '-g', '-I' . l:tmp])
+          call extend(l:cmd, ['-g', '-i' . s:ghcpath(l:tmp), '-g', '-I' . s:ghcpath(l:tmp)])
         endfor
       else
         " add build directory to include path for library project
-        call extend(l:cmd, ['-g', '-i' . l:build_dir, '-g', '-I' . l:build_dir])
+        call extend(l:cmd, ['-g', '-i' . s:ghcpath(l:build_dir), '-g', '-I' . s:ghcpath(l:build_dir)])
       endif
     endif
   endfor
@@ -275,14 +297,24 @@ function! ghcmod#build_command(args) "{{{
   for l:opt in l:opts
     call extend(l:cmd, ['-g', l:opt])
   endfor
-  call extend(l:cmd, a:args)
+  if has("win32unix")
+    for l:arg in a:args
+      if l:arg =~ '/'
+        call add(l:cmd, s:ghcpath(l:arg))
+      else
+        call add(l:cmd, l:arg)
+      endif
+    endfor
+  else
+    call extend(l:cmd, a:args)
+  endif
   return l:cmd
 endfunction "}}}
 
 function! ghcmod#system(...) "{{{
   let l:dir = getcwd()
   try
-    lcd `=ghcmod#basedir()`
+    lcd `=s:vimpath(ghcmod#basedir())`
     let l:ret = call('vimproc#system', a:000)
   finally
     lcd `=l:dir`
@@ -293,7 +325,7 @@ endfunction "}}}
 function! s:plineopen3(...) "{{{
   let l:dir = getcwd()
   try
-    lcd `=ghcmod#basedir()`
+    lcd `=s:vimpath(ghcmod#basedir())`
     let l:ret = call('vimproc#plineopen3', a:000)
   finally
     lcd `=l:dir`
@@ -341,7 +373,7 @@ function! s:find_basedir() "{{{
     try
       lcd `=expand('%:p:h')`
       let b:ghcmod_basedir =
-        \ substitute(vimproc#system(['ghc-mod', 'root']), '\n*$', '', '')
+        \ substitute(vimproc#system(['ghc-mod', 'root']), '\r\?\n*$', '', '')
     finally
       lcd `=l:dir`
     endtry
