@@ -246,27 +246,6 @@ endfunction "}}}
 
 function! ghcmod#build_command(args) "{{{
   let l:cmd = ['ghc-mod']
-
-  let l:dist_top  = s:find_basedir() . '/dist'
-  let l:sandboxes = split(glob(l:dist_top . '/dist-*', 1), '\n')
-  for l:dist_dir in [l:dist_top] + l:sandboxes
-    let l:build_dir = l:dist_dir . '/build'
-    if isdirectory(l:build_dir)
-      call ghcmod#add_autogen_dir(l:build_dir, l:cmd)
-
-      let l:tmps = ghcmod#util#globlist(l:build_dir . '/*/*-tmp')
-      if !empty(l:tmps)
-        " add *-tmp directory to include path for executable project
-        for l:tmp in l:tmps
-          call extend(l:cmd, ['-g', '-i' . l:tmp, '-g', '-I' . l:tmp])
-        endfor
-      else
-        " add build directory to include path for library project
-        call extend(l:cmd, ['-g', '-i' . l:build_dir, '-g', '-I' . l:build_dir])
-      endif
-    endif
-  endfor
-
   if exists('b:ghcmod_ghc_options')
     let l:opts = b:ghcmod_ghc_options
   else
