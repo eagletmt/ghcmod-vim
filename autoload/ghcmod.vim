@@ -245,7 +245,7 @@ function! ghcmod#add_autogen_dir(path, cmd) "{{{
 endfunction "}}}
 
 function! ghcmod#build_command(args) "{{{
-  let l:cmd = ['ghc-mod']
+  let l:cmd = ['ghc-mod', '--silent']
 
   let l:dist_top  = s:find_basedir() . '/dist'
   let l:sandboxes = split(glob(l:dist_top . '/dist-*', 1), '\n')
@@ -341,7 +341,7 @@ function! s:find_basedir() "{{{
     try
       lcd `=expand('%:p:h')`
       let b:ghcmod_basedir =
-        \ substitute(vimproc#system(['ghc-mod', 'root']), '\n*$', '', '')
+        \ substitute(vimproc#system(['ghc-mod', '--silent', 'root']), '\n*$', '', '')
     finally
       lcd `=l:dir`
     endtry
