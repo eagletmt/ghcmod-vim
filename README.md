@@ -31,8 +31,15 @@ See `:help :filetype-overview` for more details.
 https://github.com/Shougo/vimproc
 
 ### ghc-mod >= 5.0.0
+
+Via cabal-install:
 ```sh
 cabal install ghc-mod
+```
+
+Via Stack (when using Stackage LTS-4 or later):
+```sh
+stack install ghc-mod
 ```
 
 ## Details
@@ -175,6 +182,6 @@ ghcmod-vim will insert:
 See wiki page [Customize](https://github.com/eagletmt/ghcmod-vim/wiki/Customize).
 
 ## License
-[BSD3 License](http://www.opensource.org/licenses/BSD-3-Clause), the same license as ghc-mod.
+[BSD3 License](http://www.opensource.org/licenses/BSD-3-Clause)
 
 Copyright (c) 2012-2013, eagletmt
