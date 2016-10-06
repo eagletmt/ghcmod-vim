@@ -59,7 +59,7 @@ function! s:unit.test_lint()
         \ 'lnum': 5,
         \ 'col': 9,
         \ 'filename': 'test/data/with-cabal/src/Foo/Bar.hs',
-        \ 'text': 'Redundant $',
+        \ 'text': 'Suggestion: Redundant $',
         \ }), l:qflist)
 endfunction
 
@@ -76,7 +76,7 @@ function! s:unit.test_lint_whitespace()
         \ 'lnum': 5,
         \ 'col': 9,
         \ 'filename': 'test/data/with whitespace/src/Foo/Bar.hs',
-        \ 'text': 'Redundant $',
+        \ 'text': 'Suggestion: Redundant $',
         \ }), l:qflist)
 endfunction
 
@@ -95,7 +95,7 @@ function! s:unit.test_lint_async()
           \ 'lnum': 5,
           \ 'col': 9,
           \ 'filename': 'test/data/with-cabal/src/Foo/Bar.hs',
-          \ 'text': 'Redundant $',
+          \ 'text': 'Suggestion: Redundant $',
           \ }), a:qflist)
   endfunction
   call s:async(l:callback)
@@ -111,7 +111,7 @@ function! s:unit.test_lint_opt()
           \ 'lnum': 5,
           \ 'col': 9,
           \ 'filename': 'test/data/with-cabal/src/Foo/Bar.hs',
-          \ 'text': 'Redundant $',
+          \ 'text': 'Suggestion: Redundant $',
           \ }), l:qflist)
   finally
     unlet g:ghcmod_hlint_options
@@ -130,7 +130,7 @@ function! s:unit.test_lint_async_opt()
           \ 'lnum': 5,
           \ 'col': 9,
           \ 'filename': 'test/data/with-cabal/src/Foo/Bar.hs',
-          \ 'text': 'Redundant $',
+          \ 'text': 'Suggestion: Redundant $',
           \ }), a:qflist)
   endfunction
   call s:async(l:callback)

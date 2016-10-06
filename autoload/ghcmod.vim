@@ -183,7 +183,7 @@ function! ghcmod#expand(path) "{{{
   let l:dir = fnamemodify(a:path, ':h')
 
   let l:qflist = []
-  let l:cmd = ghcmod#build_command(['expand', "-b '\n'", a:path])
+  let l:cmd = ghcmod#build_command(["-b '\n'", 'expand', a:path])
   for l:line in split(ghcmod#system(l:cmd), '\n')
     let l:line = s:remove_dummy_prefix(l:line)
 
