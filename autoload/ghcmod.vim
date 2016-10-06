@@ -15,8 +15,8 @@ function! ghcmod#getHaskellIdentifier() "{{{
 endfunction "}}}
 
 function! ghcmod#info(fexp, path, ...) "{{{
-  let l:cmd = ghcmod#build_command(["-b \n", 'info', a:path, a:fexp])
-  let l:output = ghcmod#system(l:cmd)
+  let l:cmd = ghcmod#build_command(['info', a:path, a:fexp])
+  let l:output = join(split(s:system('info', l:cmd)[0], '\\n'), "\n")
   " Remove trailing newlines to prevent empty lines
   let l:output = substitute(l:output, '\n*$', '', '')
   return s:remove_dummy_prefix(l:output)
@@ -29,11 +29,11 @@ function! ghcmod#split(line, col, path, ...) "{{{
   if empty(l:lines)
     return []
   endif
-  let l:parsed = matchlist(l:lines[0], '\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\(.*\)"')
+  let l:parsed = matchlist(l:lines[0], '^\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\([^"]\+\)"$')
   if len(l:parsed) < 5
     return []
   endif
-  return split(l:parsed[5], '\n')
+  return split(l:parsed[5], '\\n')
 endfunction "}}}
 
 function! ghcmod#sig(line, col, path, ...) "{{{
@@ -48,10 +48,9 @@ endfunction "}}}
 
 function! ghcmod#type(line, col, path, ...) "{{{
   let l:cmd = ghcmod#build_command(['type', a:path, a:line, a:col])
-  let l:output = ghcmod#system(l:cmd)
   let l:types = []
-  for l:line in split(l:output, '\n')
-    let l:m = matchlist(l:line, '\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\([^"]\+\)"')
+  for l:line in s:system('type', l:cmd)
+    let l:m = matchlist(l:line, '^\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\([^"]\+\)"$')
     if !empty(l:m)
       call add(l:types, [map(l:m[1 : 4], 'str2nr(v:val, 10)'), l:m[5]])
     endif
@@ -114,7 +113,7 @@ function! ghcmod#parse_make(lines, basedir) "{{{
     else
       let l:qf.type = 'E'
     endif
-    let l:texts = split(l:rest, '\n')
+    let l:texts = split(l:rest, '\\n')
     if len(l:texts) > 0
       let l:qf.text = l:texts[0]
       call add(l:qflist, l:qf)
@@ -183,8 +182,8 @@ function! ghcmod#expand(path) "{{{
   let l:dir = fnamemodify(a:path, ':h')
 
   let l:qflist = []
-  let l:cmd = ghcmod#build_command(["-b '\n'", 'expand', a:path])
-  for l:line in split(ghcmod#system(l:cmd), '\n')
+  let l:cmd = ghcmod#build_command(['expand', a:path])
+  for l:line in s:system('expand', l:cmd)
     let l:line = s:remove_dummy_prefix(l:line)
 
     " path:line:col1-col2: message
@@ -245,7 +244,7 @@ function! ghcmod#add_autogen_dir(path, cmd) "{{{
 endfunction "}}}
 
 function! ghcmod#build_command(args) "{{{
-  let l:cmd = ['ghc-mod', '--silent']
+  let l:cmd = ['ghc-mod', '--silent', '-b\\n']
 
   let l:dist_top  = s:find_basedir() . '/dist'
   let l:sandboxes = split(glob(l:dist_top . '/dist-*', 1), '\n')
@@ -308,7 +307,7 @@ function! s:system(type, args) "{{{
     let [l:cond, l:status] = ghcmod#util#wait(l:proc)
     let l:tries = 1
     while l:cond ==# 'run'
-      if l:tries >= 50
+      if l:tries >= 500
         call l:proc.kill(15)  " SIGTERM
         call l:proc.waitpid()
         throw printf('ghcmod#make: `ghc-mod %s` takes too long time!', a:type)
