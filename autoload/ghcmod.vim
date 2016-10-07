@@ -295,21 +295,26 @@ function! ghcmod#build_command(args) "{{{
 endfunction "}}}
 
 " Cache a handle to the ghc-modi process.
-let s:ghc_modi_proc = {}
+let s:ghc_modi_procs = {}
 
 function! s:modi_command(args) "{{{
-  if s:ghc_modi_proc == {}
-    let l:ghcmodi_prog = ghcmod#build_command(["legacy-interactive"])
-    lcd `=ghcmod#basedir()`
-    let s:ghc_modi_proc = vimproc#popen2(ghcmodi_prog)
+  let l:basedir = ghcmod#basedir()
+
+  if has_key(s:ghc_modi_procs, l:basedir)
+    let l:ghc_modi_proc = s:ghc_modi_procs[l:basedir]
+  else
+    let l:ghc_modi_prog = ghcmod#build_command(["legacy-interactive"])
+    lcd `=l:basedir`
+    let l:ghc_modi_proc = vimproc#popen2(l:ghc_modi_prog)
     lcd -
+    let s:ghc_modi_procs[l:basedir] = l:ghc_modi_proc
   endif
 
-  call s:ghc_modi_proc.stdin.write(join(a:args) . "\n")
+  call l:ghc_modi_proc.stdin.write(join(a:args) . "\n")
 
   let l:res = []
   while 1
-    for l:line in s:ghc_modi_proc.stdout.read_lines()
+    for l:line in l:ghc_modi_proc.stdout.read_lines()
       if l:line == "OK"
         return l:res
       elseif line =~ "^NG "
@@ -323,13 +328,15 @@ function! s:modi_command(args) "{{{
 endfunction "}}}
 
 function! ghcmod#kill_modi(sig) "{{{
-  if s:ghc_modi_proc == {}
-    return
+  let l:basedir = ghcmod#basedir()
+
+  if has_key(s:ghc_modi_procs, l:basedir)
+    let l:ghc_modi_proc = s:ghc_modi_procs[l:basedir]
+    let l:ret = l:ghc_modi_proc.kill(a:sig)
+    call l:ghc_modi_proc.waitpid()
+    unlet s:ghc_modi_procs[l:basedir]
+    return l:ret
   endif
-  let l:ret = s:ghc_modi_proc.kill(a:sig)
-  call s:ghc_modi_proc.waitpid()
-  let s:ghc_modi_proc = {}
-  return l:ret
 endfunction "}}}
 
 function! ghcmod#system(...) "{{{
