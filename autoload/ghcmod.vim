@@ -310,7 +310,7 @@ function! s:modi_command(args) "{{{
     let s:ghc_modi_procs[l:basedir] = l:ghc_modi_proc
   endif
 
-  call l:ghc_modi_proc.stdin.write(join(a:args) . "\n")
+  call l:ghc_modi_proc.stdin.write("ascii-escape " . join(map(copy(a:args), '"\2" . v:val . "\3"')) . "\n")
 
   let l:res = []
   while 1
