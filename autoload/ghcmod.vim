@@ -291,9 +291,7 @@ function! s:modi_command(args) "{{{
     let l:ghc_modi_proc = s:ghc_modi_procs[l:basedir]
   else
     let l:ghc_modi_prog = ghcmod#build_command(["legacy-interactive"])
-    lcd `=l:basedir`
-    let l:ghc_modi_proc = vimproc#popen2(l:ghc_modi_prog)
-    lcd -
+    let l:ghc_modi_proc = s:plineopen3([{'args': l:ghc_modi_prog, 'fd': { 'stdin': '', 'stdout': '', 'stderr': '/dev/null' }}])
     let s:ghc_modi_procs[l:basedir] = l:ghc_modi_proc
   endif
 
