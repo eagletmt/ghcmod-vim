@@ -22,7 +22,7 @@ run_tests() {
 
 retval=0
 
-modonly_tests=(test/test_type.vim test/test_info.vim)
+modonly_tests=(test/test_{expand,info,split,type,command_sig_codegen,command_split,command_type}.vim)
 
 run_tests "test/test_*.vim"
 

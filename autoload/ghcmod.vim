@@ -21,12 +21,7 @@ function! ghcmod#getHaskellIdentifier() "{{{
 endfunction "}}}
 
 function! ghcmod#info(fexp, path, ...) "{{{
-  if s:use_modi
-    let l:lines = s:modi_command(['info', a:path, a:fexp])
-  else
-    let l:cmd = ghcmod#build_command(['info', a:path, a:fexp])
-    let l:lines = s:system('info', l:cmd)
-  endif
+  let l:lines = s:command(['info', a:path, a:fexp])
   let l:output = join(split(l:lines[0], '\\n'), "\n")
   " Remove trailing newlines to prevent empty lines
   let l:output = substitute(l:output, '\n*$', '', '')
@@ -35,8 +30,7 @@ endfunction "}}}
 
 function! ghcmod#split(line, col, path, ...) "{{{
   " `ghc-mod split` is available since v5.0.0.
-  let l:cmd = ghcmod#build_command(['split', a:path, a:line, a:col])
-  let l:lines = s:system('split', l:cmd)
+  let l:lines = s:command(['split', a:path, a:line, a:col])
   if empty(l:lines)
     return []
   endif
@@ -49,8 +43,7 @@ endfunction "}}}
 
 function! ghcmod#sig(line, col, path, ...) "{{{
   " `ghc-mod sig` is available since v5.0.0.
-  let l:cmd = ghcmod#build_command(['sig', a:path, a:line, a:col])
-  let l:lines = s:system('sig', l:cmd)
+  let l:lines = s:command(['sig', a:path, a:line, a:col])
   if len(l:lines) < 3
     return []
   endif
@@ -58,12 +51,7 @@ function! ghcmod#sig(line, col, path, ...) "{{{
 endfunction "}}}
 
 function! ghcmod#type(line, col, path, ...) "{{{
-  if s:use_modi
-    let l:lines = s:modi_command(['type', a:path, a:line, a:col])
-  else
-    let l:cmd = ghcmod#build_command(['type', a:path, a:line, a:col])
-    let l:lines = s:system('type', l:cmd)
-  endif
+  let l:lines = s:command(['type', a:path, a:line, a:col])
   let l:types = []
   for l:line in l:lines
     let l:m = matchlist(l:line, '^\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\([^"]\+\)"$')
@@ -198,8 +186,7 @@ function! ghcmod#expand(path) "{{{
   let l:dir = fnamemodify(a:path, ':h')
 
   let l:qflist = []
-  let l:cmd = ghcmod#build_command(['expand', a:path])
-  for l:line in s:system('expand', l:cmd)
+  for l:line in s:command(['expand', a:path])
     let l:line = s:remove_dummy_prefix(l:line)
 
     " path:line:col1-col2: message
@@ -325,6 +312,14 @@ function! s:modi_command(args) "{{{
       endif
     endfor
   endwhile
+endfunction "}}}
+
+function! s:command(args) "{{{
+  if s:use_modi
+    return s:modi_command(a:args)
+  else
+    return s:system(a:args[0], ghcmod#build_command(a:args))
+  endif
 endfunction "}}}
 
 function! ghcmod#kill_modi(sig) "{{{
