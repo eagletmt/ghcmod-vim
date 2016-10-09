@@ -138,21 +138,21 @@ function! ghcmod#parse_make(lines, basedir) "{{{
   return l:qflist
 endfunction "}}}
 
-function! s:build_make_command(type, path) "{{{
-  let l:cmd = ghcmod#build_command([a:type])
+function! s:build_make_args(type, path) "{{{
+  let l:args = [a:type]
   if a:type ==# 'lint'
     for l:hopt in get(g:, 'ghcmod_hlint_options', [])
-      call extend(l:cmd, ['-h', l:hopt])
+      call extend(l:args, ['-h', l:hopt])
     endfor
   endif
-  call add(l:cmd, a:path)
-  return l:cmd
+  call add(l:args, a:path)
+  return l:args
 endfunction "}}}
 
 function! ghcmod#make(type, path) "{{{
   try
-    let l:args = s:build_make_command(a:type, a:path)
-    return ghcmod#parse_make(s:system(a:type, l:args), b:ghcmod_basedir)
+    let l:lines = s:command(s:build_make_args(a:type, a:path))
+    return ghcmod#parse_make(l:lines, b:ghcmod_basedir)
   catch
     call ghcmod#util#print_error(printf('%s %s', v:throwpoint, v:exception))
   endtry
@@ -160,7 +160,7 @@ endfunction "}}}
 
 function! ghcmod#async_make(type, path, callback) "{{{
   let l:tmpfile = tempname()
-  let l:args = s:build_make_command(a:type, a:path)
+  let l:args = ghcmod#build_command(s:build_make_args(a:type, a:path))
   let l:proc = s:plineopen3([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
   let l:obj = {
         \ 'proc': l:proc,
