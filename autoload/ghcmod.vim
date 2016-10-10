@@ -108,6 +108,8 @@ function! ghcmod#parse_make(lines, basedir) "{{{
     if l:rest =~# '^Warning:'
       let l:qf.type = 'W'
       let l:rest = matchstr(l:rest, '^Warning:\s*\zs.*$')
+    elseif l:rest =~# '^Suggestion:'
+      let l:qf.type = 'W'
     elseif l:rest =~# '^Error:'
       let l:qf.type = 'E'
       let l:rest = matchstr(l:rest, '^Error:\s*\zs.*$')
