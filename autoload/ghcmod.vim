@@ -1,3 +1,9 @@
+if !exists("g:ghcmod_should_use_ghc_modi")
+  let g:ghcmod_should_use_ghc_modi = 1
+endif
+
+let s:use_modi = g:ghcmod_should_use_ghc_modi
+
 function! ghcmod#highlight_group() "{{{
   return get(g:, 'ghcmod_type_highlight', 'Search')
 endfunction "}}}
@@ -15,8 +21,8 @@ function! ghcmod#getHaskellIdentifier() "{{{
 endfunction "}}}
 
 function! ghcmod#info(fexp, path, ...) "{{{
-  let l:cmd = ghcmod#build_command(["-b \n", 'info', a:path, a:fexp])
-  let l:output = ghcmod#system(l:cmd)
+  let l:lines = s:command(['info', a:path, a:fexp])
+  let l:output = join(split(l:lines[0], '\\n'), "\n")
   " Remove trailing newlines to prevent empty lines
   let l:output = substitute(l:output, '\n*$', '', '')
   return s:remove_dummy_prefix(l:output)
@@ -24,22 +30,20 @@ endfunction "}}}
 
 function! ghcmod#split(line, col, path, ...) "{{{
   " `ghc-mod split` is available since v5.0.0.
-  let l:cmd = ghcmod#build_command(['split', a:path, a:line, a:col])
-  let l:lines = s:system('split', l:cmd)
+  let l:lines = s:command(['split', a:path, a:line, a:col])
   if empty(l:lines)
     return []
   endif
-  let l:parsed = matchlist(l:lines[0], '\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\(.*\)"')
+  let l:parsed = matchlist(l:lines[0], '^\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\([^"]\+\)"$')
   if len(l:parsed) < 5
     return []
   endif
-  return split(l:parsed[5], '\n')
+  return split(l:parsed[5], '\\n')
 endfunction "}}}
 
 function! ghcmod#sig(line, col, path, ...) "{{{
   " `ghc-mod sig` is available since v5.0.0.
-  let l:cmd = ghcmod#build_command(['sig', a:path, a:line, a:col])
-  let l:lines = s:system('sig', l:cmd)
+  let l:lines = s:command(['sig', a:path, a:line, a:col])
   if len(l:lines) < 3
     return []
   endif
@@ -47,11 +51,10 @@ function! ghcmod#sig(line, col, path, ...) "{{{
 endfunction "}}}
 
 function! ghcmod#type(line, col, path, ...) "{{{
-  let l:cmd = ghcmod#build_command(['type', a:path, a:line, a:col])
-  let l:output = ghcmod#system(l:cmd)
+  let l:lines = s:command(['type', a:path, a:line, a:col])
   let l:types = []
-  for l:line in split(l:output, '\n')
-    let l:m = matchlist(l:line, '\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\([^"]\+\)"')
+  for l:line in l:lines
+    let l:m = matchlist(l:line, '^\(\d\+\) \(\d\+\) \(\d\+\) \(\d\+\) "\([^"]\+\)"$')
     if !empty(l:m)
       call add(l:types, [map(l:m[1 : 4], 'str2nr(v:val, 10)'), l:m[5]])
     endif
@@ -114,7 +117,7 @@ function! ghcmod#parse_make(lines, basedir) "{{{
     else
       let l:qf.type = 'E'
     endif
-    let l:texts = split(l:rest, '\n')
+    let l:texts = split(l:rest, '\\n')
     if len(l:texts) > 0
       let l:qf.text = l:texts[0]
       call add(l:qflist, l:qf)
@@ -135,21 +138,21 @@ function! ghcmod#parse_make(lines, basedir) "{{{
   return l:qflist
 endfunction "}}}
 
-function! s:build_make_command(type, path) "{{{
-  let l:cmd = ghcmod#build_command([a:type])
+function! s:build_make_args(type, path) "{{{
+  let l:args = [a:type]
   if a:type ==# 'lint'
     for l:hopt in get(g:, 'ghcmod_hlint_options', [])
-      call extend(l:cmd, ['-h', l:hopt])
+      call extend(l:args, ['-h', l:hopt])
     endfor
   endif
-  call add(l:cmd, a:path)
-  return l:cmd
+  call add(l:args, a:path)
+  return l:args
 endfunction "}}}
 
 function! ghcmod#make(type, path) "{{{
   try
-    let l:args = s:build_make_command(a:type, a:path)
-    return ghcmod#parse_make(s:system(a:type, l:args), b:ghcmod_basedir)
+    let l:lines = s:command(s:build_make_args(a:type, a:path))
+    return ghcmod#parse_make(l:lines, b:ghcmod_basedir)
   catch
     call ghcmod#util#print_error(printf('%s %s', v:throwpoint, v:exception))
   endtry
@@ -157,7 +160,7 @@ endfunction "}}}
 
 function! ghcmod#async_make(type, path, callback) "{{{
   let l:tmpfile = tempname()
-  let l:args = s:build_make_command(a:type, a:path)
+  let l:args = ghcmod#build_command(s:build_make_args(a:type, a:path))
   let l:proc = s:plineopen3([{'args': l:args,  'fd': { 'stdin': '', 'stdout': l:tmpfile, 'stderr': '' }}])
   let l:obj = {
         \ 'proc': l:proc,
@@ -183,8 +186,7 @@ function! ghcmod#expand(path) "{{{
   let l:dir = fnamemodify(a:path, ':h')
 
   let l:qflist = []
-  let l:cmd = ghcmod#build_command(['expand', "-b '\n'", a:path])
-  for l:line in split(ghcmod#system(l:cmd), '\n')
+  for l:line in s:command(['expand', a:path])
     let l:line = s:remove_dummy_prefix(l:line)
 
     " path:line:col1-col2: message
@@ -245,7 +247,7 @@ function! ghcmod#add_autogen_dir(path, cmd) "{{{
 endfunction "}}}
 
 function! ghcmod#build_command(args) "{{{
-  let l:cmd = ['ghc-mod', '--silent']
+  let l:cmd = ['ghc-mod', '--silent', '-b\\n']
 
   let l:dist_top  = s:find_basedir() . '/dist'
   let l:sandboxes = split(glob(l:dist_top . '/dist-*', 1), '\n')
@@ -279,6 +281,57 @@ function! ghcmod#build_command(args) "{{{
   return l:cmd
 endfunction "}}}
 
+" Cache a handle to the ghc-modi process.
+let s:ghc_modi_procs = {}
+
+function! s:modi_command(args) "{{{
+  let l:basedir = ghcmod#basedir()
+
+  if has_key(s:ghc_modi_procs, l:basedir)
+    let l:ghc_modi_proc = s:ghc_modi_procs[l:basedir]
+  else
+    let l:ghc_modi_prog = ghcmod#build_command(["legacy-interactive"])
+    let l:ghc_modi_proc = s:plineopen3([{'args': l:ghc_modi_prog, 'fd': { 'stdin': '', 'stdout': '', 'stderr': '/dev/null' }}])
+    let s:ghc_modi_procs[l:basedir] = l:ghc_modi_proc
+  endif
+
+  call l:ghc_modi_proc.stdin.write("ascii-escape " . join(map(copy(a:args), '"\2" . v:val . "\3"')) . "\n")
+
+  let l:res = []
+  while 1
+    for l:line in l:ghc_modi_proc.stdout.read_lines()
+      if l:line == "OK"
+        return l:res
+      elseif line =~ "^NG "
+        echoerr "ghc-modi terminated with message: " . join(l:res, "\n")
+        return ''
+      elseif len(line) > 0
+        let l:res += [l:line]
+      endif
+    endfor
+  endwhile
+endfunction "}}}
+
+function! s:command(args) "{{{
+  if s:use_modi
+    return s:modi_command(a:args)
+  else
+    return s:system(a:args[0], ghcmod#build_command(a:args))
+  endif
+endfunction "}}}
+
+function! ghcmod#kill_modi(sig) "{{{
+  let l:basedir = ghcmod#basedir()
+
+  if has_key(s:ghc_modi_procs, l:basedir)
+    let l:ghc_modi_proc = s:ghc_modi_procs[l:basedir]
+    let l:ret = l:ghc_modi_proc.kill(a:sig)
+    call l:ghc_modi_proc.waitpid()
+    unlet s:ghc_modi_procs[l:basedir]
+    return l:ret
+  endif
+endfunction "}}}
+
 function! ghcmod#system(...) "{{{
   let l:dir = getcwd()
   try
@@ -308,7 +361,7 @@ function! s:system(type, args) "{{{
     let [l:cond, l:status] = ghcmod#util#wait(l:proc)
     let l:tries = 1
     while l:cond ==# 'run'
-      if l:tries >= 50
+      if l:tries >= 500
         call l:proc.kill(15)  " SIGTERM
         call l:proc.waitpid()
         throw printf('ghcmod#make: `ghc-mod %s` takes too long time!', a:type)
