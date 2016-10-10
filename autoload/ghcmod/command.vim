@@ -261,7 +261,7 @@ function! ghcmod#command#kill_modi(force) "{{{
   if a:force
     let l:sig = g:vimproc#SIGKILL
   else
-    let l:sig = g:vimproc#SIGTERM
+    let l:sig = g:vimproc#SIGINT
   endif
   let l:ret = ghcmod#kill_modi(l:sig)
   if l:ret
