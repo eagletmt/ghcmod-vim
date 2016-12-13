@@ -110,6 +110,12 @@ function! GhcModQuickFix()
 endfunction
 ```
 
+If you want to use the location list instead of the quickfix list, set `g:ghcmod_use_loclist`.
+
+```vim
+let g:ghcmod_use_loclist = 1
+```
+
 ### :GhcModCheckAsync, :GhcModLintAsync, :GhcModCheckAndLintAsync
 You can run check and/or lint asynchronously.
 

@@ -187,10 +187,10 @@ function! ghcmod#command#make(type, force) "{{{
     return
   endif
 
-  let l:qflist = ghcmod#make(a:type, l:path)
-  call setqflist(l:qflist)
+  let l:list = ghcmod#make(a:type, l:path)
+  call s:set_list(l:list)
   call s:open_quickfix()
-  if empty(l:qflist)
+  if empty(l:list)
     echo printf('ghc-mod %s: No errors found', a:type)
   endif
 endfunction "}}}
@@ -202,14 +202,14 @@ function! ghcmod#command#async_make(type, force) "{{{
   endif
 
   let l:callback = { 'type': a:type }
-  function! l:callback.on_finish(qflist)
-    call setqflist(a:qflist)
+  function! l:callback.on_finish(list)
+    call s:set_list(a:list)
     call s:open_quickfix()
     if &l:buftype ==# 'quickfix'
       " go back to original window
       wincmd p
     endif
-    if empty(a:qflist)
+    if empty(a:list)
       echomsg printf('ghc-mod %s(async): No errors found', self.type)
     endif
   endfunction
@@ -224,18 +224,18 @@ function! ghcmod#command#check_and_lint_async(force) "{{{
   endif
 
   let l:callback = { 'first': 1 }
-  function! l:callback.on_finish(qflist)
+  function! l:callback.on_finish(list)
     if self.first
-      call setqflist(a:qflist)
+      call s:set_list(a:list)
       let self.first = 0
     else
-      call setqflist(a:qflist, 'a')
+      call s:set_list(a:list, 'a')
       call s:open_quickfix()
       if &l:buftype ==# 'quickfix'
         " go back to original window
         wincmd p
       endif
-      if empty(getqflist())
+      if empty(s:get_list())
         echomsg 'ghc-mod check and lint(async): No errors found'
       endif
     endif
@@ -253,14 +253,38 @@ function! ghcmod#command#expand(force) "{{{
     return
   endif
 
-  call setqflist(ghcmod#expand(l:path))
+  call s:set_list(ghcmod#expand(l:path))
   call s:open_quickfix()
+endfunction "}}}
+
+function! s:get_list() "{{{
+  let l:use_loclist = get(g:, 'ghcmod_use_loclist', 0)
+  if l:use_loclist
+    return getloclist(0)
+  else
+    return getqflist()
+  endif
+endfunction "}}}
+
+function! s:set_list(...) "{{{
+  let l:use_loclist = get(g:, 'ghcmod_use_loclist', 0)
+  if l:use_loclist
+    let l:args = [0] + a:000
+    call call('setloclist', l:args)
+  else
+    call call('setqflist', a:000)
+  endif
 endfunction "}}}
 
 function! s:open_quickfix() "{{{
   let l:func = get(g:, 'ghcmod_open_quickfix_function', '')
   if empty(l:func)
-    cwindow
+    let l:use_loclist = get(g:, 'ghcmod_use_loclist', 0)
+    if l:use_loclist
+      lwindow
+    else
+      cwindow
+    endif
   else
     try
       call call(l:func, [])
