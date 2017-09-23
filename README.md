@@ -177,4 +177,4 @@ See wiki page [Customize](https://github.com/eagletmt/ghcmod-vim/wiki/Customize)
 ## License
 [BSD3 License](http://www.opensource.org/licenses/BSD-3-Clause), the same license as ghc-mod.
 
-Copyright (c) 2012-2013, eagletmt
+Copyright (c) 2012-2017, eagletmt
