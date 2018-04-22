@@ -246,6 +246,9 @@ endfunction "}}}
 
 function! ghcmod#build_command(args) "{{{
   let l:cmd = ['ghc-mod', '--silent']
+  if get(g:, 'ghcmod_use_stack', 0)
+    let l:cmd = ['stack', 'exec', '--'] + l:cmd
+  endif
 
   let l:dist_top  = s:find_basedir() . '/dist'
   let l:sandboxes = split(glob(l:dist_top . '/dist-*', 1), '\n')
