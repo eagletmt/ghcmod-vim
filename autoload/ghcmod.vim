@@ -85,6 +85,10 @@ function! s:fix_qf_lnum_col(qf) "{{{
   endfor
 endfunction "}}}
 
+function! s:filename_to_modulename(filename)
+  return substitute(substitute(fnamemodify(a:filename, ":r"), '^\/\?\(\l\f\{-}\/\)\+', '', 'g'), '\/', '.', 'g')
+endfunction
+
 function! ghcmod#parse_make(lines, basedir) "{{{
   " `ghc-mod check` and `ghc-mod lint` produces <NUL> characters but Vim cannot
   " treat them correctly.  Vim converts <NUL> characters to <NL> in readfile().
@@ -104,6 +108,7 @@ function! ghcmod#parse_make(lines, basedir) "{{{
       break
     end
     let [l:qf.filename, _, l:qf.lnum, l:qf.col, l:rest] = l:m[1 : 5]
+    let l:qf.module = s:filename_to_modulename(l:qf.filename)
     let l:qf.filename = ghcmod#util#join_path(a:basedir, l:qf.filename)
     if l:rest =~# '^Warning:'
       let l:qf.type = 'W'
@@ -183,7 +188,8 @@ function! ghcmod#expand(path) "{{{
   let l:dir = fnamemodify(a:path, ':h')
 
   let l:qflist = []
-  let l:cmd = ghcmod#build_command(['expand', "-b '\n'", a:path])
+  let l:cmd = ghcmod#build_command(['expand', a:path])
+  let g:cmd = l:cmd
   for l:line in split(ghcmod#system(l:cmd), '\n')
     let l:line = s:remove_dummy_prefix(l:line)
 
@@ -193,6 +199,7 @@ function! ghcmod#expand(path) "{{{
     if !empty(l:m)
       let l:qf = {}
       let [l:qf.filename, _, l:qf.lnum, l:qf.col, l:col2, l:qf.text] = l:m[1 : 6]
+      let l:qf.module = s:filename_to_modulename(l:qf.filename)
       call add(l:qflist, l:qf)
       if !empty(l:col2)
         let l:qf2 = deepcopy(l:qf)
@@ -205,8 +212,9 @@ function! ghcmod#expand(path) "{{{
       let l:m = matchlist(l:line, '^\s*\(\(\f\| \)\+\):(\(\d\+\),\(\d\+\))-(\(\d\+\),\(\d\+\))\%(:\s*\(.*\)\)\?$')
       if !empty(l:m)
         let [l:filename, _, l:lnum1, l:col1, l:lnum2, l:col2, l:text] = l:m[1 : 7]
-        call add(l:qflist, { 'filename': l:filename, 'lnum': l:lnum1, 'col': l:col1, 'text': l:text })
-        call add(l:qflist, { 'filename': l:filename, 'lnum': l:lnum2, 'col': l:col2, 'text': 'Splicing end here' })
+        let l:modulename = s:filename_to_modulename(l:filename)
+        call add(l:qflist, { 'filename': l:filename, 'module': s:modulename, 'lnum': l:lnum1, 'col': l:col1, 'text': l:text })
+        call add(l:qflist, { 'filename': l:filename, 'module': s:modulename, 'lnum': l:lnum2, 'col': l:col2, 'text': 'Splicing end here' })
       else
         " message
         let l:text = substitute(l:line, '^\s\{2\}', '', '')
