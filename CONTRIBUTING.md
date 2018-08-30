@@ -14,7 +14,7 @@ It shows your environment information possibly related to ghcmod.vim.
 - Filetype status
     - ghcmod.vim is a ftplugin. See `:help filetype-overview` and `:help filetype-plugins`.
 - ghc-mod executable
-    - ghcmod.vim requires [ghc-mod](https://github.com/kazu-yamamoto/ghc-mod) and it must be placed in your `$PATH`.
+    - ghcmod.vim requires [ghc-mod](https://github.com/kazu-yamamoto/ghc-mod). It must be placed in your `$PATH` or must be executable via `stack exec`
 - vimproc.vim
     - ghcmod.vim requires [vimproc.vim](https://github.com/Shougo/vimproc.vim).
 - ghc-mod version

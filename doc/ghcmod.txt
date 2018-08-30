@@ -233,6 +233,9 @@ g:ghcmod_open_quickfix_function              *g:ghcmod_open_quickfix_function*
 	  CtrlPQuickfix
 	endfunction
 <
+
+g:ghcmod_stack_exec                                      *g:ghcmod_stack_exec*
+  This flag modifies ghcmod-vim to invoke ghc-mod via `stack exec -- ghc-mod`.
 ==============================================================================
 CUSTOMIZE                                                   *ghcmod-customize*
 

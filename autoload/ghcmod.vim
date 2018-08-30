@@ -245,7 +245,7 @@ function! ghcmod#add_autogen_dir(path, cmd) "{{{
 endfunction "}}}
 
 function! ghcmod#build_command(args) "{{{
-  let l:cmd = ['ghc-mod', '--silent']
+  let l:cmd = ghcmod#util#basic_command() + ['--silent']
 
   let l:dist_top  = s:find_basedir() . '/dist'
   let l:sandboxes = split(glob(l:dist_top . '/dist-*', 1), '\n')
@@ -334,6 +334,7 @@ function! ghcmod#basedir() "{{{
 endfunction "}}}
 
 function! s:find_basedir() "{{{
+  let args = ghcmod#util#basic_command() + ['--silent', 'root']
   " search Cabal file
   if !exists('b:ghcmod_basedir')
     " `ghc-mod root` is available since v4.0.0.
@@ -341,7 +342,7 @@ function! s:find_basedir() "{{{
     try
       lcd `=expand('%:p:h')`
       let b:ghcmod_basedir =
-        \ substitute(vimproc#system(['ghc-mod', '--silent', 'root']), '\n*$', '', '')
+        \ substitute(vimproc#system(args), '\n*$', '', '')
     finally
       lcd `=l:dir`
     endtry

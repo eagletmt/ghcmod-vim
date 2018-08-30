@@ -22,7 +22,13 @@ endif
 if !exists('s:has_ghc_mod')
   let s:has_ghc_mod = 0
 
-  if !executable('ghc-mod')
+  if get(g:, "ghcmod_stack_exec", 0)
+    let s:ghcmod_path = substitute(system('stack exec -- which ghc-mod'), '\n\+$', '', '')
+  else
+    let s:ghcmod_path = 'ghc-mod'
+  endif
+
+  if !executable(s:ghcmod_path)
     call ghcmod#util#print_error('ghcmod: ghc-mod is not executable!')
     finish
   endif

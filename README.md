@@ -171,6 +171,9 @@ ghcmod-vim will insert:
     cString x = _cString_body
 ```
 
+## Stack Support
+If you've built/installed ghc-mod using stack and typically invoke it using `stack exec -- ghc-mod ...`, just set `g:ghcmod_stack_exec = 1` in your `~/.vimrc`
+
 ## Customize
 See wiki page [Customize](https://github.com/eagletmt/ghcmod-vim/wiki/Customize).
 

@@ -38,6 +38,16 @@ else
   endfunction
 endif "}}}
 
+function! ghcmod#util#basic_command()
+  " Should we invoke ghc-mod via `stack exec -- ghc-mod`?
+  if get(g:, "ghcmod_stack_exec", 0)
+    let args = ['stack', 'exec', '--', 'ghc-mod']
+  else
+    let args = ['ghc-mod']
+  endif
+  return args
+endfunction
+
 function! ghcmod#util#join_path(dir, path) "{{{
   if ghcmod#util#is_abspath(a:path)
     return a:path
@@ -106,7 +116,8 @@ endfunction "}}}
 
 function! ghcmod#util#ghc_mod_version() "{{{
   if !exists('s:ghc_mod_version')
-    let l:ghcmod = vimproc#system(['ghc-mod','version'])
+    let l:cmd = ghcmod#util#basic_command() + ['version']
+    let l:ghcmod = vimproc#system(l:cmd)
     let l:m = matchlist(l:ghcmod, 'version \(\d\+\)\.\(\d\+\)\.\(\d\+\)')
     if empty(l:m)
       if match(l:ghcmod, 'version 0 ') == -1
